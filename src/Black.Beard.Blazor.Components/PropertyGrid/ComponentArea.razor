@@ -1,0 +1,23 @@
+﻿@inherits ComponentFieldBase<string>
+@using MudBlazor
+
+<label class="mud-input-label mud-input-label-animated mud-input-label-outlined mud-input-label-margin-dense mud-input-label-inputcontrol">test1</label>
+
+<textarea maxlength="@Property.Maximum"
+          disabled="@Property.ReadOnly"
+          rows="5"
+          cols="60"
+          onchange="@((ChangeEventArgs e) => HandleOnChange(e))">
+        @Value
+    </textarea>
+
+<MudTextField T="string"
+              Label="@Property.GetDisplay()"
+              HelperText="@Property.GetDescription()"
+              @bind-Value="Value"
+              Validation="Validate"
+              Disabled="@Property.ReadOnly"
+              Variant="Variant.Outlined"
+              Margin="Margin.Dense" />
+
+

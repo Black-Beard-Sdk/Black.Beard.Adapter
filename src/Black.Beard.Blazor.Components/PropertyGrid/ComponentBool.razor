@@ -1,0 +1,16 @@
+﻿@inherits ComponentFieldBase<bool>
+@using MudBlazor
+
+    <MudCheckBox           
+        Label="@Property.GetDisplay()"
+        HelperText="@Property.GetDescription()"
+
+        @bind-Checked="Value"
+
+        Disabled="@Property.ReadOnly"
+      
+        Variant="Variant.Outlined" 
+        Margin="Margin.Dense"
+
+        />
+

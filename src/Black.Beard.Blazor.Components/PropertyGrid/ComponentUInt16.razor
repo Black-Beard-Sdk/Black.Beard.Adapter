@@ -1,0 +1,24 @@
+﻿@inherits ComponentFieldBase<UInt16>
+@using MudBlazor
+
+    <MudNumericField 
+
+        T="UInt16"
+        @bind-Value="Value"
+        
+        Label="@Property.GetDisplay()"
+        HelperText="@Property.GetDescription()"
+        
+        Validation="Validate"
+        Disabled="@Property.ReadOnly"
+        Format="@Property.DataFormatString"
+
+        Variant="Variant.Outlined" 
+        
+        Min="@GetMinimum()"
+        Max="@GetMaximum()"
+        Step="@GetStep()"
+
+        />
+
+        

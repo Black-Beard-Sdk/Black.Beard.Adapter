@@ -1,0 +1,43 @@
+﻿@page "/PropertyGridView"
+@using Bb.CustomComponents
+@using MudBlazor
+@using Bb.ComponentModel.Translations
+
+<MudCard>
+    <MudItem>
+        <MudPaper>
+
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                @if (Descriptor != null && Descriptor.Items != null)
+                {
+
+                    <MudCard>
+                        @if (WithGroup)
+                        {
+                            @foreach (TranslatedKeyLabel category in Descriptor.Categories())
+                            {
+
+                                <MudExpansionPanel Text="@TranslateService.Translate(category)" IsExpanded="true">
+                                    @foreach (PropertyObjectDescriptor property in Descriptor.ItemsByCategories(category))
+                                    {
+                                        <DynamicComponent Type="@property.EditorType" Parameters="@property.Parameters" />
+                                    }
+                                </MudExpansionPanel>
+
+                            }
+                        }
+                        else
+                        {
+                            @foreach (PropertyObjectDescriptor property in Descriptor.Items)
+                            {
+                                <DynamicComponent Type="@property.EditorType" Parameters="@property.Parameters" />
+                            }
+                        }
+                    </MudCard>
+
+                }
+            </MudForm>
+
+        </MudPaper>
+    </MudItem>
+</MudCard>

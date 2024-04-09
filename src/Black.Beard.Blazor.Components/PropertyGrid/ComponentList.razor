@@ -1,0 +1,50 @@
+﻿@inherits ComponentFieldBaseList
+@using Bb.CustomComponents
+@using MudBlazor
+
+<MudPaper Elevation="25">
+    <MudToolBar Dense="true">
+        <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="Add" />
+        @*<MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" OnClick="Add" />*@
+    </MudToolBar>
+</MudPaper>
+
+<MudSimpleTable Style="overflow-x: auto;height:150px" Dense="true">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            @foreach (PropertyObjectDescriptor h in Headings())
+            {
+                <th>@h.GetDisplay()</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Rows)
+        {
+            <tr>
+                <td><MudIconButton Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => Edit(row))" /></td>
+                <td><MudIconButton Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => Del(row))" /></td>
+                @foreach (var itemCol in Descriptor.Items)
+                {
+                    <td>@itemCol.Value</td>
+                }
+            </tr>
+        }
+    </tbody>
+</MudSimpleTable>
+
+<PropertyGrid SelectedObject="@CurrentItem" PropertyHasChanged="PropertyHasChanged" />
+
+<MudMessageBox @ref="mbox" Title="@Property.Parent.TranslateService.Translate("p:PropertyGrid,k:RemoveItemTitle,l:en-us,d:Remove item ?")" CancelText="@Property.Parent.TranslateService.Translate("p:PropertyGrid,k:CancelButton,l:en-us,d:Cancel ?")">
+
+    <MessageContent>
+        @Property.Parent.TranslateService.Translate("p:PropertyGrid,k:RemoveItemQuestion,l:en-us,d:Are you sure you want remove this item ?")
+    </MessageContent>
+
+    <YesButton>
+        <MudButton Variant="Variant.Filled" OnClick="@(() => Remove())" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete">@Property.Parent.TranslateService.Translate("p:PropertyGrid,k:RemoveButton,l:en-us,d:Delete")</MudButton>
+    </YesButton>
+
+</MudMessageBox>

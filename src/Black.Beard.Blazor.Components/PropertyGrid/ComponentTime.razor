@@ -1,0 +1,10 @@
+﻿@inherits ComponentFieldBase<TimeSpan>
+    @using MudBlazor
+
+    <MudTimePicker Label="@Property.GetDisplay()"
+                   HelperText="@Property.GetDescription()"
+                   AmPm="true"
+                   TimeFormat="h:mm tt"
+                   @bind-Time="Time"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense" />

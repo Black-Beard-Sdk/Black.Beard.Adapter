@@ -1,0 +1,14 @@
+﻿@inherits ComponentFieldBase<DateTime>
+@using MudBlazor
+
+    <MudDatePicker 
+        Label="@Property.GetDisplay()" 
+        Editable="@(!Property.ReadOnly)" 
+        @bind-Date="Date" 
+        Placeholder="@Property.GetDescription()"
+        Variant="Variant.Outlined" 
+        Margin="Margin.Dense"
+        />
+
+        
+    

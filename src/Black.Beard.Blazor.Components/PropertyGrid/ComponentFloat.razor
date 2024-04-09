@@ -1,0 +1,25 @@
+﻿@inherits ComponentFieldBase<float>
+@using MudBlazor
+
+    <MudNumericField 
+
+        T="float"
+        
+        @bind-Value="Value"
+        
+        Label="@Property.GetDisplay()"
+        HelperText="@Property.GetDescription()"
+        Disabled="@Property.ReadOnly"
+        Validation="Validate"
+
+        Format="@Property.DataFormatString"
+
+        Variant="Variant.Outlined" 
+        
+        Min="@GetMinimum()"
+        Max="@GetMaximum()"
+        
+        Step="@GetStep()"
+
+        />
+

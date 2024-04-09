@@ -1,0 +1,23 @@
+﻿@inherits ComponentFieldBase<ListItem>
+@using MudBlazor
+@using Bb.ComponentModel.DataAnnotations
+
+<MudSelect 
+        T="ListItem" 
+        Label="@Property.GetDisplay()" 
+        Variant="Variant.Outlined"
+        Dense="true"
+        @bind-Value="Value"
+        HelperText="@Property.GetDescription()"
+        AnchorOrigin="Origin.BottomCenter">
+
+
+    @foreach (var item in Items)
+    {
+        <MudSelectItem Value="@(item)">@item.Display</MudSelectItem>
+    }
+
+</MudSelect>
+
+
+

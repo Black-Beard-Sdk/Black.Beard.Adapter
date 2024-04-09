@@ -1,0 +1,9 @@
+﻿@inherits ComponentFieldBase
+@typeparam T
+@using MudBlazor
+
+<MudTreeView T="T" Dense="true" Items="@Items">
+    <MudTreeViewItem Value="@("Components")">
+        <MudTreeViewItem Value="@("Avatar")" />
+    </MudTreeViewItem>
+</MudTreeView>

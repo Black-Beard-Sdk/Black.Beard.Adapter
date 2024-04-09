@@ -1,0 +1,25 @@
+﻿@inherits ComponentFieldBase<decimal>
+@using MudBlazor
+
+    <MudNumericField 
+
+        T="decimal"
+        
+        @bind-Value="Value"
+        
+        Label="@Property.GetDisplay()"
+        HelperText="@Property.GetDescription()"
+        
+        Validation="Validate"
+        Disabled="@Property.ReadOnly"
+        Format="@Property.DataFormatString"
+
+        Variant="Variant.Outlined" 
+        
+        Min="@GetMinimum()"
+        Max="@GetMaximum()"
+        
+        Step="@GetStep()"
+
+        />
+

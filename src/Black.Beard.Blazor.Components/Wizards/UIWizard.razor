@@ -1,0 +1,34 @@
+﻿@using Bb.PropertyGrid
+@using Microsoft.FluentUI.AspNetCore.Components
+
+
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel>
+            @Content.CurrentPage.Description
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+
+<FluentDialogBody>
+
+    <PropertyGridView 
+        SelectedObject="@CurrentModel" 
+        PropertyHasChanged="PropertyHasChanged" 
+        PropertyFilter="PropertyFilter"
+        @ref="CurrentPropertyGridView" />
+
+</FluentDialogBody>
+
+
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Neutral" Disabled="@DisableCanCancel" OnClick="@Cancel">&nbsp;&nbsp;<FluentIcon Value="@(new Icons.Regular.Size24.Delete())" />&nbsp;Cancel&nbsp;&nbsp;</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" Disabled="@DisableCanPrevious" OnClick="@GoToPreviousStep">&nbsp;&nbsp;<FluentIcon Value="@(new Icons.Regular.Size24.PreviousFrame())" />Previous&nbsp;&nbsp;</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" Disabled="@DisableCanNext" OnClick="@GoToNextStep">&nbsp;&nbsp;Next<FluentIcon Value="@(new Icons.Regular.Size24.NextFrame())" />&nbsp;&nbsp;</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" Disabled="@DisableCanValidate" OnClick="@Apply">&nbsp;&nbsp;Submit<FluentIcon Value="@(new Icons.Regular.Size24.Checkmark())" />&nbsp;&nbsp;</FluentButton>
+</FluentDialogFooter>
+
+
+

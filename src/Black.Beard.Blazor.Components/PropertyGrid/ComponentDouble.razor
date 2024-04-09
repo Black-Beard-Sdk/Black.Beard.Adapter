@@ -1,0 +1,17 @@
+﻿@inherits ComponentFieldBase<double>
+@using MudBlazor
+
+<MudNumericField 
+        T="double"
+        @bind-Value="Value"
+        Label="@Property.GetDisplay()"
+        HelperText="@Property.GetDescription()"
+        Validation="Validate"
+        Format="@Property.DataFormatString"
+        Variant="Variant.Outlined"
+        Disabled="@Property.ReadOnly"
+        Min="@GetMinimum()"
+        Max="@GetMaximum()"
+
+        Step="@GetStep()" />
+
