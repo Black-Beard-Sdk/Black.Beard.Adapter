@@ -10,17 +10,17 @@ namespace Bb.PropertyGrid
         public ComponentTime()
         {
 
-        }              
+        }
 
-        public TimeSpan? Time
+        public DateTime? Time
         {
             get
             {
-                return base.Value;
+                return new DateTime(base.Value.Ticks);
             }
             set
             {
-                base.Value = value.Value;
+                base.Value = new TimeSpan(0, value.Value.Hour, value.Value.Minute, value.Value.Second);
             }
         }
 

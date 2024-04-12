@@ -1,25 +1,18 @@
-﻿@inherits ComponentFieldBase<Int32>
-@using MudBlazor
+﻿@using Microsoft.FluentUI.AspNetCore.Components
+@inherits ComponentFieldBase<Int32>
 
-    <MudNumericField 
+<FluentLabel Typo="@LabelTypography"
+             Color="@LabelColor"
+             Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
 
-        T="Int32"
-        
-        @bind-Value="Value"
-        
-        Label="@Property.GetDisplay()"
-        HelperText="@Property.GetDescription()"
-        
-        Validation="Validate"
-        Disabled="@Property.ReadOnly"
-        Format="@Property.DataFormatString"
+<FluentNumberField @bind-Value="Value"
+                   Appearance="FluentInputAppearance.Filled"
+                   
+                   style="width: 80%;"
+                   oninput="@(c => c.ToString())"
+                   Min="@GetMinimum()"
+                   Max="@GetMaximum()"
+                   Step="@GetStep()"
+                   ReadOnly="@IsReadOnly" />
 
-        Variant="Variant.Outlined" 
-        
-        Min="@GetMinimum()"
-        Max="@GetMaximum()"
-
-        Step="@GetStep()"
-
-        />
 

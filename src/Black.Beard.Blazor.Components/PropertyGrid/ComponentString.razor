@@ -1,18 +1,15 @@
 ﻿@inherits ComponentFieldBase<string>
 @using Microsoft.FluentUI.AspNetCore.Components
 
-
-<FluentLabel 
-    Typo="@LabelTypography" 
-    Color="@LabelColor" 
-    Alignment="LabelHorizontalAlignment"
-    >@Property.GetDisplay()</FluentLabel>
+<FluentLabel Typo="@LabelTypography"
+             Color="@LabelColor"
+             Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
 
 <FluentTextField 
-    @bind-Value=CurrentValue 
+    @bind-Value=Value 
     Placeholder="@Property.GetDescription()" 
-    style="width: 100%;" ReadOnly="@IsReadOnly"
-    ></FluentTextField>
+    style="width: 80%;"
+    ReadOnly="@IsReadOnly"></FluentTextField>
 
 
 

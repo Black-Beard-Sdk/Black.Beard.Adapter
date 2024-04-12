@@ -14,6 +14,9 @@ namespace Bb.PropertyGrid
     {
 
 
+        [Parameter]
+        public string StrategyName { get; set; }
+
 
         [Parameter]
         public PropertyObjectDescriptor? Property
@@ -26,6 +29,13 @@ namespace Bb.PropertyGrid
             }
         }
 
+        protected string Translate(string key)
+        {
+            return TranslateService.Translate(key);
+        }
+
+        [Inject]
+        public ITranslateService TranslateService { get; set; }
 
         public bool IsReadOnly => Property?.ReadOnly ?? false;
 

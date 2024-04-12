@@ -7,6 +7,8 @@ using Microsoft.FluentUI.AspNetCore.Components;
 using MudBlazor.Services;
 using Bb.Extensions;
 using Bb.Modules;
+using Bb.ComponentModel.Factories;
+using Microsoft.AspNetCore.Components;
 
 namespace Bb.MockService
 {
@@ -25,6 +27,8 @@ namespace Bb.MockService
         public Startup(IConfiguration configuration)
             : base(configuration)
         {
+
+            ObjectCreatorByIoc.SetInjectionAttribute<InjectAttribute>();
 
         }
 

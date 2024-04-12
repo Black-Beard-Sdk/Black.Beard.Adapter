@@ -1,5 +1,7 @@
 using Bb.Adapter.Data;
 using Bb.MockService;
+using Bb.Modules;
+using Bb.Modules.Etl;
 using Bb.Servers.Web;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -20,6 +22,9 @@ namespace Bb.Adapter
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
+            var yy = typeof(ModuleSpecifications);
+            var zz = typeof(ModuleDataFlow);
+
             var service = GetService(args);
             service.Run();
         }
@@ -89,7 +94,7 @@ namespace Bb.Adapter
             StaticWebAssetsLoader.UseStaticWebAssets(wbuilder.Environment, wbuilder.Configuration);
         }
 
-  
+
 
     }
 

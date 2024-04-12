@@ -10,47 +10,35 @@ namespace Bb.Modules
 
         public ModuleSpecifications()
         {
-            
         }
         /// <summary>
         /// Return all modules
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<ModuleSpecification> GetModules()
+        public IEnumerable<ModuleSpecification> GetModules()
         {
 
             if (_items == null)
                 lock (_lock)
                     if (_items == null)
                     {
-
                         var items = new Dictionary<Guid, ModuleSpecification>();
 
-                        var types = ComponentModel.TypeDiscovery.Instance
-                            .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object),
-                            c => c.ExposedType == typeof(ModuleSpecification) && c.Context == "Plugin");
-                        Add(types);
+                        var types = ComponentModel.TypeDiscovery.Instance.GetTypesWithAttributes<ExposeClassAttribute>(typeof(object), 
+                            c => c.ExposedType == typeof(ModuleSpecification) && c.Context == "Plugin").ToList();
+
+                        foreach (var item in types)
+                        {
+                            var module = (ModuleSpecification)Activator.CreateInstance(item);
+                            items.Add(module.Uuid, module);
+                        }
 
                         _items = items;
-
                     }
 
             return _items.Values;
 
-        }
-
-        private void Add(IEnumerable<Type> types)
-        {
-            foreach (var item in types)
-                Add(item);
-        }
-
-        private void Add(Type item)
-        {
-            var module = (ModuleSpecification)Activator.CreateInstance(item);
-            _items.Add(module.Uuid, module);
-
-        }
+        }             
 
         private volatile object _lock = new object();
         private Dictionary<Guid, ModuleSpecification> _items;

@@ -1,6 +1,7 @@
 ﻿using Bb.CustomComponents;
 using MudBlazor;
 using System.Collections;
+using System.Diagnostics;
 
 namespace Bb.PropertyGrid
 {
@@ -8,7 +9,6 @@ namespace Bb.PropertyGrid
 
     public partial class ComponentFieldBaseList : ComponentFieldBase
     {
-
 
         protected override void PropertyChange()
         {
@@ -24,7 +24,7 @@ namespace Bb.PropertyGrid
                     if (_value == null)
                         Property.Value = _value = Activator.CreateInstance(Property.Type);
 
-                    this.Descriptor = new ObjectDescriptor(null, this.Property.SubType, this.Property.Parent.TranslateService, this.Property.Parent.ServiceProvider, null, null);
+                    this.Descriptor = new ObjectDescriptor(null, this.Property.SubType, this.Property.Parent.TranslateService, this.Property.Parent.ServiceProvider, this.StrategyName, null, null);
 
                 }
                 catch (Exception)
@@ -72,7 +72,7 @@ namespace Bb.PropertyGrid
 
             object newItem;
 
-            if (PropertyObjectDescriptor.Create(Property.SubType, out newItem))
+            if (PropertyObjectDescriptor.Create(this.StrategyName, Property.SubType, out newItem))
             {
 
             }
@@ -122,7 +122,6 @@ namespace Bb.PropertyGrid
         public ObjectDescriptor Descriptor { get; set; }
 
         protected MudMessageBox mbox { get; set; }
-
 
     }
 

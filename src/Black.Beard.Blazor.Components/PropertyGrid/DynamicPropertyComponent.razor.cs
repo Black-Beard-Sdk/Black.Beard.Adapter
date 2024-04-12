@@ -5,21 +5,33 @@ using Microsoft.AspNetCore.Components;
 namespace Bb.PropertyGrid
 {
 
-    public partial class DynamicPropertyComponent
+    public partial class DynamicPropertyComponent : ComponentBase
     {
 
         public DynamicPropertyComponent()
         {
 
+        }        
+
+        [Parameter]
+        public object Model 
+        {
+            get => _model;
+            set
+            {
+                _model = value;
+                var o = this;
+                StateHasChanged();
+            }
         }
-        
-        [Parameter]
-        public object Model { get; set; }
+
+        private DynamicComponent Ui;
+
+        public object _model { get; set; }
 
 
         [Parameter]
-        public string Field { get; set; }
-
+        public PropertyObjectDescriptor Property { get; set; }
 
         [Parameter]
         public Action<PropertyObjectDescriptor> PropertyValidationHasChanged { get; set; }
@@ -27,38 +39,14 @@ namespace Bb.PropertyGrid
         [Parameter]
         public Action<PropertyObjectDescriptor> PropertyHasChanged { get; set; }
 
-
         [Parameter]
         public Action<PropertyObjectDescriptor> PropertyHasInitialized { get; set; }
-
 
         [Inject]
         public ITranslateService TranslateService { get; set; }
 
-
         [Inject]
         public IServiceProvider ServiceProvider { get; set; }
-
-
-        protected override Task OnInitializedAsync()
-        {
-            
-            this._descriptor = new ObjectDescriptor(Model, Model?.GetType(), TranslateService, ServiceProvider, (p) => p.Name == this.Field);
-            if (_descriptor.Items.Count() == 0)
-                throw new InvalidOperationException($"Missing {this.Field} field");
-            this.property = _descriptor.Items.First();
-            this.property.PropertyHasChanged = PropertyHasChanged;
-            this.property.PropertyValidationHasChanged = PropertyValidationHasChanged;
-            
-            if (PropertyHasInitialized != null)
-                PropertyHasInitialized(this.property);
-
-            return base.OnInitializedAsync();
-        }
-
-
-        private PropertyObjectDescriptor? property;
-        private ObjectDescriptor _descriptor;
 
     }
 

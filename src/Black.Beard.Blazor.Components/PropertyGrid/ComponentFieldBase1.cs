@@ -50,7 +50,7 @@ namespace Bb.PropertyGrid
 
 
 
-        public T GetStep()
+        public string? GetStep()
         {
 
             var step = this.Property.Step;
@@ -59,11 +59,11 @@ namespace Bb.PropertyGrid
             if (object.Equals(result, 0))
                 result = 1;
 
-            return (T)result;
+            return result.ToString();
 
         }
 
-        public T GetMinimum()
+        public string? GetMinimum()
         {
 
             var step = this.Property.Minimum;
@@ -72,11 +72,11 @@ namespace Bb.PropertyGrid
             if (object.Equals(result, 0))
                 result = 1;
 
-            return (T)result;
+            return result.ToString();
 
         }
 
-        public T GetMaximum()
+        public string GetMaximum()
         {
 
             var step = this.Property.Maximum;
@@ -85,7 +85,7 @@ namespace Bb.PropertyGrid
             if (object.Equals(result, 0))
                 result = 1;
 
-            return (T)result;
+            return result.ToString();
 
         }
 
@@ -161,7 +161,7 @@ namespace Bb.PropertyGrid
 
                     var c = object.Equals(v, _value);
 
-                    if (this.Property.KingView == PropertyKingView.Date || this.Property.KingView == PropertyKingView.DateOffset)
+                    if (this.Property.KingView == PropertyKingView.Date.ToString() || this.Property.KingView == PropertyKingView.DateOffset.ToString())
                     {
                         if (Property.IsNullable)
                         {

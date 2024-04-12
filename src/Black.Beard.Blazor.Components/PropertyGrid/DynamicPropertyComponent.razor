@@ -1,5 +1,6 @@
 ﻿@page "/DynamicPropertyComponent"
-@using MudBlazor
-@using Bb.ComponentModel.Translations
-@using Bb.CustomComponents
-<DynamicComponent Type="@property.EditorType" Parameters="@property.Parameters" />
+
+@if (Property.Enabled)
+{
+    <DynamicComponent @ref="Ui" Type="@Property.EditorType" Parameters="@Property.Parameters" />
+}

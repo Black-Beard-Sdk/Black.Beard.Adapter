@@ -1,33 +1,50 @@
-﻿using Bb.ComponentModel.DataAnnotations;
+﻿using Bb.ComponentModel.Attributes;
+using Bb.ComponentModel.DataAnnotations;
 using System.Collections;
 using System.ComponentModel;
 
 namespace Bb.Modules
 {
-    public class ListProviderModule : IListProvider
+
+    [ExposeClass(Context = "Service", ExposedType = typeof(ListProviderModule), LifeCycle = IocScopeEnum.Transiant)]
+    public class ListProviderModule : ProviderListBase<ModuleSpecification>
     {
 
-        public object Instance { get; set; }
-
-        public PropertyDescriptor Property { get; set; }
-
-        public IEnumerable<ListItem> GetItems()
+        public ListProviderModule(ModuleSpecifications moduleSpecifications)
         {
-            List<ListItem> list = new List<ListItem>();
+            _moduleSpecifications = moduleSpecifications;
+        }
+
+        public override IEnumerable<ListItem<ModuleSpecification>> GetItems()
+        {
+
+            List<ListItem<ModuleSpecification>> list = new List<ListItem<ModuleSpecification>>();
 
             if (Instance != null && Property != null)
             {
-                var items = (IEnumerable)Property.GetValue(Instance);
+
+                var items = _moduleSpecifications.GetModules();
                 foreach (var item in items)
                 {
-                    var value = item.GetType().GetProperty("Value").GetValue(item);
-                    var text = item.GetType().GetProperty("Text").GetValue(item);
-                    list.Add(new ListItem() { Name = "", Display = "", Value = "" });
+                    var value = item.Uuid;
+                    var text = item.Name;
+                    list.Add(CreateItem( item, item.Name, item.Uuid, c =>
+                    {
+
+                    }));
                 }
             }
 
             return list;
+                    
         }
+
+        protected override object ResolveOriginalValue(ListItem<ModuleSpecification> item)
+        {
+            return item.Value;
+        }
+
+        private readonly ModuleSpecifications _moduleSpecifications;
 
     }
 

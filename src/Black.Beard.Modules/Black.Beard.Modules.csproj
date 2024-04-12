@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.58" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.64" />
   </ItemGroup>
 
 </Project>

@@ -62,18 +62,18 @@ namespace Bb.PropertyGrid
             return base.OnInitializedAsync();
         }
 
-        public string CurrentValue
-        {
-            get => Property.Value?.ToString() ?? string.Empty;
-            set
-            {
-                if (Property.Value != value)
-                {
-                    Property.Value = value;
-                    PropertyChange();
-                }
-            }
-        }
+        //public string CurrentValue
+        //{
+        //    get => Property.Value?.ToString() ?? string.Empty;
+        //    set
+        //    {
+        //        if (Property.Value != value)
+        //        {
+        //            Property.Value = value;
+        //            PropertyChange();
+        //        }
+        //    }
+        //}
 
 
         private InputType inputType = InputType.Text;

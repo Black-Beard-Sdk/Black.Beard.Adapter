@@ -20,7 +20,7 @@
                                 <MudExpansionPanel Text="@TranslateService.Translate(category)" IsExpanded="true">
                                     @foreach (PropertyObjectDescriptor property in Descriptor.ItemsByCategories(category))
                                     {
-                                        <DynamicComponent Type="@property.EditorType" Parameters="@property.Parameters" />
+                                        <DynamicPropertyComponent Property="@property" Model="@SelectedObject"  hidden="@property.Enabled" />
                                     }
                                 </MudExpansionPanel>
 
@@ -30,7 +30,7 @@
                         {
                             @foreach (PropertyObjectDescriptor property in Descriptor.Items)
                             {
-                                <DynamicComponent Type="@property.EditorType" Parameters="@property.Parameters" />
+                                <DynamicPropertyComponent Property="@property" Model="@SelectedObject" />
                             }
                         }
                     </MudCard>

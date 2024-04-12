@@ -1,6 +1,23 @@
 ﻿@inherits ComponentFieldBase<Int16>
 @using MudBlazor
 
+    <FluentLabel Typo="@LabelTypography"
+                 Color="@LabelColor"
+                 Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
+
+    <FluentNumberField @bind-Value="exampleInt2"
+                       Appearance="FluentInputAppearance.Filled"
+                       @oninput="@(e => Int16.TryParse(e.Value?.ToString(), out exampleInt2))"
+                        Min="@GetMinimum()"
+                        Max="@GetMaximum()"
+                        Step="@GetStep()"
+                       Label="Integer" />
+
+
+        Format="@Property.DataFormatString"
+
+
+
     <MudNumericField 
 
         T="Int16"

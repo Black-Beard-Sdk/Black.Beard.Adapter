@@ -43,7 +43,7 @@ namespace Bb.Wizards
         public IEnumerable<WizardPage> Pages => Content.Pages;
 
 
-        public bool PropertyFilter(PropertyDescriptor property)
+        public bool PropertyFilter(PropertyObjectDescriptor property)
         {
             if (Content.CurrentPage != null)
             {

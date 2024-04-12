@@ -1,21 +1,14 @@
-﻿@inherits ComponentFieldBase<char>
-@using MudBlazor
+﻿@using Microsoft.FluentUI.AspNetCore.Components
+@inherits ComponentFieldBase<char>
 
-    <MudTextField 
+<FluentLabel Typo="@LabelTypography"
+             Color="@LabelColor"
+             Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
 
-        T="char"
-        
-        Label="@Property.GetDisplay()"
-        HelperText="@Property.GetDescription()"
 
-        @bind-Value="Value"
+<FluentTextField @bind-Value=Item
+                 Placeholder="@Property.GetDescription()"
+                 style="width: 80%;"
+                 ReadOnly="@IsReadOnly"></FluentTextField>
 
-        Validation="Validate"
-        Disabled="@Property.ReadOnly"
-        Format="@Property.DataFormatString"
-
-        Variant="Variant.Outlined" 
-        Margin="Margin.Dense"
-
-        />
 

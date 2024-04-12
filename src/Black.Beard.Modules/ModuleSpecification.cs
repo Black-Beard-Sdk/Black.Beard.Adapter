@@ -39,9 +39,15 @@ namespace Bb.Modules
                         var items = new Dictionary<Guid, FeatureSpecification>();
 
                         var assembly = GetType().Assembly;
-                        Add(assembly.GetTypes()
+                        var types = assembly.GetTypes()
                             .Where(c => typeof(FeatureSpecification).IsAssignableFrom(c))
-                            .ToList());
+                            .ToList();
+
+                        foreach (var item in types)
+                        {
+                            var module = (FeatureSpecification)Activator.CreateInstance(item);
+                            items.Add(module.Uuid, module);
+                        }
 
                         _items = items;
 
@@ -65,18 +71,6 @@ namespace Bb.Modules
         /// Describe the module
         /// </summary>
         public string Description { get; }
-
-        private void Add(List<Type> types)
-        {
-            foreach (var item in types)
-                Add(item);
-        }
-
-        private void Add(Type item)
-        {
-            var module = (FeatureSpecification)Activator.CreateInstance(item);
-            _items.Add(module.Uuid, module);
-        }
 
         private volatile object _lock = new object();
         private Dictionary<Guid, FeatureSpecification> _items;

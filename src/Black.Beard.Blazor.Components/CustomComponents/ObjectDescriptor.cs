@@ -1,11 +1,7 @@
-﻿using Bb.ComponentModel.Accessors;
-using Bb.ComponentModel.Translations;
+﻿using Bb.ComponentModel.Translations;
 using Bb.PropertyGrid;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.FluentUI.AspNetCore.Components;
 using System.ComponentModel;
 using System.Diagnostics;
-using static Bb.CustomComponents.PropertyDescriptorExtension;
 
 namespace Bb.CustomComponents
 {
@@ -13,8 +9,17 @@ namespace Bb.CustomComponents
     public class ObjectDescriptor
     {
 
-        public ObjectDescriptor(object? instance, Type? type, ITranslateService translateService, IServiceProvider serviceProvider, Func<PropertyDescriptor, bool> propertyDescriptorFilter = null, Func<PropertyObjectDescriptor, bool> propertyFilter = null)
+
+
+        public ObjectDescriptor(object? instance,
+            Type? type,
+            ITranslateService translateService,
+            IServiceProvider serviceProvider,
+            string StrategyName,
+            Func<PropertyDescriptor, bool> propertyDescriptorFilter = null,
+            Func<PropertyObjectDescriptor, bool> propertyFilter = null)
         {
+            this.StrategyName = StrategyName;
             this.Instance = instance;
             this._type = type;
             this.TranslateService = translateService;
@@ -33,12 +38,11 @@ namespace Bb.CustomComponents
             else
                 this.PropertyFilter = (p) => true;
 
-            this.PropertyFilter = (p) => true;
-
             if (this._type != null)
                 this.Analyze();
 
         }
+
 
         public Func<PropertyDescriptor, bool> PropertyDescriptorFilter { get; }
 
@@ -58,17 +62,13 @@ namespace Bb.CustomComponents
                     foreach (PropertyDescriptor property in properties)
                         if (PropertyDescriptorFilter(property))
                         {
-
-                            var p = new PropertyObjectDescriptor(property, this);
-                            p.AnalyzeAttributes();
-
-                            if (PropertyFilter == null || PropertyFilter(p))
-                            {
-                                if (p.IsValid)
-                                    _items.Add(p);
-                                else
-                                    _invaLidItems.Add(p);
-                            }
+                            var p = new PropertyObjectDescriptor(property, this, this.StrategyName)
+                                .Build();
+                            p.Enabled = (PropertyFilter == null || PropertyFilter(p));
+                            if (p.IsValid)
+                                _items.Add(p);
+                            else
+                                _invaLidItems.Add(p);
                         }
 
                 }
@@ -78,15 +78,13 @@ namespace Bb.CustomComponents
         public ITranslateService TranslateService { get; }
 
         public IServiceProvider ServiceProvider { get; }
-
+        public string StrategyName { get; }
         public object? Instance { get; set; }
-
 
         public IEnumerable<TranslatedKeyLabel> Categories()
         {
 
             var result = _items
-                .Where(this.PropertyFilter)
                 .Where(c => c.Browsable)
                 .Select(x => x.Category).ToList();
 
@@ -118,7 +116,6 @@ namespace Bb.CustomComponents
             var c = category.ToString();
 
             var result = _items
-                .Where(this.PropertyFilter)
                 .Where(c => c.Browsable)
                 .Where(x => x.Category.ToString() == c)
                 // .OrderBy(c => c.Display.ToString())
@@ -130,7 +127,7 @@ namespace Bb.CustomComponents
         }
 
 
-        public IEnumerable<PropertyObjectDescriptor> Items { get => _items.Where(PropertyFilter); }
+        public IEnumerable<PropertyObjectDescriptor> Items { get => _items; }
 
         public IEnumerable<PropertyObjectDescriptor> InvalidItems { get => _invaLidItems; }
 
@@ -162,6 +159,6 @@ namespace Bb.CustomComponents
 
     }
 
-    
+
 
 }

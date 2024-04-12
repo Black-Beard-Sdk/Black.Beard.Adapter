@@ -8,11 +8,15 @@ namespace Bb.Modules
     public class NewModuleDescription
     {
 
+        //[Description("Name of the module")]
+        //[Required]
+        //public string Name { get; set; }
+
         [Description("Name of the module")]
         [Required]
-        public string Name { get; set; }
+        public Enum1 Name { get; set; }
 
-        [Description("Description of the finality of this module")]
+        [Description("Description of the finality of the new module")]
         [Required]
         public string? Description { get; set; }
 
@@ -23,5 +27,11 @@ namespace Bb.Modules
 
     }
 
+    public enum Enum1
+    {
+        Value1,
+        Value2,
+        Value3,
+    }
 
 }

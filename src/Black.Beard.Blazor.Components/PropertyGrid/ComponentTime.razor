@@ -1,10 +1,9 @@
-﻿@inherits ComponentFieldBase<TimeSpan>
-    @using MudBlazor
+﻿@using Microsoft.FluentUI.AspNetCore.Components
+@inherits ComponentFieldBase<TimeSpan>
+    
+    <FluentLabel Typo="@LabelTypography"
+                 Color="@LabelColor"
+                 Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
 
-    <MudTimePicker Label="@Property.GetDisplay()"
-                   HelperText="@Property.GetDescription()"
-                   AmPm="true"
-                   TimeFormat="h:mm tt"
-                   @bind-Time="Time"
-                   Variant="Variant.Outlined"
-                   Margin="Margin.Dense" />
+<FluentTimePicker @bind-Value="@Time" ReadOnly="@IsReadOnly" />
+

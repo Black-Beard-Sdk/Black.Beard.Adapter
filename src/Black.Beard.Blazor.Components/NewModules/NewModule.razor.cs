@@ -1,10 +1,6 @@
 ﻿using Bb.Wizards;
-
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Bb.ComponentModel.Attributes;
 using Bb.Modules;
 
 namespace Bb.NewModules
@@ -23,7 +19,10 @@ namespace Bb.NewModules
         private async Task Create()
         {
 
-            var model = new NewModuleDescription();
+            var model = new NewModuleDescription()
+            {
+                Name = Enum1.Value2,
+            };
 
             var Model = new WizardModel()
             {
@@ -31,7 +30,7 @@ namespace Bb.NewModules
             }
             .AddPage(model, "description", c =>
             {
-                c.Description = "Specify the name and the description of the new module";
+                c.Description = "Specify the name and the description for the new module";
                 c.Filter = ["Name", "Description"];
             })
             .AddPage(model, "Type", c =>
