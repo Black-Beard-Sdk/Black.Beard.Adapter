@@ -1,12 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using Bb.Servers.Web.Models;
 using Bb.Servers.Web;
-using Microsoft.Extensions.FileProviders;
 using Bb.Adapter.Data;
-using Microsoft.FluentUI.AspNetCore.Components;
 using MudBlazor.Services;
-using Bb.Extensions;
-using Bb.Modules;
 using Bb.ComponentModel.Factories;
 using Microsoft.AspNetCore.Components;
 
@@ -66,7 +62,6 @@ namespace Bb.MockService
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            services.AddFluentUIComponents();
             services.AddMudServices();
         }
 

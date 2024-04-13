@@ -6,7 +6,7 @@ using System.ComponentModel;
 namespace Bb.Modules
 {
 
-    [ExposeClass(Context = "Service", ExposedType = typeof(ListProviderModule), LifeCycle = IocScopeEnum.Transiant)]
+    [ExposeClass(UIConstants.Service, ExposedType = typeof(ListProviderModule), LifeCycle = IocScopeEnum.Transiant)]
     public class ListProviderModule : ProviderListBase<ModuleSpecification>
     {
 

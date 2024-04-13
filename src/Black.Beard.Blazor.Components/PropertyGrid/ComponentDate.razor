@@ -1,12 +1,13 @@
-﻿@using Microsoft.FluentUI.AspNetCore.Components
-@inherits ComponentFieldBase<DateTime>
+﻿@inherits ComponentFieldBase<DateTime>
+@using MudBlazor
 
-    <FluentLabel Typo="@LabelTypography"
-                 Color="@LabelColor"
-                 Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
-
-    <FluentDatePicker 
-        @bind-Value="@Date"
-        ReadOnly="@IsReadOnly" />
+    <MudDatePicker 
+        Label="@Property.GetDisplay()"
+        Editable="@(!Property.ReadOnly)"
+        @bind-Date="Date"
+        Placeholder="@Property.GetDescription()"
+        Variant="@CurrentVariant"
+        Margin="@CurrentMargin"
+                   />
 
 

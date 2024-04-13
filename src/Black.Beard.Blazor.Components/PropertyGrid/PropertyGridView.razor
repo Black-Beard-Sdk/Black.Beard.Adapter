@@ -3,41 +3,43 @@
 @using MudBlazor
 @using Bb.ComponentModel.Translations
 
-<MudCard>
-    <MudItem>
-        <MudPaper>
 
-            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-                @if (Descriptor != null && Descriptor.Items != null)
+<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+    @if (Descriptor != null && Descriptor.Items != null)
+    {
+
+        <MudContainer>
+
+                @if (WithGroup)
                 {
+                    @foreach (TranslatedKeyLabel category in Descriptor.Categories())
+                    {
 
-                    <MudCard>
-                        @if (WithGroup)
-                        {
-                            @foreach (TranslatedKeyLabel category in Descriptor.Categories())
+                        <MudExpansionPanel Text="@TranslateService.Translate(category)" IsExpanded="true">
+                            @foreach (PropertyObjectDescriptor property in Descriptor.ItemsByCategories(category))
                             {
-
-                                <MudExpansionPanel Text="@TranslateService.Translate(category)" IsExpanded="true">
-                                    @foreach (PropertyObjectDescriptor property in Descriptor.ItemsByCategories(category))
-                                    {
-                                        <DynamicPropertyComponent Property="@property" Model="@SelectedObject"  hidden="@property.Enabled" />
-                                    }
-                                </MudExpansionPanel>
-
+                                <DynamicPropertyComponent Property="@property"
+                                                          Model="@SelectedObject"
+                                                          CurrentVariant="@CurrentVariant"
+                                                          CurrentMargin="@CurrentMargin" />
                             }
-                        }
-                        else
-                        {
-                            @foreach (PropertyObjectDescriptor property in Descriptor.Items)
-                            {
-                                <DynamicPropertyComponent Property="@property" Model="@SelectedObject" />
-                            }
-                        }
-                    </MudCard>
+                        </MudExpansionPanel>
 
+                    }
                 }
-            </MudForm>
+                else
+                {
+                    @foreach (PropertyObjectDescriptor property in Descriptor.Items)
+                    {
+                        <DynamicPropertyComponent Property="@property"
+                                                  Model="@SelectedObject"
+                                                  CurrentVariant="@CurrentVariant"
+                                                  CurrentMargin="@CurrentMargin" />
+                    }
+                }
 
-        </MudPaper>
-    </MudItem>
-</MudCard>
+        </MudContainer>
+
+    }
+    </MudForm>
+

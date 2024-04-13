@@ -1,7 +1,7 @@
-﻿using Bb.Wizards;
+﻿using Bb.Modules;
+using Bb.Wizards;
 using Microsoft.AspNetCore.Components;
-using Microsoft.FluentUI.AspNetCore.Components;
-using Bb.Modules;
+using MudBlazor;
 
 namespace Bb.NewModules
 {
@@ -40,20 +40,21 @@ namespace Bb.NewModules
             })
             ;
 
-            var dialog = await DialogService.ShowDialogAsync<UIWizard>(Model, new DialogParameters()
+            var b = new DialogParameters
             {
-                Height = "400px",
-                Width = "600px",
-                Title = $"Updating the {Model.Title} sheet",
-                PreventDismissOnOverlayClick = true,
-                PreventScroll = true,
-            });
+                { "Content", Model }
+            };
 
-            var result = await dialog.Result;
-            if (!result.Cancelled && result.Data != null)
+            var options = new DialogOptions() 
             {
-                var dialogData = (WizardModel)result.Data;
-            }
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true,
+                CloseOnEscapeKey = true,
+                NoHeader = false,
+                Position = DialogPosition.Center,
+            };
+
+            var reference  = DialogService.Show<UIWizard>("Options Dialog", b, options);
 
         }
 

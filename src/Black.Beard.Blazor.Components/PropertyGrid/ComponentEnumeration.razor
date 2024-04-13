@@ -1,16 +1,23 @@
-﻿@using Microsoft.FluentUI.AspNetCore.Components
-@inherits ComponentFieldBase<object>
+﻿@inherits ComponentFieldBase<ListItem>
+@using MudBlazor
 @using Bb.ComponentModel.DataAnnotations
 
-<FluentLabel Typo="@LabelTypography"
-             Color="@LabelColor"
-             Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
+<MudSelect T="ListItem"
+           Label="@Property.GetDisplay()"
+           Variant="@CurrentVariant"
+           Margin="@CurrentMargin"
+           
+           @bind-Value="Value"
+           HelperText="@Property.GetDescription()"
+           AnchorOrigin="Origin.BottomCenter">
 
 
-<FluentCombobox TOption="Option<string>"
-                Items=@Items
-                OptionText="@(i => i.Text)"
-                OptionValue="@(i => i.Value)"
-                OptionSelected="@(i => i.Selected)"
-                @bind-Value="@SelecteItem" 
-                />
+    @foreach (var item in Items)
+    {
+        <MudSelectItem Value="@(item)">@item.Display</MudSelectItem>
+    }
+
+</MudSelect>
+
+
+

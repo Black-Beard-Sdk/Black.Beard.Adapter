@@ -1,8 +1,7 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.CustomComponents;
 using Microsoft.AspNetCore.Components;
-using Microsoft.FluentUI.AspNetCore.Components;
-using System.ComponentModel;
+using MudBlazor;
 
 
 // https://www.fluentui-blazor.net/
@@ -34,27 +33,21 @@ namespace Bb.PropertyGrid
             return TranslateService.Translate(key);
         }
 
+
+        [Parameter]
+        public Variant CurrentVariant { get; set; }
+
+        [Parameter]
+        public Margin CurrentMargin { get; set; }
+
+
         [Inject]
         public ITranslateService TranslateService { get; set; }
 
         public bool IsReadOnly => Property?.ReadOnly ?? false;
 
         public bool Changed { get; internal set; }
-
-        [Parameter]
-        public Color LabelColor { get; set; } = Color.Neutral;
-
-
-        [Parameter]
-        public Typography LabelTypography { get; set; } = Typography.Body;
-
-
-        [Parameter]
-        public HorizontalAlignment LabelHorizontalAlignment { get; set; } = HorizontalAlignment.Left;
-
-
-
-
+            
 
         protected virtual void PropertyChange()
         {

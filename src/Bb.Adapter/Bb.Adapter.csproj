@@ -9,8 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.64" />
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.6.1" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.70" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
     <PackageReference Include="MudBlazor" Version="6.19.1" />
   </ItemGroup>
@@ -21,5 +20,16 @@
     <ProjectReference Include="..\Black.Beard.Modules.Etl\Black.Beard.Modules.Etl.csproj" />
     <ProjectReference Include="..\Black.Beard.Modules\Black.Beard.Modules.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Configs\ExposedAssemblyRepositories.schema.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Configs\WebApplicationBuilder.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties configs_4webapplication_1json__JsonSchema="./ExposedAssemblyRepositories.schema.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

@@ -19,8 +19,7 @@ namespace Bb.CustomComponents
                 ? StrategyMapper.Get(string.Empty)
                 : StrategyMapper.Get(strategyKey);
 
-            StrategyName = _strategy.Key;
-            this.Parameters = new Dictionary<string, object> { { "Property", this } };
+            StrategyName = _strategy.Key;            
             this.Parent = parent;
             this.Name = property.Name;
             this.PropertyDescriptor = property;
@@ -160,8 +159,6 @@ namespace Bb.CustomComponents
         private readonly StrategyMapper _strategy;
 
         public string StrategyName { get; }
-
-        public IDictionary<string, object> Parameters { get; set; }
 
         public string? ErrorText { get; internal set; }
 

@@ -1,33 +1,17 @@
 ﻿@inherits ComponentFieldBase<float>
     @using MudBlazor
 
-    <FluentLabel Typo="@LabelTypography"
-                 Color="@LabelColor"
-                 Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
-
-    <FluentNumberField @bind-Value="exampleInt2"
-                       Appearance="FluentInputAppearance.Filled"
-                       @oninput="@(e => float.TryParse(e.Value?.ToString(), out exampleInt2))"
-                        Min="@GetMinimum()"
- Max="@GetMaximum()"
- 
- Step="@GetStep()"
-                       Label="Integer" />
-
-
-    Format="@Property.DataFormatString"
-
-
-
-    <MudNumericField T="float"
-                     @bind-Value="Value"
-                     Label="@Property.GetDisplay()"
-                     HelperText="@Property.GetDescription()"
-                     Disabled="@Property.ReadOnly"
-                     Validation="Validate"
-                     Format="@Property.DataFormatString"
-                     Variant="Variant.Outlined"
-                     Min="@GetMinimum()"
-                     Max="@GetMaximum()"
-                     Step="@GetStep()" />
+    <MudNumericField 
+        T="float"
+        @bind-Value="Value"
+        Label="@Property.GetDisplay()"
+        HelperText="@Property.GetDescription()"
+        Disabled="@Property.ReadOnly"
+        Validation="Validate"
+        Format="@Property.DataFormatString"
+        Variant="@CurrentVariant"
+        Margin="@CurrentMargin"
+        Min="@GetMinimum()"
+        Max="@GetMaximum()"
+        Step="@GetStep()" />
 

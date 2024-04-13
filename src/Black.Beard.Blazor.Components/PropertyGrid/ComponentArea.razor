@@ -11,13 +11,15 @@
         @Value
     </textarea>
 
-<MudTextField T="string"
-              Label="@Property.GetDisplay()"
-              HelperText="@Property.GetDescription()"
-              @bind-Value="Value"
-              Validation="Validate"
-              Disabled="@Property.ReadOnly"
-              Variant="Variant.Outlined"
-              Margin="Margin.Dense" />
+<MudTextField 
+            T="string"
+            Label="@Property.GetDisplay()"
+            HelperText="@Property.GetDescription()"
+            @bind-Value="Value"
+            Validation="Validate"
+            Disabled="@Property.ReadOnly"
+            Variant="@CurrentVariant"
+            Margin="@CurrentMargin"
+              />
 
 

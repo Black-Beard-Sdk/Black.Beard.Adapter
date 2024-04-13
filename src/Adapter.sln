@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bb.Adapter", "Bb.Adapter\Bb
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Web.Server", "..\..\Net.Server\src\Black.Beard.Web.Server\Black.Beard.Web.Server.csproj", "{5B22903F-A241-4840-B21B-347459B482EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Modules", "Black.Beard.Modules\Black.Beard.Modules.csproj", "{3BA2159D-3DD7-4C9C-BE68-9FAAC5CDB7F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Modules", "Black.Beard.Modules\Black.Beard.Modules.csproj", "{3BA2159D-3DD7-4C9C-BE68-9FAAC5CDB7F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Modules.Etl", "Black.Beard.Modules.Etl\Black.Beard.Modules.Etl.csproj", "{D3BFDFB8-C4D2-41CD-8D70-9F2B898A509A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Modules.Etl", "Black.Beard.Modules.Etl\Black.Beard.Modules.Etl.csproj", "{D3BFDFB8-C4D2-41CD-8D70-9F2B898A509A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

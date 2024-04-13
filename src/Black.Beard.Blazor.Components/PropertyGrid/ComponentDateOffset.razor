@@ -1,15 +1,15 @@
-﻿@using Microsoft.FluentUI.AspNetCore.Components
-@inherits ComponentFieldBase<DateTimeOffset>
+﻿@inherits ComponentFieldBase<DateTimeOffset>
+    @using MudBlazor
 
-    <FluentLabel Typo="@LabelTypography"
-                 Color="@LabelColor"
-                 Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
-
-    <FluentDatePicker AriaLabel="To"
-                  @bind-Value="@DateTimeOffset"
-            ReadOnly="@IsReadOnly" />
-
-
-
-        Format="@Property.DataFormatString"
+    <MudTextField 
+            T="DateTimeOffset"
+            Label="@Property.GetDisplay()"
+            HelperText="@Property.GetDescription()"
+            @bind-Value="Value"
+            Validation="Validate"
+            Disabled="@Property.ReadOnly"
+            Format="@Property.DataFormatString"
+            Variant="@CurrentVariant"
+            Margin="@CurrentMargin"
+                  />
 

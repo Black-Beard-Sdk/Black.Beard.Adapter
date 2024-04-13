@@ -1,16 +1,13 @@
-﻿@using Microsoft.FluentUI.AspNetCore.Components
-@inherits ComponentFieldBase<bool>
+﻿@inherits ComponentFieldBase<bool>
+@using MudBlazor
 
+    <MudCheckBox       
+        Label="@Property.GetDisplay()"
+        HelperText="@Property.GetDescription()"
 
-<FluentLabel Typo="@LabelTypography"
-             Color="@LabelColor"
-             Alignment="LabelHorizontalAlignment">@Property.GetDisplay()</FluentLabel>
+        @bind-Checked="Value"
 
-<FluentSwitch @bind-Value=Value
-                 Placeholder="@Property.GetDescription()"
-                 style="width: 80%;"
-                 InputType="InputType.Password"
-                 ReadOnly="@IsReadOnly">
-    <span slot="checked-message">&nbsp;&nbsp;@Translate("On")</span>
-    <span slot="unchecked-message">&nbsp;&nbsp;@Translate("Off")</span>
-</FluentSwitch>
+        Disabled="@Property.ReadOnly"
+             Variant="@CurrentVariant"
+             Margin="@CurrentMargin"
+             />

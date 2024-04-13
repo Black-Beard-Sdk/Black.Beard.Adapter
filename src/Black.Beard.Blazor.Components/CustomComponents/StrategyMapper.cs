@@ -215,7 +215,7 @@ namespace Bb.CustomComponents
 
                 .ToTarget<ComponentChar>(PropertyKingView.Char)
                 .ToTarget<ComponentBool>(PropertyKingView.Bool)
-                .ToTarget<ComponentTime>(PropertyKingView.Time)
+                //.ToTarget<ComponentTime>(PropertyKingView.Time)
                 .ToTarget<ComponentString>(PropertyKingView.String)
             //.ToTarget<ComponentInt16>(PropertyKingView.Int16)
             //.ToTarget<ComponentInt32>(PropertyKingView.Int32)

@@ -1,10 +1,11 @@
 ﻿using Bb.ComponentModel.Attributes;
+using ICSharpCode.Decompiler.CSharp.Syntax;
 
 namespace Bb.Modules
 {
 
 
-    [ExposeClass("Service", ExposedType = typeof(ModuleSpecifications), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(UIConstants.Service, ExposedType = typeof(ModuleSpecifications), LifeCycle = IocScopeEnum.Singleton)]
     public class ModuleSpecifications
     {
 
@@ -24,7 +25,8 @@ namespace Bb.Modules
                     {
                         var items = new Dictionary<Guid, ModuleSpecification>();
 
-                        var types = ComponentModel.TypeDiscovery.Instance.GetTypesWithAttributes<ExposeClassAttribute>(typeof(object), 
+                        var types = ComponentModel.TypeDiscovery.Instance
+                            .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object),
                             c => c.ExposedType == typeof(ModuleSpecification) && c.Context == "Plugin").ToList();
 
                         foreach (var item in types)
@@ -38,7 +40,21 @@ namespace Bb.Modules
 
             return _items.Values;
 
-        }             
+        }
+
+        public ModuleSpecification GetModule(Guid guid)
+        {
+            if (_items == null)
+                lock (_lock)
+                    if (_items == null)
+                        GetModules();
+
+            if (_items.TryGetValue(guid, out ModuleSpecification module))
+                return module;
+
+            return null;
+
+        }
 
         private volatile object _lock = new object();
         private Dictionary<Guid, ModuleSpecification> _items;

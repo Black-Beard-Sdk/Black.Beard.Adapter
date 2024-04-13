@@ -1,34 +1,34 @@
 ﻿@using Bb.PropertyGrid
-@using Microsoft.FluentUI.AspNetCore.Components
+@using MudBlazor
 
+<MudDialog @bind-IsVisible="visible" Options="dialogOptions">
 
-<FluentDialogHeader ShowDismiss="true">
-    <FluentStack VerticalAlignment="VerticalAlignment.Center">
-        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
-        <FluentLabel>
-            @Content.CurrentPage.Description
-        </FluentLabel>
-    </FluentStack>
-</FluentDialogHeader>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @this.Content.Title
+        </MudText>
+    </TitleContent>
+    <DialogContent>
 
+        <MudPaper Height="400px" Width="100%">
+            <MudContainer MaxWidth="MaxWidth.Medium">
 
-<FluentDialogBody>
+                <PropertyGridView SelectedObject="@CurrentModel"
+                                  PropertyHasChanged="PropertyHasChanged"
+                                  PropertyFilter="PropertyFilter"
+                                  @ref="CurrentPropertyGridView" />
 
-    <PropertyGridView 
-        SelectedObject="@CurrentModel" 
-        PropertyHasChanged="PropertyHasChanged" 
-        PropertyFilter="PropertyFilter"
-        @ref="CurrentPropertyGridView" />
+            </MudContainer>
+        </MudPaper>
 
-</FluentDialogBody>
-
-
-<FluentDialogFooter>
-    <FluentButton Appearance="Appearance.Neutral" Disabled="@DisableCanCancel" OnClick="@Cancel">&nbsp;&nbsp;<FluentIcon Value="@(new Icons.Regular.Size24.Delete())" />&nbsp;Cancel&nbsp;&nbsp;</FluentButton>
-    <FluentButton Appearance="Appearance.Neutral" Disabled="@DisableCanPrevious" OnClick="@GoToPreviousStep">&nbsp;&nbsp;<FluentIcon Value="@(new Icons.Regular.Size24.PreviousFrame())" />Previous&nbsp;&nbsp;</FluentButton>
-    <FluentButton Appearance="Appearance.Neutral" Disabled="@DisableCanNext" OnClick="@GoToNextStep">&nbsp;&nbsp;Next<FluentIcon Value="@(new Icons.Regular.Size24.NextFrame())" />&nbsp;&nbsp;</FluentButton>
-    <FluentButton Appearance="Appearance.Accent" Disabled="@DisableCanValidate" OnClick="@Apply">&nbsp;&nbsp;Submit<FluentIcon Value="@(new Icons.Regular.Size24.Checkmark())" />&nbsp;&nbsp;</FluentButton>
-</FluentDialogFooter>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanCancel OnClick=Cancel StartIcon="@Icons.Material.Filled.Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanPrevious OnClick=GoToPreviousStep StartIcon="@Icons.Material.Filled.SkipPrevious">Previous</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanNext OnClick=GoToNextStep EndIcon="@Icons.Material.Filled.SkipNext">Next</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanValidate OnClick=Apply EndIcon="@Icons.Material.Filled.Check">Apply</MudButton>
+    </DialogActions>
+</MudDialog>
 
 
 

@@ -41,6 +41,12 @@ namespace Bb.PropertyGrid
         [Parameter]
         public Action<PropertyObjectDescriptor> PropertyHasChanged { get; set; }
 
+        [Parameter]
+        public Variant CurrentVariant { get; set; } = Variant.Text;
+
+        [Parameter]
+        public Margin CurrentMargin { get; set; } = Margin.Dense;
+
         private void Update()
         {
 

@@ -1,16 +1,15 @@
-﻿using Bb.ComponentModel.Accessors;
-using Bb.CustomComponents;
+﻿using Bb.CustomComponents;
 using Bb.PropertyGrid;
 using Microsoft.AspNetCore.Components;
-using Microsoft.FluentUI.AspNetCore.Components;
-using System.ComponentModel;
+using MudBlazor;
+using static MudBlazor.CategoryTypes;
 
 
 namespace Bb.Wizards
 {
 
     // https://www.fluentui-blazor.net/Icon
-    public partial class UIWizard : IDialogContentComponent<WizardModel>
+    public partial class UIWizard
     {
 
         /// <summary>
@@ -35,6 +34,10 @@ namespace Bb.Wizards
                 this.StateHasChanged();
             }
         }
+
+        private bool visible = true;
+
+        public DialogOptions dialogOptions { get; set; }
 
         public PropertyGridView CurrentPropertyGridView { get; set; }
 
@@ -66,8 +69,11 @@ namespace Bb.Wizards
         [Parameter] public bool AllowPrevious { get; set; }
 
 
-        [CascadingParameter]
-        public FluentDialog Dialog { get; set; } = default!;
+        [Inject]
+        public IDialogService DialogService { get; set; }
+
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
 
         public void PropertyHasChanged(PropertyObjectDescriptor obj)
         {
@@ -77,7 +83,7 @@ namespace Bb.Wizards
         internal async Task Cancel()
         {
             _content.Wizard = null; ;
-            await Dialog.CancelAsync();
+            MudDialog.Cancel();
         }
 
         internal async Task GoToPreviousStep()
@@ -99,14 +105,19 @@ namespace Bb.Wizards
         internal async Task Apply()
         {
             _content.Wizard = null; ;
-            await Dialog.CloseAsync(Content);
+            MudDialog.Close(DialogResult.Ok(true));
             this.StateHasChanged();
         }
 
         internal bool Validate()
         {
-            var result = this.CurrentPropertyGridView.Validate();
-            return result.IsValid;
+            if (this.CurrentPropertyGridView != null)
+            {
+                var result = this.CurrentPropertyGridView.Validate();
+                return result.IsValid;
+            }
+
+            return false;
         }
 
         public bool DisableCanCancel => false;

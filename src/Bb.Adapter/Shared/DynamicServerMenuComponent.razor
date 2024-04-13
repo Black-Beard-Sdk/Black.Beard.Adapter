@@ -1,0 +1,33 @@
+﻿@using Bb.UIComponents
+@using MudBlazor
+
+
+@if (Menu != null)
+{
+
+    // Add feature roles
+    @if (Menu.Count > 0)
+    {
+
+        <MudNavGroup Title="@Menu.Display" Disabled="@(!Menu.EnabledGuard)">
+            @foreach (DynamicServerMenu subMenu in Menu)
+            {
+                if (subMenu.ViewGuard)
+                {
+                    <DynamicServerMenuComponent Menu="@subMenu" Enabled="@subMenu.EnabledGuard" />
+                }
+            }
+        </MudNavGroup>
+
+    }
+    else
+    {
+
+        <MudNavLink Href="@Menu.Action.HRef"
+            Match="@Menu.Action.Match"
+            Icon="@Menu.Icon"
+            Disabled="@(!Menu.EnabledGuard)">@Menu.Display</MudNavLink>
+
+    }
+
+}

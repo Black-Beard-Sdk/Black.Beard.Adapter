@@ -1,9 +1,6 @@
 ﻿using Bb.ComponentModel.DataAnnotations;
 using Bb.ComponentModel.Factories;
-using Microsoft.AspNetCore.Components;
-using Microsoft.FluentUI.AspNetCore.Components;
-using System.Collections.Generic;
-using static MudBlazor.CategoryTypes;
+using static MudBlazor.Colors;
 
 namespace Bb.PropertyGrid
 {
@@ -18,22 +15,7 @@ namespace Bb.PropertyGrid
 
         public IListProvider? ListResolver { get; private set; }
 
-        public List<Option<string>> Items { get; set; }
-
-
-        public string SelecteItem
-        {
-            get
-            {
-                var value = Property.Value;
-                return _items.FirstOrDefault(c => c.Selected)?.Display;
-            }
-            set
-            {
-                var p = _items.FirstOrDefault(c => c.Display == value);
-                Property.Value = p.GetOriginalValue();
-            }
-        }
+        public IEnumerable<ListItem> Items { get; set; }
 
 
         protected override Task OnInitializedAsync()
@@ -42,7 +24,6 @@ namespace Bb.PropertyGrid
             if (this.Property.ListProvider != null && ListResolver == null)
             {
 
-                Items = new List<Option<string>>();
                 this.ListResolver = (IListProvider)Property.Parent.ServiceProvider.GetService(this.Property.ListProvider);
 
                 if (this.ListResolver == null)
@@ -57,19 +38,7 @@ namespace Bb.PropertyGrid
             }
 
             if (ListResolver != null)
-            {
-                var v = this.Property.Value.ToString();
-                Items.Clear();
-                _items = ListResolver.GetItems().ToList();
-                foreach (var item in _items)
-                    Items.Add(new Option<string>()
-                    {
-                        Text = item.Display,                        
-                        Value = item.Name,
-                        Selected = item.Selected,
-                    });
-
-            }
+                Items = ListResolver.GetItems().ToList();
 
             return base.OnInitializedAsync();
 
@@ -79,24 +48,17 @@ namespace Bb.PropertyGrid
         {
             var v = Property.Value;
             if (v != null)
-            {
-                foreach (var item in this.Items)
-                {
-                    if (item.Value.GetHashCode() == v.GetHashCode())
+                foreach (ListItem item in this.Items)
+                    if (item.Compare(v))
                         return item;
-                }
-            }
             return default(ListItem);
         }
 
         public override object Save(object item)
         {
-
             if (item is ListItem i)
-                return i.Value;
-
+                return i.GetOriginalValue();
             return null;
-
         }
 
         private List<ListItem> _items;
