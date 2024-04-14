@@ -21,45 +21,33 @@ namespace Bb.NewModules
 
             var model = new NewModuleDescription()
             {
-                Name = Enum1.Value2,
+                
             };
 
-            var Model = new WizardModel()
-            {
-                Title = "Add a new module",
-            }
-            .AddPage(model, "description", c =>
-            {
-                c.Description = "Specify the name and the description for the new module";
-                c.Filter = ["Name", "Description"];
-            })
-            .AddPage(model, "Type", c =>
-            {
-                c.Description = "Specify the type of the new module";
-                c.Filter = ["Type"];
-            })
+            Wizard
+                .SetTitle("Add a new module")
+                .SetModel(model)
+                .AddPage("description", c =>
+                {
+                    c.SetDescription("Specify the name and the description for the new module")
+                     .SetFilterOnPropertyModel("Name", "Description");
+                })
+                .AddPage("Type", c =>
+                {
+                    c.SetDescription("Specify the type of the new module")
+                     .SetFilterOnPropertyModel("Type");
+                })
             ;
 
-            var b = new DialogParameters
-            {
-                { "Content", Model }
-            };
-
-            var options = new DialogOptions() 
-            {
-                MaxWidth = MaxWidth.Medium,
-                FullWidth = true,
-                CloseOnEscapeKey = true,
-                NoHeader = false,
-                Position = DialogPosition.Center,
-            };
-
-            var reference  = DialogService.Show<UIWizard>("Options Dialog", b, options);
+            Wizard.Show();
 
         }
 
         [Inject]
         public IDialogService DialogService { get; set; }
+
+        [Inject]
+        public WizardModel Wizard { get; set; }
 
     }
 

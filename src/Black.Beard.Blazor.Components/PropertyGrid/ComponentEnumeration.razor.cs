@@ -17,7 +17,6 @@ namespace Bb.PropertyGrid
 
         public IEnumerable<ListItem> Items { get; set; }
 
-
         protected override Task OnInitializedAsync()
         {
 

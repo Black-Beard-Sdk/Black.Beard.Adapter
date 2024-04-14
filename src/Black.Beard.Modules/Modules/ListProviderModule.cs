@@ -43,6 +43,7 @@ namespace Bb.Modules
         {
             return item.Value;
         }
+         
 
         private readonly ModuleSpecifications _moduleSpecifications;
 

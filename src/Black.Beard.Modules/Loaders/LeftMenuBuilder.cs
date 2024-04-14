@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
+using Bb.ComponentModel.Translations;
 using Bb.UIComponents;
 using Bb.UIComponents.Glyphs;
 
@@ -7,7 +8,7 @@ using Bb.UIComponents.Glyphs;
 namespace Bb.Loaders
 {
 
-    [ExposeClass(UIConstants.LeftMenu)]
+    [ExposeClass(UIConstants.LeftMenu, ExposedType = typeof(IInjectBuilder<UIService>))]
     public class LeftMenuBuilder : IInjectBuilder<UIService>
     {
 
@@ -25,13 +26,15 @@ namespace Bb.Loaders
         public object Run(UIService service)
         {
 
-            var guidHome = UIService.Guids.Home;
-            var guidConfigurations = UIService.Guids.Configurations;
+            service.Initialize(UIKeys.Menus.LeftMenu, UIKeys.Menus.Home, menu =>
+            {
 
-            service.GetMenuOrCreate(UIService.LeftMenu, guidHome, "p:LeftMenu,k:Home,l:en-us, d:Home")
-                .SetActionMatchAll()
-                .SetIcon(GlyphFilled.Home)
-                ;                    
+                menu.WithDisplay(new TranslatedKeyLabel("LeftMenu", "Home", null, null))
+                    .SetActionMatchAll()
+                    .SetIcon(GlyphFilled.Home)
+                ;
+
+            });
 
             return 0;
 

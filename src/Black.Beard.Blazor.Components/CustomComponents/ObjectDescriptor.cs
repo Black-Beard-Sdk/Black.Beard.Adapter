@@ -148,7 +148,7 @@ namespace Bb.CustomComponents
             DiagnosticValidator validator = new DiagnosticValidator();
 
             foreach (var item in _items)
-                if (!item.Validate(out var result))
+                if (item.Enabled && !item.Validate(out var result))
                     validator.Add(result);
 
             return validator;

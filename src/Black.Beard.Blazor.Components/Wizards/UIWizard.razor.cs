@@ -22,6 +22,8 @@ namespace Bb.Wizards
 
         private WizardModel _content;
 
+        private MudCarousel<WizardPage> _carousel;
+
         [Parameter]
         public WizardModel Content
         {
@@ -43,6 +45,8 @@ namespace Bb.Wizards
 
         public object CurrentModel => Content.CurrentPage.Model;
 
+        public WizardPage CurrentPage => Content.CurrentPage;
+
         public IEnumerable<WizardPage> Pages => Content.Pages;
 
 
@@ -50,7 +54,7 @@ namespace Bb.Wizards
         {
             if (Content.CurrentPage != null)
             {
-                var filter = Content.CurrentPage.Filter;
+                var filter = Content.CurrentPage.FilterOnPropertyModel;
                 if (filter != null && filter.Length > 0)
                     return filter.Contains(property.Name);
             }
@@ -82,8 +86,11 @@ namespace Bb.Wizards
 
         internal async Task Cancel()
         {
-            _content.Wizard = null; ;
+            _content.Wizard = null;
             MudDialog.Cancel();
+
+            _content.Exit( WizardResult.Cancel);
+
         }
 
         internal async Task GoToPreviousStep()
@@ -99,6 +106,9 @@ namespace Bb.Wizards
             Content.Next();
             if (CurrentPropertyGridView != null)
                 CurrentPropertyGridView.SelectedObject = CurrentModel;
+
+            _carousel.MoveTo(Content.Index);
+
             this.StateHasChanged();
         }
 
@@ -107,6 +117,9 @@ namespace Bb.Wizards
             _content.Wizard = null; ;
             MudDialog.Close(DialogResult.Ok(true));
             this.StateHasChanged();
+
+            _content.Exit(WizardResult.Ok);
+
         }
 
         internal bool Validate()
@@ -127,5 +140,6 @@ namespace Bb.Wizards
 
     }
 
+   
 
 }

@@ -1,21 +1,41 @@
-﻿using Bb.NewModules;
+﻿using Bb.ComponentModel.Attributes;
+using Bb.Modules;
+using Bb.NewModules;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using System.ComponentModel;
 
 namespace Bb.Wizards
 {
 
 
+    [ExposeClass(UIConstants.Service, ExposedType = typeof(WizardModel), LifeCycle = IocScopeEnum.Transiant)]
     public class WizardModel : INotifyPropertyChanged
     {
 
-        public WizardModel()
+        public WizardModel(IDialogService dialogService)
         {
+
+            this.DialogService = dialogService;
+
             this._pages = new List<WizardPage>();
             this._index = 0;
         }
 
-        public string Title { get; internal set; }
+        public string Title { get; set; }
 
+
+        public WizardModel SetTitle(string title)
+        {
+            this.Title = title;
+            return this;
+        }
+
+        public WizardModel SetModel(object model)
+        {
+            this._model = model;
+            return this;
+        }
 
         public void Previous()
         {
@@ -39,7 +59,7 @@ namespace Bb.Wizards
                 _index++;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Title"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentPage"));
-                
+
             }
         }
 
@@ -48,7 +68,7 @@ namespace Bb.Wizards
             if (index >= 0 && index < this._pages.Count)
                 _index = index;
         }
-                
+
 
         internal bool DisableCanPrevious()
         {
@@ -86,7 +106,15 @@ namespace Bb.Wizards
         }
 
 
-        
+        public WizardModel AddPage(string title = null, Action<WizardPage> action = null)
+        {
+
+            if (this._model == null)
+                throw new InvalidOperationException("Model is not defined");
+
+            return AddPage(this._model, title, action);
+
+        }
 
         public WizardModel AddPage(object model, string title = null, Action<WizardPage> action = null)
         {
@@ -110,15 +138,59 @@ namespace Bb.Wizards
 
         public IEnumerable<WizardPage> Pages => this._pages;
 
+
+        public int Index { get => _index; }
+
         internal WizardPage CurrentPage { get => _pages[_index]; }
 
         public UIWizard Wizard { get; internal set; }
 
 
-        private int _index;
-        private List<WizardPage> _pages;
+        public WizardModel Show(DialogOptions options = null)
+        {
+
+            var b = new DialogParameters
+            {
+                { "Content", this }
+            };
+
+            if (options == null)
+                options = new DialogOptions()
+                {
+                    MaxWidth = MaxWidth.Medium,
+                    FullWidth = true,
+                    CloseOnEscapeKey = true,
+                    NoHeader = false,
+                    Position = DialogPosition.Center,
+                };
+
+            _reference = DialogService.Show<UIWizard>("Options Dialog", b, options);
+
+            return this;
+
+        }
+
+        internal void Exit(WizardResult result)
+        {
+            
+        }
+
+        public IDialogService DialogService { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        private int _index;
+        private List<WizardPage> _pages;
+        private object _model;
+        private IDialogReference _reference;
+
+
     }
-       
+
+    public enum WizardResult
+    {
+        Cancel,
+        Ok,
+    }
+
 }

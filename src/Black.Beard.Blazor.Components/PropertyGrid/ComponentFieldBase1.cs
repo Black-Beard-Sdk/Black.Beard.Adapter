@@ -161,7 +161,7 @@ namespace Bb.PropertyGrid
 
                     var c = object.Equals(v, _value);
 
-                    if (this.Property.KingView == PropertyKingView.Date.ToString() || this.Property.KingView == PropertyKingView.DateOffset.ToString())
+                    if (this.Property.KindView == PropertyKingView.Date.ToString() || this.Property.KindView == PropertyKingView.DateOffset.ToString())
                     {
                         if (Property.IsNullable)
                         {

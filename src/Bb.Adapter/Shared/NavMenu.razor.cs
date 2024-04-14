@@ -26,7 +26,7 @@ namespace Bb.Adapter.Shared
             var menuBuilder = new MenuConverter(translateService, GuardMenuProvider);
             if (uIService != null)
             {
-                var m = await uIService.GetUI(UIService.LeftMenu);
+                var m = await uIService.GetUI(UIKeys.Menus.LeftMenu);
                 if (m != null)
                     foreach (var m1 in m)
                         Menus.Add((DynamicServerMenu)menuBuilder.Convert(m1));

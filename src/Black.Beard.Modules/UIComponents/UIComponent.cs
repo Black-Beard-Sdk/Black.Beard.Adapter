@@ -1,9 +1,83 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.UIComponents;
+using ICSharpCode.Decompiler.CSharp.Syntax;
+using System;
 using System.Diagnostics;
+using System.Reflection.Emit;
 
 namespace Bb.UIComponents
 {
+
+
+    public static class UIComponentExtension
+    {
+
+
+        public static T WithDisplay<T>(this T self, TranslatedKeyLabel display)
+            where T : UIComponent
+        {
+            self.Display = display;
+            return self;
+        }
+
+
+        public static T SetIcon<T>(this T self, Glyph glyph)
+            where T : UIComponent
+        {
+            self.Icon = glyph;
+            return self;
+        }
+
+
+        public static T WithRoles<T>(this T self, params string[] roles)
+            where T : UIComponent
+        {
+
+            foreach (var role in roles)
+                self.Roles.Add(role);
+
+            return self;
+
+        }
+
+
+        public static T Add<T>(this T self, T child)
+            where T : UIComponent
+        {
+
+            if (child.Parent != null)
+                child.Parent.RemoveChild(child);
+
+            child.Parent = self;
+            child.Service = self.Service;
+            child.Type = self.Type;
+
+            self._children.Add(child);
+
+            return child;
+
+        }
+
+
+        public static UIComponentMenu AddMenu(this UIComponentMenu self, Guid? guid, TranslatedKeyLabel label = null)
+        { 
+            if (guid == null)
+                guid = Guid.NewGuid();
+            return self.Add(new UIComponentMenu(guid, label));
+        }
+
+
+        public static UIComponent RemoveChild<T>(this T self, UIComponent child)
+            where T : UIComponent
+        {
+            self._children.Remove(child);
+            child.Parent = null;
+            return self;
+
+        }
+
+
+    }
 
 
     [DebuggerDisplay("{Display} : {Uuid}")]
@@ -26,7 +100,7 @@ namespace Bb.UIComponents
         public UIService? Service { get; internal set; }
 
 
-        public UIComponent? Parent { get; private set; }
+        public UIComponent? Parent { get; internal set; }
 
 
         public Guid Uuid { get; set; }
@@ -41,80 +115,30 @@ namespace Bb.UIComponents
         public HashSet<string> Roles { get; }
 
 
-        public UIComponent WithRoles(params string[] roles)
-        {
-
-            foreach (var role in roles)
-                Roles.Add(role);
-
-            return this;
-
-        }
-
-        public UIComponent SetIcon(Glyph glyph)
-        {
-            this.Icon = glyph;
-            return this;
-        }
-
         public object Convert(IMenuConverter menuConverter)
         {
             return menuConverter.Convert(this);
         }
 
+
         public string Type { get; set; }
 
 
-        public UIComponent RemoveChild(UIComponent child)
-        {
-
-            this._children.Remove(child);
-            child.Parent = null;
-
-            return this;
-
-        }
-
-        
-        public UIComponentMenu AddMenu(Guid? guid, TranslatedKeyLabel label = null)
-        {
-
-            if (guid == null)
-                guid = Guid.NewGuid();
-
-            return this.Add(new UIComponentMenu(guid, label));
-        }
-
-        
-        public T Add<T>(T child)
-            where T : UIComponent
-        {
-
-            if (child.Parent != null)
-                child.Parent.RemoveChild(child);
-
-            child.Parent = this;
-            child.Service = this.Service;
-            child.Type = this.Type;
-
-            this._children.Add(child);
-
-            return child;
-
-        }
-
         public IEnumerable<UIComponent> Children { get; }
 
-        public static class Types
-        {
 
-            public const string Menu = "Menu";
+        internal readonly List<UIComponent> _children;
 
-        }
-
-        private readonly List<UIComponent> _children;
+        internal volatile object _lock = new object();
 
     }
 
+
+    public static class UITypes
+    {
+
+        public const string Menu = "Menu";
+
+    }
 
 }

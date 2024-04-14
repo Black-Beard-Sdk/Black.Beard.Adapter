@@ -46,25 +46,9 @@ namespace Bb.CustomComponents
         internal PropertyObjectDescriptor Build()
         {
 
-            if (_strategy.TryGetValueByType(this.Type, out StrategyEditor? strategyE))
-                AssignStrategy(strategyE);
-
-            //else if (this.Type.IsEnum)
-            //{
-            //    this.EditorType = typeof(ComponentEnumeration);
-            //    this.KingView = PropertyKingView.Enumeration.ToString();
-            //    this.ListProvider = typeof(EnumListProvider);
-            //}
-
-            else if (typeof(IEnumerable).IsAssignableFrom(this.Type))
-                foreach (var item in this.Type.GetInterfaces())
-                    if (item.IsGenericType && item.GetGenericTypeDefinition() is Type type && type == typeof(ICollection<>))
-                    {
-                        this.SubType = item.GetGenericArguments()[0];
-                        this.KingView = PropertyKingView.List.ToString();
-                        this.EditorType = typeof(ComponentList);
-                    }
-
+            if (_strategy.TryGetValueByType(this.Type, out StrategyEditor? strategyEditor))
+                AssignStrategy(strategyEditor);
+         
             this.IsValid = this.EditorType != null;
 
             return this;
@@ -125,7 +109,7 @@ namespace Bb.CustomComponents
         {
 
             this.EditorType = strategy.ComponentView;
-            this.KingView = strategy.PropertyKingView;
+            this.KindView = strategy.PropertyKingView;
 
             var i = strategy.Initializer;
             if (i != null)
@@ -178,15 +162,14 @@ namespace Bb.CustomComponents
             return Parent.TranslateService.Translate(this.Category);
         }
 
-        public Type SubType { get; private set; }
+        public Type SubType { get; set; }
+
         public string Name { get; }
         public ObjectDescriptor Parent { get; }
+
         public bool IsValid { get; private set; }
 
         public PropertyDescriptor PropertyDescriptor { get; set; }
-
-
-
 
         public TranslatedKeyLabel Display { get; set; }
 
@@ -206,7 +189,7 @@ namespace Bb.CustomComponents
 
         public bool HtmlEncode { get; set; }
 
-        public string KingView { get; set; }
+        public string KindView { get; set; }
 
         public bool IsNullable { get; set; }
 

@@ -30,7 +30,7 @@ namespace Bb.Adapter.Shared
             var menuBuilder = new MenuConverter(translateService, guardMenuProvider);
             if (UIService != null)
             {
-                var m = await UIService.GetUI(UIService.TopLeftMenu);
+                var m = await UIService.GetUI(UIKeys.Menus.TopLeftMenu);
                 if (m != null)
                     foreach (var m1 in m)
                         menusLeft.Add((DynamicServerMenu)menuBuilder.Convert(m1));
@@ -40,7 +40,7 @@ namespace Bb.Adapter.Shared
             menuBuilder = new MenuConverter(translateService, guardMenuProvider);
             if (UIService != null)
             {
-                var m = await UIService.GetUI(UIService.TopRightMenu);
+                var m = await UIService.GetUI(UIKeys.Menus.TopRightMenu);
                 if (m != null)
                     foreach (var m1 in m)
                         menusRight.Add((DynamicServerMenu)menuBuilder.Convert(m1));

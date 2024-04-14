@@ -8,13 +8,9 @@ namespace Bb.Modules
     public class NewModuleDescription
     {
 
-        //[Description("Name of the module")]
-        //[Required]
-        //public string Name { get; set; }
-
         [Description("Name of the module")]
         [Required]
-        public Enum1 Name { get; set; }
+        public string Name { get; set; }
 
         [Description("Description of the finality of the new module")]
         [Required]
@@ -23,7 +19,7 @@ namespace Bb.Modules
         [Description("Type based module")]
         [ListProvider(typeof(ListProviderModule))]
         [Required]
-        public Guid Type { get; set; }
+        public Guid? Type { get; set; }
 
     }
 

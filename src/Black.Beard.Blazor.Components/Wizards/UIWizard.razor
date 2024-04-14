@@ -6,28 +6,44 @@
     <TitleContent>
         <MudText Typo="Typo.h6">
             <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @this.Content.Title
+
+            <MudCarousel @ref=_carousel BulletsPosition="Position.Top" Class="mud-width-full" Style="height:90px" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="false" AutoCycle="false" TData="WizardPage">            
+                @foreach (WizardPage page in this.Content.Pages)
+                {
+                    <MudCarouselItem Transition="Transition.Slide" Style="margin-top:40px" >
+                        <MudContainer Style="text-align:left;vertical-align:text-bottom">
+                            @(page.Description)
+                        </MudContainer>
+                    </MudCarouselItem>
+                }
+            </MudCarousel>
         </MudText>
     </TitleContent>
+
+
     <DialogContent>
+        <MudPaper Elevation="1" Height="300px">
+            
+            <MudContainer >
 
-        <MudPaper Height="400px" Width="100%">
-            <MudContainer MaxWidth="MaxWidth.Medium">
-
-                <PropertyGridView SelectedObject="@CurrentModel"
+                <PropertyGridView @ref="CurrentPropertyGridView"
                                   PropertyHasChanged="PropertyHasChanged"
                                   PropertyFilter="PropertyFilter"
-                                  @ref="CurrentPropertyGridView" />
+                                  SelectedObject="@CurrentModel" />
 
             </MudContainer>
         </MudPaper>
-
     </DialogContent>
+
+
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanCancel OnClick=Cancel StartIcon="@Icons.Material.Filled.Cancel">Cancel</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanPrevious OnClick=GoToPreviousStep StartIcon="@Icons.Material.Filled.SkipPrevious">Previous</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanNext OnClick=GoToNextStep EndIcon="@Icons.Material.Filled.SkipNext">Next</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanValidate OnClick=Apply EndIcon="@Icons.Material.Filled.Check">Apply</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanValidate OnClick=Apply EndIcon="@Icons.Material.Filled.Check">Submit</MudButton>
     </DialogActions>
+
+
 </MudDialog>
 
 

@@ -47,8 +47,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.70" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.70" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.73" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.73" />
     <PackageReference Include="MudBlazor" Version="6.19.1" />
   </ItemGroup>
 

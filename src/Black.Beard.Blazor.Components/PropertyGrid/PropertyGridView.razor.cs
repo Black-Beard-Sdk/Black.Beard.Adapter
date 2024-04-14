@@ -25,8 +25,6 @@ namespace Bb.PropertyGrid
         public PropertyGridView()
         {
 
-            PropertyFilter = c => true;
-
         }
 
         [Inject]
@@ -36,7 +34,12 @@ namespace Bb.PropertyGrid
         public IServiceProvider ServiceProvider { get; set; }
 
         [Parameter]
-        public Func<PropertyObjectDescriptor, bool> PropertyFilter { get; set; }
+        public Func<PropertyObjectDescriptor, bool> PropertyFilter
+        {
+            get => _propertyFilter;
+            set => _propertyFilter = value;
+        }
+
 
         [Parameter]
         public Action<PropertyObjectDescriptor> PropertyHasChanged { get; set; }
@@ -103,6 +106,7 @@ namespace Bb.PropertyGrid
         string[] errors = { };
         MudForm form;
         private object _selectedObject;
+        private Func<PropertyObjectDescriptor, bool> _propertyFilter = c => true;
 
     }
 
