@@ -1,6 +1,4 @@
-﻿using Bb.CustomComponents;
-using Bb.PropertyGrid;
-using ICSharpCode.Decompiler.Util;
+﻿
 
 namespace Bb.CustomComponents
 {
@@ -181,7 +179,10 @@ namespace Bb.CustomComponents
 
         }
 
-        public static StrategyMapper Default(string name) => new StrategyMapper(name)
+        public static StrategyMapper Default(string name)
+        {
+
+            var strategy = new StrategyMapper(name)
                 .Source(PropertyKingView.String, () => string.Empty)
                 .Source<char>(PropertyKingView.Char)
                 .Source(PropertyKingView.Bool, () => true)
@@ -211,24 +212,16 @@ namespace Bb.CustomComponents
                 .Source(PropertyKingView.Double, () => 0d)
                 .Source<double?>(PropertyKingView.Double, () => 0d)
                 .Source<decimal>(PropertyKingView.Decimal, () => 0)
-                .Source<decimal?>(PropertyKingView.Decimal, () => 0)
+                .Source<decimal?>(PropertyKingView.Decimal, () => 0);
 
-                .ToTarget<ComponentChar>(PropertyKingView.Char)
-                .ToTarget<ComponentBool>(PropertyKingView.Bool)
-                //.ToTarget<ComponentTime>(PropertyKingView.Time)
-                .ToTarget<ComponentString>(PropertyKingView.String)
-            //.ToTarget<ComponentInt16>(PropertyKingView.Int16)
-            //.ToTarget<ComponentInt32>(PropertyKingView.Int32)
-            //.ToTarget<ComponentInt64>(PropertyKingView.Int64)
-            //.ToTarget<ComponentUInt16>(PropertyKingView.UInt16)
-            //.ToTarget<ComponentUInt32>(PropertyKingView.UInt32)
-            //.ToTarget<ComponentUInt64>(PropertyKingView.UInt64)
-            //.ToTarget<ComponentDate>(PropertyKingView.Date)
-            //.ToTarget<ComponentDateOffset>(PropertyKingView.DateOffset)
-            //.ToTarget<ComponentFloat>(PropertyKingView.Float)
-            //.ToTarget<ComponentDouble>(PropertyKingView.Double)
-            //.ToTarget<ComponentDecimal>(PropertyKingView.Decimal)
-            ;
+            if (DefaultInitializerExtension != null)
+                DefaultInitializerExtension(strategy);
+
+            return strategy;
+
+        }
+
+        public static Action<StrategyMapper> DefaultInitializerExtension { get; set; }
 
         public string Key { get; }
 

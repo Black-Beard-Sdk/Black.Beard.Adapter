@@ -1,5 +1,4 @@
-﻿using Bb.ComponentModel.Attributes;
-using Bb.ComponentModel.Translations;
+﻿using Bb.ComponentModel.Translations;
 using Bb.PropertyGrid;
 using System.Collections;
 using System.ComponentModel;

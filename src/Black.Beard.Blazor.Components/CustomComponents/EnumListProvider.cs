@@ -1,10 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.DataAnnotations;
 using Bb.ComponentModel.Translations;
-using Bb.Modules;
-using Microsoft.AspNetCore.Components;
-using System.ComponentModel;
-using System.Reflection.Metadata;
 
 namespace Bb.CustomComponents
 {

@@ -12,7 +12,7 @@ namespace Bb.PropertyGrid
         public DynamicPropertyComponent()
         {
 
-        }        
+        }
 
         [Parameter]
         public object Model 
@@ -25,28 +25,6 @@ namespace Bb.PropertyGrid
                 StateHasChanged();
             }
         }
-
-
-        public IDictionary<string, object> Parameters 
-        {
-            get
-            {
-                var result = new Dictionary<string, object>()
-                {
-                    { "CurrentVariant", CurrentVariant },
-                    { "CurrentMargin", CurrentMargin },
-                    { "Property", Property },
-                };
-       
-                return result;
-
-            }
-        }
-
-
-        private DynamicComponent Ui;
-
-        public object _model { get; set; }
 
         [Parameter]
         public Variant CurrentVariant { get; set; } = Variant.Outlined;
@@ -71,6 +49,27 @@ namespace Bb.PropertyGrid
 
         [Inject]
         public IServiceProvider ServiceProvider { get; set; }
+
+
+        public IDictionary<string, object> Parameters
+        {
+            get
+            {
+                var result = new Dictionary<string, object>()
+                {
+                    { "CurrentVariant", CurrentVariant },
+                    { "CurrentMargin", CurrentMargin },
+                    { "Property", Property },
+                };
+
+                return result;
+
+            }
+        }
+
+
+        private object _model;
+        private DynamicComponent Ui;
 
     }
 
