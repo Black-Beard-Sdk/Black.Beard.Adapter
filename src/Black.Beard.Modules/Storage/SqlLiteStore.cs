@@ -93,8 +93,8 @@ namespace Bb.Modules.Storage
 
             Func<IDataReader, bool> action = reader =>
             {
-                var instance = new ModuleInstance(reader.GetGuid(0), this);
-                result = new StoreItem<ModuleInstance>(instance, reader.GetGuid(2));
+                //var instance = new ModuleInstance(reader.GetGuid(0), this);
+                //result = new StoreItem<ModuleInstance>(instance, reader.GetGuid(2));
 
                 return true;
             };
@@ -111,6 +111,14 @@ namespace Bb.Modules.Storage
         }
 
         public void Save(StoreItem<ModuleInstance> value)
+        {
+
+            var sql = _table.CreateUpdate();
+
+
+        }
+
+        public void Save(ModuleInstance value)
         {
 
             var sql = _table.CreateInsert();

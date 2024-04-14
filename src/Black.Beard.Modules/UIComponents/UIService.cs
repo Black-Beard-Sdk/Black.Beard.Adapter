@@ -43,6 +43,7 @@ namespace Bb.UIComponents
 
 
         }
+        
         public ActionReference GetAction(NavLinkMatch match, Type type)
         {
 
@@ -192,6 +193,7 @@ namespace Bb.UIComponents
                 action(menu);
 
         }
+
 
         public UIComponentMenu? GetMenu(string name, Guid? guid)
         {

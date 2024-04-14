@@ -32,7 +32,7 @@ namespace Bb.Wizards
             {
                 _content = value;
                 if (value != null)
-                    _content.Wizard = this;                
+                    _content.Wizard = this;
                 this.StateHasChanged();
             }
         }
@@ -88,9 +88,7 @@ namespace Bb.Wizards
         {
             _content.Wizard = null;
             MudDialog.Cancel();
-
-            _content.Exit( WizardResult.Cancel);
-
+            _content.Exit(WizardResult.Cancel);
         }
 
         internal async Task GoToPreviousStep()
@@ -140,6 +138,6 @@ namespace Bb.Wizards
 
     }
 
-   
+
 
 }

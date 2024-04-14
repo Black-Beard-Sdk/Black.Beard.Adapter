@@ -1,6 +1,5 @@
 ﻿using Bb.ComponentModel.Attributes;
-using Bb.Modules;
-using Bb.NewModules;
+
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.ComponentModel;
@@ -9,7 +8,7 @@ namespace Bb.Wizards
 {
 
 
-    [ExposeClass(UIConstants.Service, ExposedType = typeof(WizardModel), LifeCycle = IocScopeEnum.Transiant)]
+    [ExposeClass("Service", ExposedType = typeof(WizardModel), LifeCycle = IocScopeEnum.Transiant)]
     public class WizardModel : INotifyPropertyChanged
     {
 
@@ -23,7 +22,6 @@ namespace Bb.Wizards
         }
 
         public string Title { get; set; }
-
 
         public WizardModel SetTitle(string title)
         {
@@ -69,7 +67,6 @@ namespace Bb.Wizards
                 _index = index;
         }
 
-
         internal bool DisableCanPrevious()
         {
             var result = _index > 0;
@@ -105,7 +102,6 @@ namespace Bb.Wizards
             return result;
         }
 
-
         public WizardModel AddPage(string title = null, Action<WizardPage> action = null)
         {
 
@@ -138,13 +134,11 @@ namespace Bb.Wizards
 
         public IEnumerable<WizardPage> Pages => this._pages;
 
-
         public int Index { get => _index; }
 
         internal WizardPage CurrentPage { get => _pages[_index]; }
 
         public UIWizard Wizard { get; internal set; }
-
 
         public WizardModel Show(DialogOptions options = null)
         {
@@ -172,13 +166,31 @@ namespace Bb.Wizards
 
         internal void Exit(WizardResult result)
         {
-            
+            if (_close != null)
+                _close(this, result);
+        }
+
+        public WizardModel ExecuteOnClose(Action<WizardModel, WizardResult> action)
+        {
+            this._close = action;
+            return this;
+        }
+
+        public T GetModel<T>()
+        {
+            return (T)this._model;
+        }
+
+        public T GetModel<T>(int page)
+        {
+            return (T)this._pages[page].Model;
         }
 
         public IDialogService DialogService { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        private Action<WizardModel, WizardResult> _close;
         private int _index;
         private List<WizardPage> _pages;
         private object _model;

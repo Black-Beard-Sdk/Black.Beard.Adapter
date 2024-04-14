@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.UIComponents;
+using ICSharpCode.Decompiler.CSharp.Syntax;
 using Microsoft.AspNetCore.Components.Routing;
 
 namespace Bb.UIComponents
@@ -26,8 +27,6 @@ namespace Bb.UIComponents
         public IEnumerable<GuardContainer> ViewGuards { get => _viewGuards; }
 
         public IEnumerable<GuardContainer> EnabledGuards { get => _enabledGuards; }
-
-
 
         public UIComponent SetKeyboardArrowDown(bool activated)
         {

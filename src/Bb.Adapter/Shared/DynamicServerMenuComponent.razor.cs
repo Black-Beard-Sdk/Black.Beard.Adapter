@@ -8,13 +8,26 @@ namespace Bb.Adapter.Shared
     {
 
 
-        [Parameter]
-        public DynamicServerMenu? Menu { get; set; }
+        public DynamicServerMenuComponent()
+            : base()
+        {
+                
+        }
 
-
         [Parameter]
-        public bool Enabled { get; set; }
+        public DynamicServerMenu? Menu 
+        {
+            get => _menu;
+            set
+            {
+                _menu = value;
+
+            }
+        }
+
+        private DynamicServerMenu? _menu;
 
     }
 
 }
+

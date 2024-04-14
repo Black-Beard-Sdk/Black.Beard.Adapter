@@ -40,13 +40,17 @@ namespace Bb.Modules
         /// </summary>
         /// <param name="uuid"></param>
         /// <returns></returns>
-        private ModuleInstance Create(Guid uuid)
+        public ModuleInstance Create(Guid uuid, string name, string description)
         {
 
             //if (_store.Exist(uuid))
             //    return _store.Load(uuid);
 
-            var result = new ModuleInstance(uuid, _store);
+            var result = new ModuleInstance(uuid, Guid.NewGuid(), _store)
+            {
+                Label = name,
+                Description = description,
+            };
 
             return result;
 

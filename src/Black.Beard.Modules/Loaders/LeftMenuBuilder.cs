@@ -23,28 +23,6 @@ namespace Bb.Loaders
         public string FriendlyName => GetType().Name;
 
 
-        public object Run(UIService service)
-        {
-
-            service.Initialize(UIKeys.Menus.LeftMenu, UIKeys.Menus.Home, menu =>
-            {
-
-                menu.WithDisplay(new TranslatedKeyLabel("LeftMenu", "Home", null, null))
-                    .SetActionMatchAll()
-                    .SetIcon(GlyphFilled.Home)
-                ;
-
-            });
-
-            return 0;
-
-        }
-
-        public object Run(object context)
-        {
-            return Run((UIService)context);
-        }
-
         public bool CanExecute(object context)
         {
             return CanExecute((UIService)context);
@@ -55,13 +33,38 @@ namespace Bb.Loaders
             return true;
         }
 
-        public object Execute(UIService context)
+        public object Execute(UIService service)
         {
+
+            service.Initialize(UIKeys.Menus.LeftMenu, UIKeys.Menus.Home, menu =>
+            {
+
+                menu.WithDisplay(new TranslatedKeyLabel("LeftMenu", "Home", null, null))
+                    .SetActionMatchAll()
+                    .SetIcon(GlyphFilled.Home)
+                    .Menu(NewModule, m =>
+                    {
+                        m.WithDisplay("New module")
+                         .SetExecute(Actions.ExecuteNewModule)
+                        ;
+                    })
+                ;
+
+            });
+
+
             return 0;
         }
 
+        public object Execute(object context)
+        {
+            return Execute((UIService)context);
+        }
+
+        static readonly Guid NewModule = new("{C8063B0B-B057-4BCB-8629-19D149FE9181}");
         static readonly Guid guidConnectors = new("{C8063B0B-B057-4BCB-8629-19D149FE9881}");
 
     }
+
 
 }

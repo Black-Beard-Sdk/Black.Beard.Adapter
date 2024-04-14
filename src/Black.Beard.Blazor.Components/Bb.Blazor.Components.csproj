@@ -43,17 +43,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="NewModules\NewModule.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.73" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.73" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.74" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.74" />
     <PackageReference Include="MudBlazor" Version="6.19.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Black.Beard.Modules\Black.Beard.Modules.csproj" />
   </ItemGroup>
 
 </Project>

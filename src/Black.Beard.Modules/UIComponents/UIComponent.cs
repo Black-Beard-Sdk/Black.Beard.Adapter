@@ -9,77 +9,6 @@ namespace Bb.UIComponents
 {
 
 
-    public static class UIComponentExtension
-    {
-
-
-        public static T WithDisplay<T>(this T self, TranslatedKeyLabel display)
-            where T : UIComponent
-        {
-            self.Display = display;
-            return self;
-        }
-
-
-        public static T SetIcon<T>(this T self, Glyph glyph)
-            where T : UIComponent
-        {
-            self.Icon = glyph;
-            return self;
-        }
-
-
-        public static T WithRoles<T>(this T self, params string[] roles)
-            where T : UIComponent
-        {
-
-            foreach (var role in roles)
-                self.Roles.Add(role);
-
-            return self;
-
-        }
-
-
-        public static T Add<T>(this T self, T child)
-            where T : UIComponent
-        {
-
-            if (child.Parent != null)
-                child.Parent.RemoveChild(child);
-
-            child.Parent = self;
-            child.Service = self.Service;
-            child.Type = self.Type;
-
-            self._children.Add(child);
-
-            return child;
-
-        }
-
-
-        public static UIComponentMenu AddMenu(this UIComponentMenu self, Guid? guid, TranslatedKeyLabel label = null)
-        { 
-            if (guid == null)
-                guid = Guid.NewGuid();
-            return self.Add(new UIComponentMenu(guid, label));
-        }
-
-
-        public static UIComponent RemoveChild<T>(this T self, UIComponent child)
-            where T : UIComponent
-        {
-            self._children.Remove(child);
-            child.Parent = null;
-            return self;
-
-        }
-
-
-    }
-
-
     [DebuggerDisplay("{Display} : {Uuid}")]
     public class UIComponent
     {
@@ -101,6 +30,8 @@ namespace Bb.UIComponents
 
 
         public UIComponent? Parent { get; internal set; }
+
+        public Delegate Execute { get; internal set; }
 
 
         public Guid Uuid { get; set; }
@@ -130,14 +61,6 @@ namespace Bb.UIComponents
         internal readonly List<UIComponent> _children;
 
         internal volatile object _lock = new object();
-
-    }
-
-
-    public static class UITypes
-    {
-
-        public const string Menu = "Menu";
 
     }
 

@@ -36,6 +36,12 @@ namespace Bb.Modules.Storage
         void Save(StoreItem<TValue> key);
 
         /// <summary>
+        /// Save the model
+        /// </summary>
+        /// <param name="value"></param>
+        void Save(TValue key);
+
+        /// <summary>
         /// Remove the model
         /// </summary>
         /// <param name="value"></param>
