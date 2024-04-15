@@ -1,18 +1,18 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 
-namespace Bb.UIComponents
+namespace Bb.UIComponents.Guards
 {
 
 
-    [ExposeClass(UIConstants.Service, ExposedType =typeof(GuardMenuProvider), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(UIConstants.Service, ExposedType = typeof(GuardMenuProvider), LifeCycle = IocScopeEnum.Singleton)]
     public class GuardMenuProvider
     {
 
         public GuardMenuProvider(IServiceProvider service)
         {
 
-            this._service = service;
+            _service = service;
 
         }
 

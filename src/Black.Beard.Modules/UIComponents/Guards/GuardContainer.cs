@@ -1,4 +1,4 @@
-﻿namespace Bb.UIComponents
+﻿namespace Bb.UIComponents.Guards
 {
     public class GuardContainer<TIGuardMenu> : GuardContainer
             where TIGuardMenu : IGuardMenu
@@ -7,13 +7,13 @@
 
         public GuardContainer(Func<TIGuardMenu, bool> evaluator)
         {
-            this._evaluator = evaluator;
+            _evaluator = evaluator;
         }
 
         public override bool Evaluate(GuardMenuProvider provider)
         {
             TIGuardMenu service = (TIGuardMenu)provider.Get(typeof(TIGuardMenu));
-            var result = this._evaluator(service);
+            var result = _evaluator(service);
             return result;
         }
 

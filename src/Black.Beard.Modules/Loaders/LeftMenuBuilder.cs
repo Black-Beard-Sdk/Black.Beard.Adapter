@@ -36,16 +36,16 @@ namespace Bb.Loaders
         public object Execute(UIService service)
         {
 
-            service.Initialize(UIKeys.Menus.LeftMenu, UIKeys.Menus.Home, menu =>
+            service.Initialize(UIKeys.Menus.LeftMenu, UIKeys.Menus.Modules, menu =>
             {
 
-                menu.WithDisplay(new TranslatedKeyLabel("LeftMenu", "Home", null, null))
+                menu.WithDisplay(new TranslatedKeyLabel("LeftMenu", "Modules", null, null))
                     .SetActionMatchAll()
                     .SetIcon(GlyphFilled.Home)
                     .Menu(NewModule, m =>
                     {
-                        m.WithDisplay("New module")
-                         .SetExecute(Actions.ExecuteNewModule)
+                        m.WithDisplay("New")
+                         .SetExecute(ActionModules.ExecuteNewModule)
                         ;
                     })
                 ;

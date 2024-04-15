@@ -1,10 +1,8 @@
 ﻿using Bb.ComponentModel.Translations;
-using Bb.UIComponents;
-using Microsoft.AspNetCore.Components;
+using Bb.UIComponents.Guards;
+using Bb.UserInterfaces;
 using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+using System.ComponentModel;
 
 namespace Bb.UIComponents
 {
@@ -25,10 +23,11 @@ namespace Bb.UIComponents
 
             var menu = new DynamicServerMenu(c.Children.Count())
             {
+
                 Uui = c.Uuid,
-                
-                Display = c.Display != null 
-                    ? this._translateService.Translate(c.Display) 
+
+                Display = c.Display != null
+                    ? this._translateService.Translate(c.Display)
                     : string.Empty,
 
                 Type = c.Type,
@@ -88,6 +87,9 @@ namespace Bb.UIComponents
         private readonly GuardMenuProvider? _guardProvider;
         private readonly ITranslateService _translateService;
         private readonly IServiceProvider _serviceProvider;
+
+
+
     }
 
 

@@ -1,7 +1,8 @@
-﻿using Bb.UIComponents;
+﻿
+using Bb.UserInterfaces;
 using Microsoft.AspNetCore.Components;
 
-namespace Bb.Adapter.Shared
+namespace Bb.Menus
 {
 
     public partial class DynamicServerMenuComponent

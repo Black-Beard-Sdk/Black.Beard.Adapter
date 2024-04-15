@@ -2,6 +2,7 @@
 using Bb.UIComponents;
 using ICSharpCode.Decompiler.CSharp.Syntax;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection.Emit;
 
@@ -10,7 +11,7 @@ namespace Bb.UIComponents
 
 
     [DebuggerDisplay("{Display} : {Uuid}")]
-    public class UIComponent
+    public class UIComponent //: ILocalComponent
     {
 
         public UIComponent(Guid? uuid, TranslatedKeyLabel? display = null)
@@ -58,10 +59,39 @@ namespace Bb.UIComponents
         public IEnumerable<UIComponent> Children { get; }
 
 
+
+
+
+        //public void Register(ILocalSite site)
+        //{
+        //    lock (_lock)
+        //    {
+        //        if (!_sites.Contains(site))
+        //            _sites.Add(site);
+        //    }
+        //}
+
+        //public void Dispose()
+        //{
+        //    lock (_lock)
+        //    {
+        //        foreach (var item in _sites)
+        //        {
+        //            item.Dispose();
+        //        }
+        //    }
+        //}
+
+        //public ILocalSite? Site { get; set; }
+        //public event EventHandler? Disposed;
+        //public event PropertyChangedEventHandler? PropertyChanged;
+        //private List<ILocalSite> _sites = new List<ILocalSite>();
+
+
+
+
         internal readonly List<UIComponent> _children;
-
         internal volatile object _lock = new object();
-
     }
 
 }

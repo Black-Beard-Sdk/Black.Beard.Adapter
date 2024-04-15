@@ -1,4 +1,4 @@
-﻿namespace Bb.UIComponents
+﻿namespace Bb.UIComponents.Guards
 {
 
 

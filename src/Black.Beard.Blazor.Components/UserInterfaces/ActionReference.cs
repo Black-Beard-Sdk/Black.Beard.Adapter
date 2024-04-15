@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Routing;
 
 
-namespace Bb.UIComponents
+namespace Bb.UserInterfaces
 {
 
     public class ActionReference

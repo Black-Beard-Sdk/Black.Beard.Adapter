@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
 
-namespace Bb.UIComponents
+namespace Bb.UserInterfaces
 {
     public class EventContext
     {

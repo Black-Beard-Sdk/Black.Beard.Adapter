@@ -1,12 +1,13 @@
 ﻿using Bb.Modules;
 using Bb.UIComponents;
+using Bb.UserInterfaces;
 using Bb.Wizards;
 
 
 namespace Bb.Loaders
 {
 
-    public static class Actions
+    public static class ActionModules
     {
 
 
