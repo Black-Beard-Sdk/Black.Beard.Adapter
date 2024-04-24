@@ -48,23 +48,14 @@ namespace Bb.MockService
 
             base.ConfigureServices(services);
 
-        }
-
-
-        /// <summary>
-        /// Configures the custom services.
-        /// </summary>
-        /// <param name="services"></param>
-        public override void AppendServices(IServiceCollection services)
-        {
 
             //RegisterServicesPolicies(services);
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMudServices();
-        }
 
+        }
 
         /// <summary>
         /// Configures the specified application.
