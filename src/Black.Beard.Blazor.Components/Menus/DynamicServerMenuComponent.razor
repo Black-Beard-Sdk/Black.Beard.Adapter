@@ -7,18 +7,15 @@
     <MudNavMenu onclick="@(Menu.OnClick)">
         @if (Menu.IsEmpty)
         {
-            if (Menu.ViewGuard)
-            {
-                <MudNavLink>@Menu.Display</MudNavLink>
-            }
+            <MudNavLink>@Menu.Display.Translate(this)</MudNavLink>
         }
         else
         {
-            @foreach (DynamicServerMenu subMenu in Menu)
+            @foreach (ServerMenu subMenu in Menu)
             {
                 if (subMenu.ViewGuard)
                 {
-                    <MudText Typo="Typo.h6" Class="px-4">@Menu.Display</MudText>
+                    <MudText Typo="Typo.h6" Class="px-4">@Menu.Display.Translate(this)</MudText>
                     <DynamicServerMenuComponent Menu="@subMenu" />
                 }
 

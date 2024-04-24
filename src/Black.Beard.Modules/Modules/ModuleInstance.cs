@@ -4,24 +4,41 @@ namespace Bb.Modules
 {
 
 
-    public class ModuleInstance
+    public class ModelBase
     {
+
+        public Guid Uuid { get; set; }
+
+        public int Version { get; set; }
+
+        public DateTimeOffset? LastUpdate { get; set; }
+        public DateTimeOffset? Inserted { get; set; }
+
+    }
+
+    public class ModuleInstance : ModelBase
+    {
+
+        public ModuleInstance()
+        {
+            
+        }
 
         public ModuleInstance(Guid uuidSpecification, Guid key, IStore<Guid, ModuleInstance> store)
         {
 
             this.Uuid = key;
-            this.Specification = Specification;
+            this.Specification = uuidSpecification;
             this._store = store;
         }
 
-        public Guid Specification { get; }
 
-        public Guid Uuid { get; }
+        
         public string Label { get; internal set; }
+        
         public string Description { get; internal set; }
 
-        private readonly IStore<Guid, ModuleInstance> _store;
+        public Guid Specification { get; }
 
         internal void Save()
         {
@@ -29,6 +46,9 @@ namespace Bb.Modules
             _store.Save(this);
 
         }
+
+        private readonly IStore<Guid, ModuleInstance> _store;
+
     }
 
 

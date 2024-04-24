@@ -8,31 +8,29 @@ namespace Bb.Loaders
 
 
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IApplicationBuilderInitializer<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
-    public class ModuleInitializeWebApplicationBuilder : IApplicationBuilderInitializer<WebApplicationBuilder>
+    public class ModuleInitializeWebApplicationBuilder : ApplicationInitializerBase<WebApplicationBuilder>
     {
-
-        public ModuleInitializeWebApplicationBuilder()
+               
+        public override void Execute(WebApplicationBuilder builder)
         {
 
+            var services = builder.Services;
 
-        }
+            services.AddAuthorization(options =>
+            {
 
-        public string FriendlyName => GetType().Name;
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireRole("Admin");
+                });
 
-        public int OrderPriority => 0;
+                //options.AddPolicy("Admin", policy => policy.RequireRole("Admin").);
+                //options.AddPolicy("User", policy => policy.RequireRole("User"));
+                //options.AddPolicy("Guest", policy => policy.RequireRole("Guest"));
 
-        public bool Executed { get; set; }
+            });
 
-        public Type Type => typeof(WebApplicationBuilder);
 
-        public bool CanExecute(WebApplicationBuilder builder, InitializationLoader<WebApplicationBuilder> initializer)
-        {
-            return true;
-        }
-                
-        public void Execute(WebApplicationBuilder builder)
-        {
-         
         }
 
     }

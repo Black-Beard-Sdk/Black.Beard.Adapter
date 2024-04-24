@@ -1,5 +1,4 @@
-﻿using Bb.ComponentModel.Accessors;
-using System.ComponentModel.DataAnnotations;
+﻿
 
 
 namespace Bb.Wizards

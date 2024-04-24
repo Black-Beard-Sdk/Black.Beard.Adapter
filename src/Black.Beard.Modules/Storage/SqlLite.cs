@@ -13,7 +13,7 @@ namespace Bb.Modules.Storage
             _path = path.Combine(databaseName + ".db").AsFile();
             if (!_path.Directory.Exists)
                 _path.Directory.Create();
-            _connectionString = $"Data Source={_path.FullName};Version=3;";
+            _connectionString = $"Data Source={_path.FullName}";
 
         }
 
@@ -26,17 +26,22 @@ namespace Bb.Modules.Storage
                 connection.Open();
                 using (var command = new SqliteCommand(sql.ToString(), connection))
                 {
-
-                    foreach (var item in paramters)
-                        command.Parameters.AddWithValue(item.Item1, item.Item2);
-
+                    MapParameter(paramters, command);
                     result = command.ExecuteNonQuery();
-
                 }
             }
 
             return result;
 
+        }
+
+        private static void MapParameter((string, object)[] paramters, SqliteCommand command)
+        {
+            foreach (var item in paramters)
+                if (item.Item1.StartsWith("@"))
+                    command.Parameters.AddWithValue(item.Item1, item.Item2);
+                else
+                    command.Parameters.AddWithValue($"@{item.Item1}", item.Item2);
         }
 
         public void ExecuteReader(StringBuilder sql, Func<IDataReader, bool> action, params (string, object)[] paramters)
@@ -49,9 +54,7 @@ namespace Bb.Modules.Storage
                 using (var command = new SqliteCommand(sql.ToString(), connection))
                 {
 
-                    foreach (var item in paramters)
-                        command.Parameters.AddWithValue(item.Item1, item.Item2);
-
+                    MapParameter(paramters, command);
                     var reader = command.ExecuteReader();
 
                     while (reader.Read())

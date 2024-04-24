@@ -4,7 +4,12 @@
 
 <PageTitle>Adapter</PageTitle>
 
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <MudLayout>
+
 
     <MudAppBar Elevation="0">
 
@@ -19,7 +24,10 @@
 
         <MenuNav Menus="topMenusRight" />
 
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/Garderoben/MudBlazor" Target="_blank" />
+        <MudIconButton Icon="@Icons.Custom.Brands.GitHub"
+                       Color="Color.Inherit"
+                       Link="https://github.com/Garderoben/MudBlazor"
+                       Target="_blank" />
 
     </MudAppBar>
 
@@ -41,8 +49,6 @@
         </MudContainer>
     </MudMainContent>
 
-    <MudThemeProvider />
-    <MudDialogProvider />
-    <MudSnackbarProvider />
+
 
 </MudLayout>

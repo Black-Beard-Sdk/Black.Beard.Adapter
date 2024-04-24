@@ -1,5 +1,4 @@
 ﻿using Bb.ComponentModel.Attributes;
-using ICSharpCode.Decompiler.CSharp.Syntax;
 
 namespace Bb.Modules
 {

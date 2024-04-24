@@ -1,5 +1,4 @@
 ﻿using Bb.Modules;
-using Bb.UIComponents;
 using Bb.UserInterfaces;
 using Bb.Wizards;
 
@@ -14,11 +13,8 @@ namespace Bb.Loaders
         public static async Task ExecuteNewModule(EventContext context, WizardModel wizard, ModuleInstances instances)
         {
 
+            var model = new NewModuleDescription();
 
-            var model = new NewModuleDescription()
-            {
-
-            };
 
             wizard.SetTitle("Add a new module")
                   .SetModel(model)
@@ -42,14 +38,14 @@ namespace Bb.Loaders
 
                           var module = instances.Create(model.Type.Value, model.Name, model.Description);
 
-                          module.Save();
-
                       }
 
                   })
             ;
 
+
             wizard.Show();
+
 
         }
 

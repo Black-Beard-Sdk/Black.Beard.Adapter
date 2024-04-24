@@ -1,6 +1,7 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Translations;
+using Bb.Modules;
 using Bb.UIComponents;
 using Bb.UIComponents.Glyphs;
 
@@ -8,45 +9,57 @@ using Bb.UIComponents.Glyphs;
 namespace Bb.Loaders
 {
 
-    [ExposeClass(UIConstants.LeftMenu, ExposedType = typeof(IInjectBuilder<UIService>))]
-    public class LeftMenuBuilder : IInjectBuilder<UIService>
+
+    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<IConfigurationBuilder>))]
+    public class ConfigurationBuilder : InjectBuilder<IConfigurationBuilder>
     {
 
-        public LeftMenuBuilder()
+        public override object Execute(IConfigurationBuilder service)
         {
+
+            return 0;
 
         }
 
-        public Type Type => typeof(UIService);
+    }
 
 
-        public string FriendlyName => GetType().Name;
+    [ExposeClass(UIConstants.LeftMenu, ExposedType = typeof(IInjectBuilder<MenuService>))]
+    public class MenuServiceBuilder : InjectBuilder<MenuService>
+    {
 
 
-        public bool CanExecute(object context)
+        public MenuServiceBuilder(ModuleInstances modules)
         {
-            return CanExecute((UIService)context);
+            _modules = modules;
         }
 
-        public bool CanExecute(UIService service)
-        {
-            return true;
-        }
-
-        public object Execute(UIService service)
+        public override object Execute(MenuService service)
         {
 
             service.Initialize(UIKeys.Menus.LeftMenu, UIKeys.Menus.Modules, menu =>
             {
 
                 menu.WithDisplay(new TranslatedKeyLabel("LeftMenu", "Modules", null, null))
-                    .SetActionMatchAll()
-                    .SetIcon(GlyphFilled.Home)
-                    .Menu(NewModule, m =>
+                    .DoActionMatchAll()
+                    .WithIcon(GlyphFilled.Home)
+                    .MenuStatic(NewModule, m =>
                     {
+
                         m.WithDisplay("New")
-                         .SetExecute(ActionModules.ExecuteNewModule)
+                            .WithViewPolicies("Admin")
+                            .WithExecute(ActionModules.ExecuteNewModule, true)
                         ;
+
+                    })
+
+                    .MenuDynamic(() => _modules.GetModules(), (item, menu) =>
+                    {
+
+                        menu.WithDisplay(item.Label)
+
+                        ;
+
                     })
                 ;
 
@@ -56,13 +69,8 @@ namespace Bb.Loaders
             return 0;
         }
 
-        public object Execute(object context)
-        {
-            return Execute((UIService)context);
-        }
-
         static readonly Guid NewModule = new("{C8063B0B-B057-4BCB-8629-19D149FE9181}");
-        static readonly Guid guidConnectors = new("{C8063B0B-B057-4BCB-8629-19D149FE9881}");
+        private readonly ModuleInstances _modules;
 
     }
 

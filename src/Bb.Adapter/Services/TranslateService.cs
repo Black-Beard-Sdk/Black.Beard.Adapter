@@ -30,18 +30,9 @@ namespace Bb.Adapter.Services
             return Translate(CultureInfo.CurrentUICulture, key);
         }
 
-        public object Container
-        {
-            get => null; /* datas;*/
-            set
-            {
+        public CultureInfo[] AvailableCultures => new CultureInfo[] { Thread.CurrentThread.CurrentUICulture }; // DataAccess.AvailableCultures;
 
-            }
-        }
-
-        public CultureInfo[] AvailableCultures => new CultureInfo[] { Thread.CurrentThread.CurrentCulture }; // DataAccess.AvailableCultures;
-
-        
+        ITranslateContainer ITranslateService.Container { get; set; }
 
         public string Translate(CultureInfo culture, TranslatedKeyLabel label)
         {

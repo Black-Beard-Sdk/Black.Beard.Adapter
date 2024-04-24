@@ -19,7 +19,7 @@ namespace Bb.Modules.Storage
             _columns.Add((name, type));
             return this;
         }
-
+  
 
         public StringBuilder CreateTable()
         {
@@ -43,13 +43,13 @@ namespace Bb.Modules.Storage
             sb.Append($"INSERT INTO {_table} (Uuid");
 
             for (int i = 0; i < _columns.Count; i++)
-                sb.Append($", @{_columns[i].Item1}");
+                sb.Append($", {_columns[i].Item1}");
             sb.Append($", LastUpdate)  VALUES (@uuid");
 
             for (int i = 0; i < _columns.Count; i++)
                 sb.Append($", @{_columns[i].Item1}");
 
-            sb.Append(", TIMESTAMP);");
+            sb.Append(", CURRENT_TIMESTAMP);");
             return sb;
         }
 
@@ -57,10 +57,9 @@ namespace Bb.Modules.Storage
         public StringBuilder CreateUpdate()
         {
             var sb = new StringBuilder();
-            sb.Append($"UPDATE {_table} SET ");
+            sb.Append($"UPDATE {_table} SET LastUpdate = CURRENT_TIMESTAMP");
             for (int i = 0; i < _columns.Count; i++)
-                sb.Append($", {_columns[i].Item1} = @{_columns[i]}");
-                sb.Append(", LastUpdate = TIMESTAMP");
+                sb.Append($", {_columns[i].Item1} = @{_columns[i].Item1}");
             sb.Append(" WHERE Uuid = @uuid AND version = @oldVersion;");
             return sb;
         }
@@ -78,7 +77,7 @@ namespace Bb.Modules.Storage
             sb.Append("SELECT Uuid");
             for (int i = 0; i < _columns.Count; i++)
                 sb.Append($", {_columns[i].Item1}");
-            sb.Append(" FROM {_table} WHERE Uuid = @uuid");
+            sb.Append($", LastUpdate, Inserted FROM {_table} WHERE Uuid = @uuid");
             return sb;
         }
 
@@ -88,7 +87,7 @@ namespace Bb.Modules.Storage
             sb.Append("SELECT Uuid");
             for (int i = 0; i < _columns.Count; i++)
                 sb.Append($", {_columns[i].Item1}");
-            sb.Append(" FROM {_table}");
+            sb.Append($", LastUpdate, Inserted FROM {_table}");
             return sb;
         }
 
@@ -99,7 +98,7 @@ namespace Bb.Modules.Storage
             sb.Append(items[0]);
             for (int i = 1; i < _columns.Count; i++)
                 sb.Append($", {items[i]}");
-            sb.Append(" FROM {_table}");
+            sb.Append($" FROM {_table}");
             return sb;
         }
 

@@ -1,5 +1,6 @@
 ﻿@if (Menus != null)
 {
+
     @foreach (var subMenu in Menus)
     {
         if (subMenu.ViewGuard)
@@ -7,4 +8,5 @@
             <DynamicServerMenuComponent Menu="@subMenu" />
         }
     }
+
 }

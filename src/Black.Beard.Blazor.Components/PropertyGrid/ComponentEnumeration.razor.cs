@@ -1,6 +1,5 @@
 ﻿using Bb.ComponentModel.DataAnnotations;
 using Bb.ComponentModel.Factories;
-using static MudBlazor.Colors;
 
 namespace Bb.PropertyGrid
 {

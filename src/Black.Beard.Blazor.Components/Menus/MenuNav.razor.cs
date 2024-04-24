@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Bb.Menus
 {
+
     public partial class MenuNav
     {
 
@@ -13,7 +14,7 @@ namespace Bb.Menus
         }
 
         [Parameter]
-        public List<DynamicServerMenu> Menus { get; set; }  
+        public ServerMenu Menus { get; set; }  
 
     }
 

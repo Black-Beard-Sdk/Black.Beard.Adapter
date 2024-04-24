@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.Modules.Storage;
+using System.Runtime.CompilerServices;
 
 namespace Bb.Modules
 {
@@ -36,6 +37,19 @@ namespace Bb.Modules
 
 
         /// <summary>
+        /// Return a module instance
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
+        public IEnumerable<ModuleInstance> GetModules()
+        {
+            Initialize();
+            var values = _store.Values();
+            return values;
+        }
+
+
+        /// <summary>
         /// Create a new module instance
         /// </summary>
         /// <param name="uuid"></param>
@@ -43,8 +57,7 @@ namespace Bb.Modules
         public ModuleInstance Create(Guid uuid, string name, string description)
         {
 
-            //if (_store.Exist(uuid))
-            //    return _store.Load(uuid);
+            Initialize();
 
             var result = new ModuleInstance(uuid, Guid.NewGuid(), _store)
             {
@@ -52,13 +65,30 @@ namespace Bb.Modules
                 Description = description,
             };
 
+            result.Save();
+
             return result;
 
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void Initialize()
+        {
+            if (!_initialized)
+                lock (_lock)
+                    if (!_initialized)
+                    {
+                        _store.Initialize();
+                        _initialized = true;
+                    }
+        }
+
+
         private ModuleSpecifications _referentiel;
         private readonly IStore<Guid, ModuleInstance> _store;
         private volatile object _lock = new object();
+        private bool _initialized;
 
     }
 

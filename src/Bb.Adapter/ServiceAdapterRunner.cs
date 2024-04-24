@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 
 namespace Bb.Adapter
 {
+
     public class ServiceAdapterRunner : ServiceRunner<Startup>
     {
 

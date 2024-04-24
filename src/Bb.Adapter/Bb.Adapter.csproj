@@ -9,14 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.74" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.86" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
     <PackageReference Include="MudBlazor" Version="6.19.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Net.Server\src\Black.Beard.Web.Server\Black.Beard.Web.Server.csproj" />
-    <ProjectReference Include="..\Black.Beard.Blazor.Components\Bb.Blazor.Components.csproj" />
+    <ProjectReference Include="..\Black.Beard.Blazor.Components\Black.Beard.Blazor.Components.csproj" />
     <ProjectReference Include="..\Black.Beard.Modules.Etl\Black.Beard.Modules.Etl.csproj" />
     <ProjectReference Include="..\Black.Beard.Modules\Black.Beard.Modules.csproj" />
   </ItemGroup>
@@ -25,11 +25,15 @@
     <Content Update="Configs\ExposedAssemblyRepositories.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="Configs\WebApplicationBuilder.json">
+    <Content Update="Configs\ExposedAssemblyRepositories.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties configs_4webapplication_1json__JsonSchema="./ExposedAssemblyRepositories.schema.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions>
+	  <VisualStudio>
+		  <UserProperties />
+	  </VisualStudio>
+  </ProjectExtensions>
 
 </Project>

@@ -4,6 +4,9 @@ using Bb.Servers.Web;
 using MudBlazor.Services;
 using Bb.ComponentModel.Factories;
 using Microsoft.AspNetCore.Components;
+using Bb.Adapter;
+using Bb.Wizards;
+
 
 namespace Bb.MockService
 {
@@ -39,10 +42,8 @@ namespace Bb.MockService
 
             GlobalConfiguration.CurrentDirectoryToWriteGenerators = root.Combine("contracts");
             GlobalConfiguration.DirectoryToTrace = root.Combine("logs");
-
             GlobalConfiguration.CurrentDirectoryToWriteGenerators.CreateFolderIfNotExists();
             GlobalConfiguration.DirectoryToTrace.CreateFolderIfNotExists();
-
             GlobalConfiguration.DirectoryToTrace += Path.DirectorySeparatorChar;
 
             base.ConfigureServices(services);
@@ -56,7 +57,8 @@ namespace Bb.MockService
         /// <param name="services"></param>
         public override void AppendServices(IServiceCollection services)
         {
-            RegisterServicesPolicies(services);
+
+            //RegisterServicesPolicies(services);
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
@@ -74,12 +76,12 @@ namespace Bb.MockService
         {
 
             var logger = loggerFactory.CreateLogger<Startup>();
-            
+
             logger.LogInformation("setting directory data stores  : " + GlobalConfiguration.CurrentDirectoryToWriteGenerators);
             logger.LogInformation("setting directory output logs : " + GlobalConfiguration.DirectoryToTrace);
 
             base.ConfigureApplication(app, env, loggerFactory);
-                        
+
             app
                 .UseHttpsRedirection()
                 .UseStaticFiles()
@@ -89,6 +91,14 @@ namespace Bb.MockService
             var web = app as WebApplication;
             web.MapBlazorHub();
             web.MapFallbackToPage("/_Host");
+
+
+            
+            //web.MapRazorComponents<Startup>()
+            //    .AddInteractiveServerRenderMode()
+                
+            //    //.AddAdditionalAssemblies(new [] { typeof(WizardPage).Assembly })
+            //    ;
 
         }
 

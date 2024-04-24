@@ -6,6 +6,7 @@
 
         public const string LeftMenu = "LeftMenu";
         public const string Service = "Service";
+        public const string Configuration = "Configuration";
 
     }
 

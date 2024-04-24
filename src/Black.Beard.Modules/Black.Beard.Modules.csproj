@@ -9,7 +9,21 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Black.Beard.ComponentModel" Version="1.0.74" />
+	  <Compile Remove="UIComponents\IMenuConverter.cs" />
+	  <Compile Remove="UIComponents\ItemEnumerable.cs" />
+	  <Compile Remove="UIComponents\ItemEnumerable1.cs" />
+	  <Compile Remove="UIComponents\MenuConverter.cs" />
+	  <Compile Remove="UIComponents\UIComponent.cs" />
+	  <Compile Remove="UIComponents\UIComponentExtension.cs" />
+	  <Compile Remove="UIComponents\UIComponentMenu.cs" />
+	  <Compile Remove="UIComponents\UIService.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="UIComponents\UIComponent.cs~RF74fd38.TMP" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Black.Beard.Helpers" Version="2.0.32" />
 		<PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.32" />
 		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.32" />
@@ -17,7 +31,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Black.Beard.Blazor.Components\Bb.Blazor.Components.csproj" />
+	  <ProjectReference Include="..\Black.Beard.Blazor.Components\Black.Beard.Blazor.Components.csproj" />
 	</ItemGroup>
 
 </Project>

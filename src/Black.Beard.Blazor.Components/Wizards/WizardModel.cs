@@ -1,6 +1,4 @@
 ﻿using Bb.ComponentModel.Attributes;
-
-using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.ComponentModel;
 
@@ -158,7 +156,8 @@ namespace Bb.Wizards
                     Position = DialogPosition.Center,
                 };
 
-            _reference = DialogService.Show<UIWizard>("Options Dialog", b, options);
+             DialogService.ShowMessageBox(new MessageBoxOptions() { Message = "Ok", YesText = "Ok" });
+            //_reference = DialogService.Show<UIWizard>("Options Dialog", b, options);
 
             return this;
 
@@ -186,7 +185,7 @@ namespace Bb.Wizards
             return (T)this._pages[page].Model;
         }
 
-        public IDialogService DialogService { get; }
+        public IDialogService DialogService { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

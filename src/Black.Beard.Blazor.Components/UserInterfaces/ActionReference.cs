@@ -12,6 +12,9 @@ namespace Bb.UserInterfaces
         public string? HRef { get; set; }
 
         public static ActionReference Default { get; } = new ActionReference() { HRef = "\\", Match = NavLinkMatch.Prefix };
+        
+        public static ActionReference Empty { get; } = new ActionReference() { HRef = string.Empty, Match = NavLinkMatch.All };
+
 
     }
 
