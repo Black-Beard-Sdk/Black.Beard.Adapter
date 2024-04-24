@@ -1,0 +1,18 @@
+{
+
+  "ByFolder": [
+
+  ],
+
+
+  "ByName": [
+
+    { "AssemblyName": "Black.Beard.Blazor.Components" },
+    { "AssemblyName": "Black.Beard.Modules" },
+    { "AssemblyName": "Black.Beard.Modules.Etl" }
+
+  ]
+
+
+
+}
