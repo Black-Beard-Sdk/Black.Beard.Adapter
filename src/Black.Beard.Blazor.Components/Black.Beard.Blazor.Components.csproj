@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
@@ -43,8 +43,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.86" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.86" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.88" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.88" />
     <PackageReference Include="MudBlazor" Version="6.19.1" />
   </ItemGroup>
 
