@@ -5,13 +5,10 @@ using Bb.UIComponents.Guards;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+using MudBlazor;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Security.Principal;
 using static MudBlazor.CategoryTypes;
 
 
@@ -31,8 +28,7 @@ namespace Bb.UserInterfaces
 
             this.ServiceProvider = serviceProvider;
             this._list = new List<ServerMenu>();
-            this.Icon = string.Empty;
-            this.Action = ActionReference.Empty;
+            //this.Action = ActionReference.Empty;
             this.ViewGuard = new GuardBlock(serviceProvider);
             this.EnabledGuard = new GuardBlock(serviceProvider);
         }
@@ -47,9 +43,20 @@ namespace Bb.UserInterfaces
 
         public GuardBlock EnabledGuard { get; }
 
-        public bool HasImage { get => !string.IsNullOrEmpty(this.Icon); }
 
-        public string Icon { get; set; }
+        public bool DividerAfter
+        {
+            get
+            {
+                return _diviserAfter && (Parent?._list.IndexOf(this) < Parent?._list.Count);
+            }
+        }
+
+        public bool IsLast { get => Parent?._list.IndexOf(this) == Parent?._list.Count - 1; }
+
+        public bool IsFirst { get => Parent?._list.IndexOf(this) == 0; }
+
+        public bool IsAlone { get => Parent?._list.Count == 1; }
 
         public string? KeyboardArrowDown { get; set; }
 
@@ -76,25 +83,25 @@ namespace Bb.UserInterfaces
             }
 
             var ctx = new EventContext(e, this, scope, service);
-            
 
-                List<object> args = new List<object>();
-                var parameters = _action.Method.GetParameters();
 
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    var p = parameters[i];
-                    if (p.ParameterType == typeof(MouseEventArgs))
-                        args.Add(e);
-                    else if (p.ParameterType == typeof(EventContext))
-                        args.Add(ctx);
-                    else
-                        args.Add(service.GetService(p.ParameterType));
-                }
+            List<object> args = new List<object>();
+            var parameters = _action.Method.GetParameters();
 
-                this._action.DynamicInvoke(args.ToArray());
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var p = parameters[i];
+                if (p.ParameterType == typeof(MouseEventArgs))
+                    args.Add(e);
+                else if (p.ParameterType == typeof(EventContext))
+                    args.Add(ctx);
+                else
+                    args.Add(service.GetService(p.ParameterType));
+            }
 
-            
+            this._action.DynamicInvoke(args.ToArray());
+
+
 
         }
 
@@ -185,10 +192,6 @@ namespace Bb.UserInterfaces
 
         }
 
-
-        private readonly List<ServerMenu> _list;
-
-
         public ServerMenu WithExecute(Delegate? action, bool scoped)
         {
             if (action != null)
@@ -207,6 +210,48 @@ namespace Bb.UserInterfaces
             return this;
         }
 
+        public ServerMenu WithIcon(Glyph glyph)
+        {
+            _iconIsDefined = true;
+            this._icon = glyph.Value;
+            return this;
+        }
+
+        public ServerMenu WithIcon(string glyph)
+        {
+            _iconIsDefined = true;
+            this._icon = glyph;
+            return this;
+        }
+
+        public bool HasImage
+        {
+            get
+            {
+                return _iconIsDefined && !string.IsNullOrEmpty(this.Icon);
+            }
+        }
+
+        public string Icon
+        {
+            get
+            {
+
+                if (!_iconIsDefined && _list.Count > 0)
+                    return @Icons.Material.TwoTone.ArrowDropDown;
+
+                return _icon;
+
+            }
+        }
+
+
+        public ServerMenu WithDividerAfter(bool value = true)
+        {
+            this._diviserAfter = value;
+            return this;
+        }
+
         public ServerMenu SetKeyboardArrowDown(string glyph)
         {
             this.KeyboardArrowDown = glyph;
@@ -219,7 +264,7 @@ namespace Bb.UserInterfaces
             return this;
         }
 
-        public ServerMenu DoActionMatchAll()
+        public ServerMenu WithLinkMatchAll()
         {
 
             this.Action = new ActionReference()
@@ -232,7 +277,7 @@ namespace Bb.UserInterfaces
 
         }
 
-        public ServerMenu DoAction(string path, NavLinkMatch nav)
+        public ServerMenu WithNavigate(string path, NavLinkMatch nav = NavLinkMatch.Prefix)
         {
 
             this.Action = new ActionReference()
@@ -243,18 +288,6 @@ namespace Bb.UserInterfaces
 
             return this;
 
-        }
-
-        public ServerMenu WithIcon(Glyph glyph)
-        {
-            this.Icon = glyph.Value;
-            return this;
-        }
-
-        public ServerMenu WithIcon(string glyph)
-        {
-            this.Icon = glyph;
-            return this;
         }
 
         public ServerMenu WithViewPolicies(params string[] policies)
@@ -269,9 +302,12 @@ namespace Bb.UserInterfaces
             return this;
         }
 
-
+        private readonly List<ServerMenu> _list;
         private Delegate _action;
         private bool _scoped;
+        private bool _diviserAfter;
+        private bool _iconIsDefined = false;
+        private string _icon;
 
         public event DisposedEventHandler? Disposed;
         public event PropertyChangedEventHandler? PropertyChanged;

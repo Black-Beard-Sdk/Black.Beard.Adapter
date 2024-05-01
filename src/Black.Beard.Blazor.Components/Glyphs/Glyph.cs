@@ -14,8 +14,7 @@ namespace Bb.UIComponents
 
         public string Value { get; private set; }
 
-        public static Glyph Empty { get; } = new Glyph(string.Empty);
-           
+        public static Glyph Empty { get; } = new Glyph(null);
 
     }
 

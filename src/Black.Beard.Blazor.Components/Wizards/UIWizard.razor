@@ -1,18 +1,17 @@
 ﻿@using Bb.PropertyGrid
 @using MudBlazor
-
 <MudDialog @bind-IsVisible="visible" Options="dialogOptions">
 
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @this.Content.Title
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3" /> @this.Content.Title.Translate(this)
 
-            <MudCarousel @ref=_carousel BulletsPosition="Position.Top" Class="mud-width-full" Style="height:90px" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="false" AutoCycle="false" TData="WizardPage">            
+            <MudCarousel @ref=_carousel BulletsPosition="Position.Top" Class="mud-width-full" Style="height:120px" ShowArrows="false" ShowBullets="true" EnableSwipeGesture="false" AutoCycle="false" TData="WizardPage">            
                 @foreach (WizardPage page in this.Content.Pages)
                 {
                     <MudCarouselItem Transition="Transition.Slide" Style="margin-top:40px" >
                         <MudContainer Style="text-align:left;vertical-align:text-bottom">
-                            @(page.Description)
+                            @(page.Description.Translate(this))
                         </MudContainer>
                     </MudCarouselItem>
                 }
@@ -37,10 +36,10 @@
 
 
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanCancel OnClick=Cancel StartIcon="@Icons.Material.Filled.Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanPrevious OnClick=GoToPreviousStep StartIcon="@Icons.Material.Filled.SkipPrevious">Previous</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanNext OnClick=GoToNextStep EndIcon="@Icons.Material.Filled.SkipNext">Next</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanValidate OnClick=Apply EndIcon="@Icons.Material.Filled.Check">Submit</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanCancel OnClick=Cancel StartIcon="@Icons.Material.Filled.Cancel">@ComponentConstants.Cancel.Translate(this)</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanPrevious OnClick=GoToPreviousStep StartIcon="@Icons.Material.Filled.SkipPrevious">@ComponentConstants.Previous.Translate(this)</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanNext OnClick=GoToNextStep EndIcon="@Icons.Material.Filled.SkipNext">@ComponentConstants.Next.Translate(this)</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="px-10" Disabled=DisableCanValidate OnClick=Apply EndIcon="@Icons.Material.Filled.Check">@ComponentConstants.Submit.Translate(this)</MudButton>
     </DialogActions>
 
 

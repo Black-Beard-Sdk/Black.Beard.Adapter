@@ -1,12 +1,14 @@
-﻿@if (Menus != null)
+﻿@using MudBlazor
+@if (Menus != null)
 {
 
-    @foreach (var subMenu in Menus)
-    {
-        if (subMenu.ViewGuard)
+    <MudNavMenu>
+        <MudNavGroup Title="@(@Menus.Display.Translate(this))" Icon="@(Menus.Icon)" HideExpandIcon="@(!Menus.HasImage)">
+        @foreach (var subMenu in Menus)
         {
             <DynamicServerMenuComponent Menu="@subMenu" />
         }
-    }
+        </MudNavGroup>
+    </MudNavMenu>
 
 }

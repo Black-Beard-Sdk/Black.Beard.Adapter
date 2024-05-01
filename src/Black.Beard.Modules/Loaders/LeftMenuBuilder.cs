@@ -10,20 +10,6 @@ namespace Bb.Loaders
 {
 
 
-    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<IConfigurationBuilder>))]
-    public class ConfigurationBuilder : InjectBuilder<IConfigurationBuilder>
-    {
-
-        public override object Execute(IConfigurationBuilder service)
-        {
-
-            return 0;
-
-        }
-
-    }
-
-
     [ExposeClass(UIConstants.LeftMenu, ExposedType = typeof(IInjectBuilder<MenuService>))]
     public class MenuServiceBuilder : InjectBuilder<MenuService>
     {
@@ -40,15 +26,17 @@ namespace Bb.Loaders
             service.Initialize(UIKeys.Menus.LeftMenu, UIKeys.Menus.Modules, menu =>
             {
 
-                menu.WithDisplay(new TranslatedKeyLabel("LeftMenu", "Modules", null, null))
-                    .DoActionMatchAll()
-                    .WithIcon(GlyphFilled.Home)
+                menu.WithDisplay(ModuleConstants.Modules)
+                    //.DoActionMatchAll()
+                    .WithDividerAfter()
+                    //.WithIcon(Glyph.Empty)
                     .MenuStatic(NewModule, m =>
                     {
 
-                        m.WithDisplay("New")
+                        m.WithDisplay(ModuleConstants.ManageModules)
                             .WithViewPolicies("Admin")
-                            .WithExecute(ActionModules.ExecuteNewModule, true)
+                            //.WithExecute(ActionModules.ExecuteNewModule, true)
+                            .WithNavigate("/pages/PageModule")
                         ;
 
                     })

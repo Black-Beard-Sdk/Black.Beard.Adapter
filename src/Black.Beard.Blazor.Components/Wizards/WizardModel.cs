@@ -1,4 +1,5 @@
 ﻿using Bb.ComponentModel.Attributes;
+using Bb.ComponentModel.Translations;
 using MudBlazor;
 using System.ComponentModel;
 
@@ -19,9 +20,9 @@ namespace Bb.Wizards
             this._index = 0;
         }
 
-        public string Title { get; set; }
+        public TranslatedKeyLabel Title { get; set; }
 
-        public WizardModel SetTitle(string title)
+        public WizardModel SetTitle( TranslatedKeyLabel title)
         {
             this.Title = title;
             return this;
@@ -100,7 +101,7 @@ namespace Bb.Wizards
             return result;
         }
 
-        public WizardModel AddPage(string title = null, Action<WizardPage> action = null)
+        public WizardModel AddPage(TranslatedKeyLabel title = null, Action<WizardPage> action = null)
         {
 
             if (this._model == null)
@@ -110,7 +111,7 @@ namespace Bb.Wizards
 
         }
 
-        public WizardModel AddPage(object model, string title = null, Action<WizardPage> action = null)
+        public WizardModel AddPage(object model, TranslatedKeyLabel title = null, Action<WizardPage> action = null)
         {
 
             var page = new WizardPage()
@@ -156,8 +157,7 @@ namespace Bb.Wizards
                     Position = DialogPosition.Center,
                 };
 
-             DialogService.ShowMessageBox(new MessageBoxOptions() { Message = "Ok", YesText = "Ok" });
-            //_reference = DialogService.Show<UIWizard>("Options Dialog", b, options);
+            _reference = DialogService.Show<UIWizard>("Options Dialog", b, options);
 
             return this;
 

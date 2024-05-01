@@ -1,6 +1,8 @@
 ﻿
 
 
+using Bb.ComponentModel.Translations;
+
 namespace Bb.Wizards
 {
     public class WizardPage
@@ -13,9 +15,9 @@ namespace Bb.Wizards
 
         public object Model { get; internal set; }
 
-        public string Title { get; set; }
+        public TranslatedKeyLabel Title { get; set; }
 
-        public string Description { get; set; }
+        public TranslatedKeyLabel Description { get; set; }
 
         public WizardModel Parent { get; internal set; }
 
@@ -24,7 +26,7 @@ namespace Bb.Wizards
         public string[] FilterOnPropertyModel { get; internal set; }
 
 
-        public WizardPage SetDescription(string description)
+        public WizardPage SetDescription(TranslatedKeyLabel description)
         {
             this.Description = description;
             return this;
@@ -47,7 +49,7 @@ namespace Bb.Wizards
             //    return isValid;
             //}
 
-            return Parent.Wizard.Validate();
+            return Parent.Wizard?.Validate() ?? false;
 
         }
     

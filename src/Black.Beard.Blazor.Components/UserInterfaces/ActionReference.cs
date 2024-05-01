@@ -9,11 +9,21 @@ namespace Bb.UserInterfaces
 
         public NavLinkMatch Match { get; set; }
 
-        public string? HRef { get; set; }
+        public string? HRef 
+        { get
+            {
+                return _hRef;
+            }
+            set
+            {
+                _hRef = value;
+            }
+        }
 
-        public static ActionReference Default { get; } = new ActionReference() { HRef = "\\", Match = NavLinkMatch.Prefix };
-        
-        public static ActionReference Empty { get; } = new ActionReference() { HRef = string.Empty, Match = NavLinkMatch.All };
+
+        private string? _hRef;
+
+        public static ActionReference Empty { get; } = new ActionReference() { HRef = null, Match = NavLinkMatch.All };
 
 
     }

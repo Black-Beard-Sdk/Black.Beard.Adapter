@@ -1,11 +1,12 @@
 ﻿
+using Bb.ComponentModel.Translations;
 using Bb.UserInterfaces;
 using Microsoft.AspNetCore.Components;
 
 namespace Bb.Menus
 {
 
-    public partial class MenuNav
+    public partial class MenuNav : ITranslateHost
     {
 
         public MenuNav()
@@ -14,7 +15,11 @@ namespace Bb.Menus
         }
 
         [Parameter]
-        public ServerMenu Menus { get; set; }  
+        public ServerMenu Menus { get; set; }
+
+        [Inject]
+        public ITranslateService TranslationService { get; set; }
+
 
     }
 

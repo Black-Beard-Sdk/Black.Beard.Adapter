@@ -4,13 +4,20 @@
 @if (Menu != null && Menu.ViewGuard)
 {
 
-    <MudNavMenu onclick="@(Menu.OnClick)">
-        @if (Menu.IsEmpty)
-        {
-            <MudNavLink>@Menu.Display.Translate(this)</MudNavLink>
-        }
-        else
-        {
+    @if (Menu.IsEmpty)
+    {
+        <MudNavLink
+            Icon="@Menu.Icon"
+            Href="@(Menu.Action?.HRef)" 
+            Match="@(Menu.Action?.Match ?? Microsoft.AspNetCore.Components.Routing.NavLinkMatch.Prefix)"
+            OnClick="@(Menu.OnClick)">@Menu.Display.Translate(this)
+        </MudNavLink>
+    }
+    else
+    {
+
+        <MudNavGroup Title="@(@Menu.Display.Translate(this))" Icon="@(Menu.Icon)" HideExpandIcon="@(!Menu.HasImage)">
+
             @foreach (ServerMenu subMenu in Menu)
             {
                 if (subMenu.ViewGuard)
@@ -18,10 +25,13 @@
                     <MudText Typo="Typo.h6" Class="px-4">@Menu.Display.Translate(this)</MudText>
                     <DynamicServerMenuComponent Menu="@subMenu" />
                 }
-
             }
-        }
+        </MudNavGroup>
+    }
 
-    </MudNavMenu>
+    if (Menu.DividerAfter)
+    {
+        <MudDivider Class="mb-4" />
+    }
 
 }

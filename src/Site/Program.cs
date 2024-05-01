@@ -1,14 +1,12 @@
-using Bb;
 using Bb.ComponentModel.Factories;
 using Bb.ComponentModel.Loaders;
 using Microsoft.AspNetCore.Components;
-using Site.SiteExtensions;
-
+using Site.Loaders;
+using Site.Loaders.SiteExtensions;
 
 ObjectCreatorByIoc.SetInjectionAttribute<InjectAttribute>();
 var Logger = Loggers.InitializeLogger();
-
-Assemblies.Load();
+Assemblies.Load(); // Ensure all required assemblies are loaded
 
 var builder = WebApplication
     .CreateBuilder(args)

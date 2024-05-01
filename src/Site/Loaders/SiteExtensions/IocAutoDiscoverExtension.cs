@@ -3,7 +3,7 @@ using Bb.ComponentModel.Factories;
 using NLog;
 using System.Reflection;
 
-namespace Site.SiteExtensions
+namespace Site.Loaders.SiteExtensions
 {
 
 

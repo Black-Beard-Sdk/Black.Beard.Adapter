@@ -3,8 +3,10 @@ using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Loaders;
 using MudBlazor.Services;
 using NLog;
+using NLog.Web;
 using Site.Data;
-using Site.SiteExtensions;
+using Site.Loaders.SiteExtensions;
+using System.Reflection.PortableExecutable;
 
 namespace Site.Loaders
 {
@@ -22,32 +24,23 @@ namespace Site.Loaders
         public override void Execute(WebApplicationBuilder builder)
         {
 
+            builder.WebHost.SetConfiguration();
+            builder.WebHost.SetLogging(new NLogAspNetCoreOptions() { IncludeScopes = true, IncludeActivityIdsWithBeginScope = true });
+
+            builder.SetIoc();
+
             var services = builder.Services;
 
-            builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.LoadConfigurationFile(Logger, hostingContext)
-                      .ConfigureApplication(Logger, hostingContext);
-            });
-
-
-            // Auto discover all types with attribute [ExposeClass] for register in ioc.
-            services.UseTypeExposedByAttribute(builder.Configuration, ConstantsCore.Configuration, c =>
-            {
-                services.BindConfiguration(c, builder.Configuration);
-            })
-                    .UseTypeExposedByAttribute(builder.Configuration, ConstantsCore.Model)
-                    .UseTypeExposedByAttribute(builder.Configuration, ConstantsCore.Service);
-
-
             // Add services to the container.
-            builder.Services.AddRazorPages();
-            builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<WeatherForecastService>();
-            builder.Services.AddMudServices();
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+            services.AddSingleton<WeatherForecastService>();
+            services.AddMudServices();
 
 
         }
+
+
 
         public Logger Logger { get; set; }
 

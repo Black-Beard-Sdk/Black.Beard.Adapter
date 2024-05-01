@@ -2,9 +2,9 @@
 using NLog;
 using System.Collections;
 
-namespace Site.SiteExtensions
+namespace Site.Loaders.SiteExtensions
 {
-    
+
     public static class Loggers
     {
 
@@ -20,7 +20,7 @@ namespace Site.SiteExtensions
             DirectoryToTrace.CreateFolderIfNotExists();
 
             // target folder where write
-            GlobalDiagnosticsContext.Set("web_log_directory", Loggers.DirectoryToTrace);
+            GlobalDiagnosticsContext.Set("web_log_directory", DirectoryToTrace);
 
             // push environment variables in the log
             foreach (DictionaryEntry item in Environment.GetEnvironmentVariables())

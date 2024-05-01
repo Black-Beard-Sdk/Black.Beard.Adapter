@@ -1,15 +1,15 @@
-﻿using Bb.CustomComponents;
+﻿using Bb.ComponentModel.Translations;
+using Bb.CustomComponents;
 using Bb.PropertyGrid;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using static MudBlazor.CategoryTypes;
 
 
 namespace Bb.Wizards
 {
 
     // https://www.fluentui-blazor.net/Icon
-    public partial class UIWizard
+    public partial class UIWizard : ITranslateHost
     {
 
         /// <summary>
@@ -20,9 +20,8 @@ namespace Bb.Wizards
 
         }
 
-        private WizardModel _content;
 
-        private MudCarousel<WizardPage> _carousel;
+
 
         [Parameter]
         public WizardModel Content
@@ -32,12 +31,28 @@ namespace Bb.Wizards
             {
                 _content = value;
                 if (value != null)
+                {
                     _content.Wizard = this;
+                }
                 this.StateHasChanged();
             }
         }
 
-        private bool visible = true;
+        [Inject]
+        public ITranslateService TranslationService { get; set; }
+        
+        [Inject]
+        public IDialogService DialogService { get; set; }
+
+        [CascadingParameter]
+        MudDialogInstance MudDialog { get; set; }
+
+
+        /// <summary>
+        /// Show a button for navigating to the previous step
+        /// </summary>
+        [Parameter] 
+        public bool AllowPrevious { get; set; }
 
         public DialogOptions dialogOptions { get; set; }
 
@@ -67,18 +82,6 @@ namespace Bb.Wizards
         [Parameter]
         public bool AllowCancel { get; set; }
 
-        /// <summary>
-        /// Show a button for navigating to the previous step
-        /// </summary>
-        [Parameter] public bool AllowPrevious { get; set; }
-
-
-        [Inject]
-        public IDialogService DialogService { get; set; }
-
-        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-
-
         public void PropertyHasChanged(PropertyObjectDescriptor obj)
         {
             this.StateHasChanged();
@@ -87,7 +90,7 @@ namespace Bb.Wizards
         internal async Task Cancel()
         {
             _content.Wizard = null;
-            MudDialog.Cancel();
+            MudDialog?.Cancel();
             _content.Exit(WizardResult.Cancel);
         }
 
@@ -113,7 +116,7 @@ namespace Bb.Wizards
         internal async Task Apply()
         {
             _content.Wizard = null; ;
-            MudDialog.Close(DialogResult.Ok(true));
+            MudDialog?.Close(DialogResult.Ok(true));
             this.StateHasChanged();
 
             _content.Exit(WizardResult.Ok);
@@ -135,6 +138,11 @@ namespace Bb.Wizards
         public bool DisableCanPrevious { get => Content.DisableCanPrevious(); }
         public bool DisableCanNext { get => Content.DisableCanNext(); }
         public bool DisableCanValidate { get => Content.DisableCanValidate(); }
+
+
+        private bool visible = true;
+        private WizardModel _content;
+        private MudCarousel<WizardPage> _carousel;
 
     }
 
