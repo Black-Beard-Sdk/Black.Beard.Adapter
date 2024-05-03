@@ -57,15 +57,25 @@ namespace Bb.Modules
         public ModuleInstance Create(Guid uuid, string name, string description)
         {
 
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+            
+            if (string.IsNullOrEmpty(description))
+                throw new ArgumentNullException(nameof(description));
+
             Initialize();
 
-            var result = new ModuleInstance(uuid, Guid.NewGuid(), _store)
+            if (_store.Exists(uuid))
+                throw new Exception("Module already exists");
+
+            var result = new ModuleInstance(uuid, Guid.NewGuid())
             {
                 Label = name,
                 Description = description,
             };
 
-            result.Save();
+
+            _store.Save(result);
 
             return result;
 

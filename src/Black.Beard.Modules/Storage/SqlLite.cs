@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Bb.Modules.Storage
 {
+
     public class SqlLite
     {
 
@@ -17,7 +18,7 @@ namespace Bb.Modules.Storage
 
         }
 
-        public int ExecuteNonQuery(StringBuilder sql, params (string, object)[] paramters)
+        public int ExecuteNonQuery(StringBuilder sql, params (string, object)[] parameters)
         {
             int result = -1;
 
@@ -26,7 +27,7 @@ namespace Bb.Modules.Storage
                 connection.Open();
                 using (var command = new SqliteCommand(sql.ToString(), connection))
                 {
-                    MapParameter(paramters, command);
+                    MapParameter(command, parameters);
                     result = command.ExecuteNonQuery();
                 }
             }
@@ -35,16 +36,17 @@ namespace Bb.Modules.Storage
 
         }
 
-        private static void MapParameter((string, object)[] paramters, SqliteCommand command)
+        private static void MapParameter(SqliteCommand command, params (string, object)[] parameters)
         {
-            foreach (var item in paramters)
-                if (item.Item1.StartsWith("@"))
-                    command.Parameters.AddWithValue(item.Item1, item.Item2);
-                else
-                    command.Parameters.AddWithValue($"@{item.Item1}", item.Item2);
+            if (parameters != null)
+                foreach (var item in parameters)
+                    if (item.Item1.StartsWith("@"))
+                        command.Parameters.AddWithValue(item.Item1, item.Item2);
+                    else
+                        command.Parameters.AddWithValue($"@{item.Item1}", item.Item2);
         }
 
-        public void ExecuteReader(StringBuilder sql, Func<IDataReader, bool> action, params (string, object)[] paramters)
+        public void ExecuteReader(StringBuilder sql, Func<IDataReader, bool> action, params (string, object)[] parameters)
         {
 
             using (SqliteConnection connection = new SqliteConnection(_connectionString))
@@ -54,7 +56,7 @@ namespace Bb.Modules.Storage
                 using (var command = new SqliteCommand(sql.ToString(), connection))
                 {
 
-                    MapParameter(paramters, command);
+                    MapParameter(command, parameters);
                     var reader = command.ExecuteReader();
 
                     while (reader.Read())

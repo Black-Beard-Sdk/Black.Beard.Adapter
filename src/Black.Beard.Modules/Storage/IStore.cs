@@ -1,10 +1,23 @@
 ﻿
+
 namespace Bb.Modules.Storage
 {
     public interface IStore<TKey, TValue>
     {
-
+        
+        /// <summary>
+        /// Initialize the store
+        /// </summary>
         void Initialize();
+
+        /// <summary>
+        /// Return true if the key exist in the referential
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
+        bool Exists(TKey uuid);
+
+
         /// <summary>
         /// Load the model
         /// </summary>
@@ -17,11 +30,11 @@ namespace Bb.Modules.Storage
         /// <param name="value"></param>
         void Save(TValue key);
 
-        ///// <summary>
-        ///// Remove the model
-        ///// </summary>
-        ///// <param name="value"></param>
-        //void Remove(TKey key);
+        /// <summary>
+        /// Remove the model
+        /// </summary>
+        /// <param name="value"></param>
+        bool Remove(TKey key);
 
 
         /// <summary>
@@ -29,14 +42,6 @@ namespace Bb.Modules.Storage
         /// </summary>
         /// <returns></returns>
         List<TValue> Values();
-
-        ///// <summary>
-        ///// Return true if the key exist
-        ///// </summary>
-        ///// <param name="key"></param>
-        ///// <returns></returns>
-        //bool Exist(TKey key);
-
 
     }
 

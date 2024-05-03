@@ -4,53 +4,90 @@ namespace Bb.Modules
 {
 
 
-    public class ModelBase
+    public static class Mapper
     {
 
-        public Guid Uuid { get; set; }
 
+
+
+    }
+
+
+    public class ModelBase<TKey>
+        where TKey : struct
+    {
+
+
+        public ModelBase()
+        {
+
+        }
+
+        [StoreDescriptor(isPrimary: true, order: 0)]
+        public TKey Uuid { get; set; }
+
+        [StoreDescriptor(checkIntegrity: true, order: 1)]
         public int Version { get; set; }
 
+        [StoreDescriptor(updateHisto: true, order: 2)]
         public DateTimeOffset? LastUpdate { get; set; }
+
+        [StoreDescriptor(insertHisto: true, order: 3)]
         public DateTimeOffset? Inserted { get; set; }
 
     }
 
-    public class ModuleInstance : ModelBase
+
+    public class ModuleInstance : ModelBase<Guid>
     {
 
         public ModuleInstance()
         {
-            
+
         }
 
-        public ModuleInstance(Guid uuidSpecification, Guid key, IStore<Guid, ModuleInstance> store)
+        public ModuleInstance(Guid uuidSpecification, Guid key)
         {
 
             this.Uuid = key;
             this.Specification = uuidSpecification;
-            this._store = store;
         }
 
 
-        
-        public string Label { get; internal set; }
-        
-        public string Description { get; internal set; }
+        [StoreDescriptor(externalize: true, order: 4)]
+        public string Label { get; set; }
 
-        public Guid Specification { get; }
+        public string Description { get; set; }
 
-        internal void Save()
-        {
-            
-            _store.Save(this);
-
-        }
-
-        private readonly IStore<Guid, ModuleInstance> _store;
+        public Guid Specification { get; set; }
 
     }
 
+
+    [AttributeUsage(AttributeTargets.Property)]
+    public class StoreDescriptorAttribute : Attribute
+    {
+
+        public StoreDescriptorAttribute(bool externalize = false, bool isPrimary = false, bool insertHisto = false, bool updateHisto = false, bool checkIntegrity = false, int order = 10)
+        {
+            this.Order = order;
+            this.IsPrimary = isPrimary;
+            this.InsertHisto = insertHisto;
+            this.UpdateHisto = updateHisto;
+            this.CheckIntegrity = checkIntegrity;
+
+            if (isPrimary | externalize | insertHisto | updateHisto | checkIntegrity)
+                this.Externalize = true;
+
+        }
+
+        public bool Externalize { get; }
+        public int Order { get; }
+        public bool IsPrimary { get; }
+        public bool InsertHisto { get; }
+        public bool UpdateHisto { get; }
+        public bool CheckIntegrity { get; }
+    }
 
 
 }
