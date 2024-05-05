@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Components;
 using System.Reflection;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
 namespace Bb.Modules
@@ -88,6 +89,26 @@ namespace Bb.Modules
             Regex regex = new Regex(_pattern, options);
             string result = regex.Replace(input, substitution);
             return result;
+        }
+
+        public virtual object GetModel(FeatureInstance featureInstance)
+        {            
+            if (Model == null)
+                return Activator.CreateInstance(Model);
+            var result = featureInstance.Model.ToJsonString().Deserialize(Model);
+            return result;
+        }
+
+        public virtual void SetModel(FeatureInstance featureInstance, object model)
+        {
+            if (model == null)
+                featureInstance.Model = null;
+            else
+            {
+                var modelText = model.Serialize(true);
+                featureInstance.Model = JsonObject.Parse(modelText);
+            }
+
         }
 
         private Type _page;

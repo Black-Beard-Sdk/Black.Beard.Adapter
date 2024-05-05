@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Bb.Storage;
 
 namespace Bb.Modules
@@ -21,6 +22,9 @@ namespace Bb.Modules
 
         public Guid Specification { get; set; }
 
+        public JsonNode Model { get; set; }
+
+
         [JsonIgnore]
         public FeatureSpecification FeatureSpecification { get; set; }
 
@@ -28,6 +32,17 @@ namespace Bb.Modules
         {
             return FeatureSpecification.GetRoute(Uuid);
         }
+
+        public object GetModel()
+        {
+            return FeatureSpecification.GetModel(this);
+        }
+
+        public void SetModel(object model)
+        {
+            FeatureSpecification.SetModel(this, model);
+        }
+
 
     }
 

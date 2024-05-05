@@ -25,7 +25,7 @@ namespace Bb.Modules
         /// </summary>
         /// <param name="uuid"></param>
         /// <returns></returns>
-        public FeatureInstance GetModule(Guid uuid)
+        public FeatureInstance GetFeature(Guid uuid)
         {
             FeatureInstance module = _store.Load(uuid);
             return module;

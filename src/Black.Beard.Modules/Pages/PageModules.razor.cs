@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.Modules;
+using Bb.UIComponents;
 using Bb.Wizards;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
@@ -17,6 +18,9 @@ namespace Bb.Pages
         {
 
         }
+
+        [Inject]
+        public IRefreshService RefreshService { get; set; }
 
         [Inject]
         public ITranslateService TranslationService { get; set; }
@@ -53,6 +57,7 @@ namespace Bb.Pages
                           var module = Instances.Create(m.Type.Value, m.Name, m.Description);
                       }
                       StateHasChanged();
+                      RefreshService.CallRequestRefresh(this, UIKeys.Menus.Modules);
                   })
             ;
 
@@ -84,6 +89,7 @@ namespace Bb.Pages
             {
                 Instances.Remove(module);
                 StateHasChanged();
+                RefreshService.CallRequestRefresh(this, UIKeys.Menus.Modules);
             }
 
         }

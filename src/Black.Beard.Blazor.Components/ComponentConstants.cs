@@ -2,7 +2,7 @@
 
 namespace Bb
 {
-    
+
     public static class ComponentConstants
     {
 

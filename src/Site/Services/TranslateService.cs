@@ -8,8 +8,7 @@ namespace Site.Services
 
 
 
-
-    [ExposeClass("Service", ExposedType = typeof(ITranslateService), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(ConstantsCore.Service, ExposedType = typeof(ITranslateService), LifeCycle = IocScopeEnum.Singleton)]
     public class TranslateService : ITranslateService
     {
 

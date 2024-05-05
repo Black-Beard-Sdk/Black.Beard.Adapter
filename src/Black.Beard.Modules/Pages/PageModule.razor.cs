@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.Modules;
+using Bb.UIComponents;
 using Bb.Wizards;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -14,6 +15,9 @@ namespace Bb.Pages
 
         [Parameter]
         public Guid Uuid { get; set; }
+
+        [Inject]
+        public IRefreshService RefreshService { get; set; }
 
         [Inject]
         public ITranslateService TranslationService { get; set; }
@@ -61,6 +65,7 @@ namespace Bb.Pages
                           var module = FeatureInstances.Create(Uuid, m.Type.Value, m.Name, m.Description);
                       }
                       StateHasChanged();
+                      RefreshService.CallRequestRefresh(this, UIKeys.Menus.Modules);
                   })
             ;
 
@@ -92,6 +97,7 @@ namespace Bb.Pages
             {
                 FeatureInstances.Remove(feature);
                 StateHasChanged();
+                RefreshService.CallRequestRefresh(this, UIKeys.Menus.Modules);
             }
 
         }

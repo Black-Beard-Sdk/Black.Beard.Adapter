@@ -54,6 +54,7 @@ namespace Bb.UIComponents
                         _menus.Add(name, block = new ServerMenu(_serviceProvider)
                         {
                             Display = label,
+                            Uuid = guid.Value
                         });
 
             return block;

@@ -13,6 +13,8 @@ namespace Bb.Modules
 
             this.FeatureSpecifications = featureSpecifications;
         }
+
+
         /// <summary>
         /// Return all modules
         /// </summary>

@@ -34,7 +34,7 @@ namespace Bb.UserInterfaces
             this.EnabledGuard = new GuardBlock(serviceProvider);
         }
 
-        public Guid Uui { get; set; }
+        public Guid Uuid { get; set; }
 
         public virtual bool IsEmpty { get => _list.Count == 0; }
 
@@ -150,7 +150,7 @@ namespace Bb.UserInterfaces
 
             var m = new ServerMenu(this.ServiceProvider)
             {
-                Uui = guid,
+                Uuid = guid,
                 Parent = this,
             };
             action(m);
@@ -169,7 +169,7 @@ namespace Bb.UserInterfaces
 
             var m = new DynamicServerMenu(this.ServiceProvider)
             {
-                Uui = Guid.Empty,
+                Uuid = Guid.Empty,
                 Parent = this,
                 Builder = (m, s) =>
                 {
@@ -177,7 +177,7 @@ namespace Bb.UserInterfaces
                     {
                         var menu = new ServerMenu(m.ServiceProvider)
                         {
-                            Uui = Guid.NewGuid(),
+                            Uuid = Guid.NewGuid(),
                             Parent = m,
                             Model = item,
                         };
