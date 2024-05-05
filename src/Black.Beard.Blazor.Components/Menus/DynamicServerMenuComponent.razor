@@ -10,7 +10,7 @@
             Icon="@Menu.Icon"
             Href="@(Menu.Action?.HRef)" 
             Match="@(Menu.Action?.Match ?? Microsoft.AspNetCore.Components.Routing.NavLinkMatch.Prefix)"
-            OnClick="@(Menu.OnClick)">@Menu.Display.Translate(this)
+            OnClick="@(Menu.OnClick)">@Menu.Display?.Translate(this)
         </MudNavLink>
     }
     else
@@ -22,7 +22,6 @@
             {
                 if (subMenu.ViewGuard)
                 {
-                    <MudText Typo="Typo.h6" Class="px-4">@Menu.Display.Translate(this)</MudText>
                     <DynamicServerMenuComponent Menu="@subMenu" />
                 }
             }

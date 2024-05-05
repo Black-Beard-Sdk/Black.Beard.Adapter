@@ -1,20 +1,21 @@
-﻿@page "/pages/PageModule/{Uuid:guid}"
+﻿@page "/pages/PageModules"
 @using Bb.Modules
 @using MudBlazor
 
-<MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">@Module?.Label</MudText>
 
-<MudDataGrid @ref=Grid T="FeatureInstance"
+<MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">@ModuleConstants.Manage.Translate(this)</MudText>
+
+<MudDataGrid @ref=Grid T="ModuleInstance"
              SortMode="SortMode.Multiple"
              Filterable="true" QuickFilter="@_quickFilter"
              Hideable="true"
              ColumnResizeMode="@ResizeMode.Column"
              ShowMenuIcon="true"
              Dense="true"
-             Items="@FeatureInstances.GetFeatures()">
+             Items="@Instances.GetModules()">
 
     <ToolBarContent>
-        <MudButton OnClick="OpenDialogCreateNewFeature" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.AddANewFeature.Translate(this)</MudButton>
+        <MudButton OnClick="OpenDialogCreateNewModule" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.AddANewModule.Translate(this)</MudButton>
         <MudSpacer />
         <MudText Typo="Typo.h6">@ModuleConstants.Filter.Translate(this)&nbsp;&nbsp;&nbsp;</MudText>
         <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
@@ -24,8 +25,8 @@
     <Columns>
 
         <PropertyColumn Property="x => x.Label" Title="Label" />
-        <PropertyColumn Property="x => x.FeatureSpecification.Name" Title="Specification" />
-
+        <PropertyColumn Property="x => x.ModuleSpecification.Name" Title="Specification" />
+        
         <PropertyColumn Property="x => x.Description" Title="Description"><MudSpacer /></PropertyColumn>
 
         <TemplateColumn CellClass="d-flex justify-end" Filterable="false">
@@ -34,7 +35,7 @@
                     <MudButton Size="@Size.Small"
                                Variant="@Variant.Filled"
                                Color="@Color.Primary"
-                               OnClick="@(() => OpenDialogDeleteFeature(context) )">@ModuleConstants.Delete.Translate(this)</MudButton>
+                               OnClick="@(() => OpenDialogDeleteModule(context) )">@ModuleConstants.Delete.Translate(this)</MudButton>
                 </MudStack>
             </CellTemplate>
         </TemplateColumn>
@@ -42,7 +43,7 @@
     </Columns>
 
     <PagerContent>
-        <MudDataGridPager T="FeatureInstance" PageSizeOptions=@(new int[] {10, 25, 50, 100}) />
+        <MudDataGridPager T="ModuleInstance" PageSizeOptions=@(new int[] {10, 25, 50, 100}) />
     </PagerContent>
 
 </MudDataGrid>

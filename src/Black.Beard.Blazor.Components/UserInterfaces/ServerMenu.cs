@@ -9,8 +9,9 @@ using MudBlazor;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
-using static MudBlazor.CategoryTypes;
-
+using System.IO;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Bb.UserInterfaces
 {
@@ -35,7 +36,7 @@ namespace Bb.UserInterfaces
 
         public Guid Uui { get; set; }
 
-        public bool IsEmpty { get => _list.Count == 0; }
+        public virtual bool IsEmpty { get => _list.Count == 0; }
 
         public TranslatedKeyLabel Display { get; set; }
 
@@ -181,7 +182,7 @@ namespace Bb.UserInterfaces
                             Model = item,
                         };
                         action(item, menu);
-                        s.Append(menu);
+                        s.Add(menu);
                     }
                 }
             };
@@ -254,12 +255,18 @@ namespace Bb.UserInterfaces
 
         public ServerMenu SetKeyboardArrowDown(string glyph)
         {
+            if (string.IsNullOrEmpty(glyph))
+                throw new ArgumentNullException(nameof(glyph));
+
             this.KeyboardArrowDown = glyph;
             return this;
         }
 
         public ServerMenu WithDisplay(TranslatedKeyLabel display)
         {
+            if (display == null)
+                throw new ArgumentNullException(nameof(display));
+
             this.Display = display;
             return this;
         }
@@ -267,23 +274,41 @@ namespace Bb.UserInterfaces
         public ServerMenu WithLinkMatchAll()
         {
 
-            this.Action = new ActionReference()
+            this.Action = new ActionReference(string.Empty)
             {
-                Match = NavLinkMatch.All,
-                HRef = string.Empty,
+                Match = NavLinkMatch.All
             };
 
             return this;
 
         }
 
-        public ServerMenu WithNavigate(string path, NavLinkMatch nav = NavLinkMatch.Prefix)
+        public ServerMenu NavigateTo<T>(Action<ActionReference<T>> action)
+            where T : ComponentBase
+        {
+            var a = new ActionReference<T>()
+            {
+                Match = NavLinkMatch.Prefix,
+            };
+            action(a);
+            this.Action = a;
+            return this; ;
+
+        }
+
+        public ServerMenu NavigateTo<T>(NavLinkMatch nav = NavLinkMatch.Prefix)
+            where T : ComponentBase
+        {
+            var attribute = typeof(T).GetCustomAttribute<RouteAttribute>(true);
+            return NavigateTo(attribute?.Template, nav);
+        }
+
+        public ServerMenu NavigateTo(string path, NavLinkMatch nav = NavLinkMatch.Prefix)
         {
 
-            this.Action = new ActionReference()
+            this.Action = new ActionReference(path)
             {
-                Match = nav,
-                HRef = path,
+                Match = nav,            
             };
 
             return this;

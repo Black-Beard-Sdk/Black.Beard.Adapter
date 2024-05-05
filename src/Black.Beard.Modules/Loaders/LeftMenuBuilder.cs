@@ -2,6 +2,7 @@
 using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Translations;
 using Bb.Modules;
+using Bb.Pages;
 using Bb.UIComponents;
 using Bb.UIComponents.Glyphs;
 
@@ -33,18 +34,36 @@ namespace Bb.Loaders
                     .MenuStatic(NewModule, m =>
                     {
 
-                        m.WithDisplay(ModuleConstants.ManageModules)
+                        m.WithDisplay(ModuleConstants.Manage)
                             .WithViewPolicies("Admin")
                             //.WithExecute(ActionModules.ExecuteNewModule, true)
-                            .WithNavigate("/pages/PageModule")
+                            .NavigateTo<PageModules>()
                         ;
 
                     })
 
-                    .MenuDynamic(() => _modules.GetModules(), (item, menu) =>
+                    .MenuDynamic(() => _modules.GetModules(), (itemModule, menu) =>
                     {
 
-                        menu.WithDisplay(item.Label)
+                        menu.WithDisplay(itemModule.Label)
+                            .MenuStatic(itemModule.Uuid, f =>
+                            {
+                                f.WithDisplay(ModuleConstants.Manage)
+                                    .WithViewPolicies("Admin")
+                                    .NavigateTo<PageModule>(c => c.MapArgument(() => itemModule.Uuid, d => d.Uuid))
+                                    ;
+
+                            })
+                            .MenuDynamic(() => itemModule.GetFeatures(), (itemFeature, subMenu) =>
+                            {
+
+                                subMenu.WithDisplay(itemFeature.Label)
+                                       .NavigateTo(itemFeature.GetRoute())
+                                    //.NavigateTo<PageModule>(c => c.MapArgument(() => itemFeature.Uuid, d => d.Uuid))
+                                    ;
+
+
+                            })
 
                         ;
 
@@ -62,5 +81,16 @@ namespace Bb.Loaders
 
     }
 
+
+    /*
+        bool	    {active:bool}	    true, FALSE	                                                                    No
+        datetime	{dob:datetime}	    2016-12-31, 2016-12-31 7:32pm	                                                Yes
+        decimal	    {price:decimal}	    49.99, -1,000.01	                                                            Yes
+        double	    {weight:double}	    1.234, -1,001.01e8	                                                            Yes
+        float	    {weight:float}	    1.234, -1,001.01e8	                                                            Yes
+        guid	    {id:guid}	        CD2C1638-1638-72D5-1638-DEADBEEF1638, {CD2C1638-1638-72D5-1638-DEADBEEF1638}    No
+        int	        {id:int}	        123456789, -123456789	                                                        Yes
+        long	    {ticks:long}	    123456789, -123456789	                                                        Yes
+     */
 
 }

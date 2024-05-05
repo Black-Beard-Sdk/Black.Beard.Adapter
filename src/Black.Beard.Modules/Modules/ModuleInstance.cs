@@ -1,41 +1,10 @@
 ﻿using Bb.Modules.Storage;
+using Bb.Storage;
+using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 
 namespace Bb.Modules
 {
-
-
-    public static class Mapper
-    {
-
-
-
-
-    }
-
-
-    public class ModelBase<TKey>
-        where TKey : struct
-    {
-
-
-        public ModelBase()
-        {
-
-        }
-
-        [StoreDescriptor(isPrimary: true, order: 0)]
-        public TKey Uuid { get; set; }
-
-        [StoreDescriptor(checkIntegrity: true, order: 1)]
-        public int Version { get; set; }
-
-        [StoreDescriptor(updateHisto: true, order: 2)]
-        public DateTimeOffset? LastUpdate { get; set; }
-
-        [StoreDescriptor(insertHisto: true, order: 3)]
-        public DateTimeOffset? Inserted { get; set; }
-
-    }
 
 
     public class ModuleInstance : ModelBase<Guid>
@@ -46,13 +15,6 @@ namespace Bb.Modules
 
         }
 
-        public ModuleInstance(Guid uuidSpecification, Guid key)
-        {
-
-            this.Uuid = key;
-            this.Specification = uuidSpecification;
-        }
-
 
         [StoreDescriptor(externalize: true, order: 4)]
         public string Label { get; set; }
@@ -61,32 +23,17 @@ namespace Bb.Modules
 
         public Guid Specification { get; set; }
 
-    }
+        [JsonIgnore]
+        public ModuleSpecification ModuleSpecification { get; set; }
+        
+        [JsonIgnore]
+        public FeatureInstances FeatureInstances { get; internal set; }
 
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class StoreDescriptorAttribute : Attribute
-    {
-
-        public StoreDescriptorAttribute(bool externalize = false, bool isPrimary = false, bool insertHisto = false, bool updateHisto = false, bool checkIntegrity = false, int order = 10)
+        internal ObservableCollection<FeatureInstance> GetFeatures()
         {
-            this.Order = order;
-            this.IsPrimary = isPrimary;
-            this.InsertHisto = insertHisto;
-            this.UpdateHisto = updateHisto;
-            this.CheckIntegrity = checkIntegrity;
-
-            if (isPrimary | externalize | insertHisto | updateHisto | checkIntegrity)
-                this.Externalize = true;
-
+            var result = new ObservableCollection<FeatureInstance>(FeatureInstances.GetFeatures().Where(c => c.ModuleUuid == this.Uuid));
+            return result;
         }
-
-        public bool Externalize { get; }
-        public int Order { get; }
-        public bool IsPrimary { get; }
-        public bool InsertHisto { get; }
-        public bool UpdateHisto { get; }
-        public bool CheckIntegrity { get; }
     }
 
 

@@ -1,5 +1,4 @@
-﻿using Bb.ComponentModel.Accessors;
-using System.Text;
+﻿using System.Text;
 using static MudBlazor.CategoryTypes;
 
 
@@ -21,6 +20,37 @@ namespace Bb.Modules.Storage
         {
             _columns.Add(field);
             return this;
+        }
+
+
+
+        public static IEnumerable<TableField> Parse(string sql)
+        {
+            List<TableField> result = new List<TableField>();
+
+            var s = sql.IndexOf('(');
+            var e = sql.IndexOf( ')', s);
+            var txt = sql.Substring(s, e - s).Trim(' ', '(', ')');
+            var fields = txt.Split(',');
+            foreach (var item in fields)
+            {
+                var f = item.Trim();
+                var p = f.Split(' ');
+                var name = p[0];
+                var type = p[1];
+                var field = new TableField(name, type);
+                field.Parse(new Queue<string>(p.Skip(2)));
+                result.Add(field);
+            }
+
+            return result;
+        }        
+
+
+        public StringBuilder GetTableStructure()
+        {
+            var sb = new StringBuilder("SELECT sql FROM sqlite_master WHERE name = @name AND type = 'table'");
+            return sb;
         }
 
         public StringBuilder CreateTable()
@@ -48,7 +78,6 @@ namespace Bb.Modules.Storage
             return sb;
 
         }
-
 
         public StringBuilder CreateInsert()
         {
@@ -81,7 +110,6 @@ namespace Bb.Modules.Storage
             return sb;
         }
 
-
         public StringBuilder CreateUpdate()
         {
             var sb = new StringBuilder();
@@ -100,7 +128,7 @@ namespace Bb.Modules.Storage
             comma = string.Empty;
 
 
-            foreach (var col in _columns.Where(c => c.IsPrimary | c.CheckIntegrity))
+            foreach (var col in _columns.Where(c => c.IsPrimary | c.OptimistLock))
             {
 
                 if (col.IsPrimary)
@@ -109,7 +137,7 @@ namespace Bb.Modules.Storage
                 if (!string.IsNullOrEmpty(col.DefaultValue) && col.UpdateHisto)
                     sb.Append($"{comma}{col.DefaultValue}");
 
-                else if (col.CheckIntegrity)
+                else if (col.OptimistLock)
                     sb.Append($"{comma} {col.Name} = @old_{col.Variable}");
 
                 else
@@ -125,6 +153,23 @@ namespace Bb.Modules.Storage
             return sb;
         }
 
+        public StringBuilder CreateExists()
+        {
+
+            var sb = new  StringBuilder();
+
+            sb.Append($"SELECT 1 FROM {_table} WHERE");
+
+            string comma = string.Empty;
+            foreach (var col in _columns.Where(c => c.IsPrimary))
+            {
+                sb.Append($"{comma} {col.Name} = @{col.Variable}");
+                comma = " AND";
+            }
+
+            return sb;
+
+        }
 
         public StringBuilder CreateDelete()
         {
@@ -172,74 +217,17 @@ namespace Bb.Modules.Storage
             return sb;
         }
 
+        internal StringBuilder AlterTable()
+        {
+            var sql = new StringBuilder($"ALTER TABLE {_table}");
+            return sql;
+        }
+
+        public string TableName => _table;
+
         private readonly string _table;
         private List<TableField> _columns;
 
-    }
-
-
-    [System.Diagnostics.DebuggerDisplay("{Name} {Type}")]
-    public class TableField
-    {
-
-
-        public TableField(string name, string Type)
-        {
-            this.Name = name;
-            this.Type = Type;
-        }
-
-        public TableField(AccessorItem property)
-        {
-            Accessor = property;
-            Name = property.Name;
-
-
-            var type = property.Type;
-
-            if (type.IsGenericType)
-                type = property.Type.GenericTypeArguments[0];
-
-            if (type == typeof(string))
-                Type = "TEXT";
-
-            else if (type == typeof(Guid))
-                Type = "TEXT";
-
-            else if (type == typeof(int))
-                Type = "INTEGER";
-
-            else if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
-                Type = "TIMESTAMP";
-
-
-            else
-            {
-
-            }
-
-        }
-
-        public AccessorItem Accessor { get; }
-
-        public string Name { get; }
-
-        public string Variable { get => Name.ToLower(); }
-
-        public string Type { get; }
-
-        public bool IsPrimary { get; set; }
-
-        public bool NotNull { get; set; }
-
-        public string DefaultValue { get; set; }
-
-        public bool CheckIntegrity { get; internal set; }
-
-        public bool UpdateHisto { get; internal set; }
-        public bool IsPayload { get; internal set; }
-        public int Order { get; internal set; }
-        public bool InsertHisto { get; internal set; }
     }
 
 

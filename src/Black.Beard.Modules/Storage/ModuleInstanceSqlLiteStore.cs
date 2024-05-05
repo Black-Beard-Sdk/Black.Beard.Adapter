@@ -1,10 +1,10 @@
 ﻿using Bb.ComponentModel.Accessors;
 using Bb.ComponentModel.Attributes;
+using System.Data;
 
 
 namespace Bb.Modules.Storage
 {
-
 
 
     [ExposeClass("Service", ExposedType = typeof(IStore<Guid, ModuleInstance>), LifeCycle = IocScopeEnum.Singleton)]
@@ -12,22 +12,25 @@ namespace Bb.Modules.Storage
     {
 
 
-        public ModuleInstanceSqlLiteStore()
-            : base("Modules") 
+        public ModuleInstanceSqlLiteStore(ModuleSpecifications moduleSpecifications, FeatureInstances featureInstances)
+            : base("Modules")
         {
 
-
+            _moduleSpecifications = moduleSpecifications;
+            _featureInstances = featureInstances;
         }
 
-        //protected override void MapParameter(ModuleInstance value, List<(string, object)> parameters)
-        //{
-        //    parameters.Add((_name.ToLower(), value.Label));
-        //    parameters.Add((_specification.ToLower(), value.Specification));
-        //    parameters.Add((_data.ToLower(), value.Serialize(false)));
-        //}
 
-        private const string _name = "Name";
-        private const string _specification = "Specification";
+        protected override ModuleInstance MapInstance(IDataReader reader)
+        {
+            var result = base.MapInstance(reader);
+            result.ModuleSpecification = _moduleSpecifications.GetModule(result.Specification);
+            result.FeatureInstances = _featureInstances;
+            return result;
+        }
+
+        private readonly ModuleSpecifications _moduleSpecifications;
+        private readonly FeatureInstances _featureInstances;
 
     }
 

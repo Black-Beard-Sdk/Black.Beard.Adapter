@@ -25,7 +25,7 @@ namespace Bb.Adapter.Services
         //public TranslateServiceDataAccess DataAccess { get; }
 
 
-        public string Translate(TranslatedKeyLabel key)
+        public string Translate(TranslatedKeyLabel key, params TranslatedKeyLabel[] arguments)
         {
             return Translate(CultureInfo.CurrentUICulture, key);
         }
@@ -34,7 +34,7 @@ namespace Bb.Adapter.Services
 
         ITranslateContainer ITranslateService.Container { get; set; }
 
-        public string Translate(CultureInfo culture, TranslatedKeyLabel label)
+        public string Translate(CultureInfo culture, TranslatedKeyLabel label, params TranslatedKeyLabel[] arguments)
         {
 
             //if (!label.IsNotValidKey)
@@ -90,7 +90,12 @@ namespace Bb.Adapter.Services
 
             //}
 
-            return label.DefaultDisplay;
+            var result = label.DefaultDisplay;
+
+            if (arguments != null && arguments.Length > 0)
+                result = string.Format(result, arguments.Select(c => this.Translate(c)).ToArray());
+
+            return result;
 
         }
 

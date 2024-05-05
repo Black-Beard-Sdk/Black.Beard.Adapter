@@ -3,7 +3,7 @@
 namespace Bb.Modules.Etl
 {
 
-    [ExposeClass("Plugin", ExposedType = typeof(ModuleSpecification), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(ModuleSpecification), LifeCycle = IocScopeEnum.Singleton)]
     public class ModuleDataFlow : ModuleSpecification
     {
 

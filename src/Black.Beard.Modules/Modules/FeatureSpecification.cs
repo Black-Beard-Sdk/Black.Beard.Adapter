@@ -1,4 +1,8 @@
 ﻿
+using Microsoft.AspNetCore.Components;
+using System.Reflection;
+using System.Text.RegularExpressions;
+
 namespace Bb.Modules
 {
 
@@ -6,7 +10,7 @@ namespace Bb.Modules
     {
 
 
-        protected FeatureSpecification(Guid uuid, string name, string description, Type owner, Type model = null)
+        protected FeatureSpecification(Guid uuid, string name, string description, Guid owner, Type model)
         {
 
             if (uuid == Guid.Empty)
@@ -17,9 +21,6 @@ namespace Bb.Modules
 
             if (string.IsNullOrEmpty(description))
                 throw new ArgumentException("description is empty");
-
-            if (owner == null)
-                throw new ArgumentException("owner is null");
 
             this.Uuid = uuid;
             this.Name = name;
@@ -43,17 +44,56 @@ namespace Bb.Modules
         /// <summary>
         /// Module owner
         /// </summary>
-        public Type Owner { get; }
+        public Guid Owner { get; }
 
         /// <summary>
         /// Describe the feature module
         /// </summary>
         public Type Model { get; }
 
+        public Type Page
+        {
+            get => _page;
+            protected set
+            {
+
+                if (value != null && typeof(ComponentBase).IsAssignableFrom(value))
+                {
+                    _page = value;
+                    var attribute = _page.GetCustomAttribute<RouteAttribute>(true);
+                    this.Route = attribute.Template;
+                }
+                else
+                    throw new ArgumentException("value is not a page");
+
+            }
+        }
+
         /// <summary>
         /// Describe the feature
         /// </summary>
         public string Description { get; }
+
+        public FeatureSpecifications Parent { get; internal set; }
+
+        public string GetRoute(Guid uuid)
+        {
+            return Replace(Route, uuid.ToString());
+        }
+
+        public string Route { get; private set; }
+
+        private string Replace(string input, string substitution)
+        {
+            Regex regex = new Regex(_pattern, options);
+            string result = regex.Replace(input, substitution);
+            return result;
+        }
+
+        private Type _page;
+        private string _pattern = @"{\w+(:\w+)?}";
+        private const RegexOptions options = RegexOptions.Multiline;
+
 
     }
 

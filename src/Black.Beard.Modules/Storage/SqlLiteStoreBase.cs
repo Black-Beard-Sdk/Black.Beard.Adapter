@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Accessors;
 using Bb.Expressions;
+using Bb.Storage;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using SQLitePCL;
 using System.ComponentModel;
@@ -43,14 +44,77 @@ namespace Bb.Modules.Storage
         public void Initialize()
         {
             var sql = _table.CreateTable();
-            _db.ExecuteNonQuery(sql);
+            var count = _db.ExecuteNonQuery(sql);
+            if (count == 0)
+                InitializeAlterTable();
+
+        }
+
+        private void InitializeAlterTable()
+        {
+
+            List<TableField> fields = new List<TableField>();
+            StringBuilder sql = _table.GetTableStructure();
+
+            _db.ExecuteReader(sql, c =>
+            {
+                var sqlCreate = c.GetString(0);
+                fields = StoreTable.Parse(sqlCreate).ToList();
+                return true;
+            }, ("name", _table.TableName));
+
+
+            List<TableField> _added = new List<TableField>();
+
+            foreach (var c in _columns)
+                if (!fields.Any(d => d.Name == c.Name))
+                {
+                    sql = _table.AlterTable();
+                    c.AddColumn(sql);
+                    _db.ExecuteNonQuery(sql);
+                    _added.Add(c);
+                }
+
+            if (_added.Count > 0)
+            {
+
+                var values = Values();
+                foreach (var item in values)
+                {
+
+                    foreach (var c in _added)
+                    {
+                        var init = (IInitializeColumn<TKey, TValue>)Activator.CreateInstance(c.TypeInitializeColumn);
+                        var changed = init.InitializeColumns(item);
+                        if (changed)
+                            Save(item);
+                    }
+
+                }
+
+                foreach (var c in _added)
+                {
+                    if (c.NotNull)
+                    {
+                        sql = _table.AlterTable();
+                        c.AddNotNull(sql);
+                        _db.ExecuteNonQuery(sql);
+                    }
+                }
+
+            }
         }
 
         public virtual bool Exists(TKey key)
         {
-            var sql = _table.CreateReadOne();
-            var results = Read(sql, (_Uuid.ToLower(), key));
-            return results.Any();
+            var sql = _table.CreateExists();
+            bool exists = false;
+            _db.ExecuteReader(sql, c =>
+            {
+                exists = true;
+                return false;
+            }, (_Uuid.ToLower(), key));
+            return exists;
         }
 
         public virtual TValue? Load(TKey key)
@@ -69,8 +133,6 @@ namespace Bb.Modules.Storage
         }
 
 
-
-
         public virtual bool Remove(TKey key)
         {
 
@@ -80,7 +142,6 @@ namespace Bb.Modules.Storage
             return results > 0;
 
         }
-
 
 
         public virtual void Save(TValue value)
@@ -101,7 +162,6 @@ namespace Bb.Modules.Storage
         }
 
 
-
         protected virtual List<(string, object)> MapParameter(HashSet<string> expectedParameters, TValue instance)
         {
 
@@ -109,7 +169,7 @@ namespace Bb.Modules.Storage
             List<(string, object)> parameters = new List<(string, object)>();
 
 
-            foreach (var item in _columns.Where(c => c.CheckIntegrity))
+            foreach (var item in _columns.Where(c => c.OptimistLock))
             {
 
                 var value = item.Accessor.GetValue(instance);
@@ -164,7 +224,6 @@ namespace Bb.Modules.Storage
 
         }
 
-
         protected HashSet<string> GetExpectedParameters(StringBuilder sql)
         {
             HashSet<string> expectedParameters = new HashSet<string>();
@@ -174,30 +233,76 @@ namespace Bb.Modules.Storage
             return expectedParameters;
         }
 
-        protected virtual TValue Map(IDataReader reader)
+        protected virtual TValue MapInstance(IDataReader reader)
         {
 
             var payload = reader.GetString(reader.GetOrdinal(_data));
             var instance = payload.Deserialize<TValue>();
 
+            var b = typeof(bool?);
+
+
             foreach (var item in _columns.Where(c => !c.IsPayload && !c.IsPrimary))
             {
-                
-                var index = reader.GetOrdinal(item.Name);
 
-                var type2 = reader.GetDataTypeName(index);  // "TIMESTAMP"
-                
                 object value;
 
-                if (type2 == "TIMESTAMP")
+                var index = reader.GetOrdinal(item.Name);
+
+                var type = item.Accessor.Type;
+                var nameType = type.IsGenericType
+                    ? type.GetGenericArguments()[0].Name
+                    : type.Name;
+
+                switch (nameType)
                 {
-                    value = reader.GetDateTime(index);
+                    case "DateTimeOffset":
+                        value = new DateTimeOffset(reader.GetDateTime(index));
+                        break;
+                    case "DateTime":
+                        value = reader.GetDateTime(index);
+                        break;
+                    case "Int16":
+                        value = reader.GetInt16(index);
+                        break;
+                    case "Int32":
+                        value = reader.GetInt32(index);
+                        break;
+                    case "Int64":
+                        value = reader.GetInt64(index);
+                        break;
+                    case "Byte":
+                        value = reader.GetByte(index);
+                        break;
+                    case "Char":
+                        value = reader.GetChar(index);
+                        break;
+                    case "Double":
+                        value = reader.GetDouble(index);
+                        break;
+                    case "Float":
+                        value = reader.GetFloat(index);
+                        break;
+                    case "Decimal":
+                        value = reader.GetDecimal(index);
+                        break;
+                    case "String":
+                        value = reader.GetString(index);
+                        break;
+                    case "Guid":
+                        value = reader.GetGuid(index);
+                        break;
+                    case "Boolean":
+                        value = reader.GetBoolean(index);
+                        break;
+                    default:
+                        value = reader.GetValue(index);
+                        break;
                 }
-                else
-                    value = reader.GetValue(index);
 
                 value = ConverterHelper.ToObject(value, item.Accessor.Type);
                 item.Accessor.SetValue(instance, value);
+
             }
 
             return instance;
@@ -231,7 +336,7 @@ namespace Bb.Modules.Storage
             Func<IDataReader, bool> action = reader =>
             {
 
-                var result = Map(reader);
+                var result = MapInstance(reader);
                 results.Add(result);
 
                 return true;
@@ -263,26 +368,31 @@ namespace Bb.Modules.Storage
                     o.Order = attribute.Order;
 
                     if (attribute.Externalize)
+                    {
+
                         _items.Add(o);
 
-                    if (attribute.IsPrimary)
-                        o.IsPrimary = true;
+                        if (attribute.IsPrimary)
+                            o.IsPrimary = true;
 
-                    else if (attribute.InsertHisto)
-                    {
-                        o.InsertHisto = true;
-                        o.DefaultValue = "CURRENT_TIMESTAMP";
+                        else if (attribute.InsertHisto)
+                        {
+                            o.InsertHisto = true;
+                            o.DefaultValue = "CURRENT_TIMESTAMP";
+                        }
+
+                        else if (attribute.UpdateHisto)
+                        {
+                            o.UpdateHisto = true;
+                            o.DefaultValue = "CURRENT_TIMESTAMP";
+                        }
+
+                        else if (attribute.CheckIntegrity)
+                            o.OptimistLock = true;
+
+                        o.TypeInitializeColumn = attribute.TypeInitializeColumn;
+
                     }
-
-                    else if (attribute.UpdateHisto)
-                    {
-                        o.UpdateHisto = true;
-                        o.DefaultValue = "CURRENT_TIMESTAMP";
-                    }
-
-                    else if (attribute.CheckIntegrity)
-                        o.CheckIntegrity = true;
-
                 }
 
             }

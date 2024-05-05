@@ -2,18 +2,21 @@
 using Bb.Modules;
 using Bb.Wizards;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Options;
 using MudBlazor;
 
 
 namespace Bb.Pages
 {
 
-    public partial class PageModule : ComponentBase, ITranslateHost
+    public partial class PageModules : ComponentBase, ITranslateHost
     {
 
 
-        [Parameter]
-        public Guid Uuid { get; set; }
+        public PageModules()
+        {
+
+        }
 
         [Inject]
         public ITranslateService TranslationService { get; set; }
@@ -22,43 +25,32 @@ namespace Bb.Pages
         public ModuleInstances Instances { get; set; }
 
         [Inject]
-        public FeatureInstances FeatureInstances { get; set; }
-
-        [Inject]
         public IDialogService DialogService { get; set; }
 
+        public MudDataGrid<ModuleInstance> Grid { get; set; }
 
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-            StateHasChanged();
-        }
-
-        public ModuleInstance Module => _module ?? (_module = Instances.GetModule(Uuid));
-
-
-        private void OpenDialogCreateNewFeature()
+        private void OpenDialogCreateNewModule()
         {
 
             var wizardModel = new WizardModel(DialogService)
-                  .SetTitle(ModuleConstants.AddANewFeature)
-                  .SetModel(new NewFeatureDescription() { Module = Module })
+                  .SetTitle(ModuleConstants.AddANewModule)
+                  .SetModel(new NewModuleDescription())
                   .AddPage(ModuleConstants.Description, c =>
                   {
-                      c.SetDescription(ModuleConstants.AddNewFeatureSetName)
+                      c.SetDescription(ModuleConstants.AddNewModuleSetName)
                        .SetFilterOnPropertyModel("Name", "Description");
                   })
                   .AddPage(ModuleConstants.Type, c =>
                   {
-                      c.SetDescription(ModuleConstants.AddNewFeatureSetType)
+                      c.SetDescription(ModuleConstants.AddNewModuleSetType)
                        .SetFilterOnPropertyModel("Type");
                   })
                   .ExecuteOnClose(async (wizard, result) =>
                   {
                       if (result == WizardResult.Ok)
                       {
-                          var m = wizard.GetModel<NewFeatureDescription>();
-                          var module = FeatureInstances.Create(Uuid, m.Type.Value, m.Name, m.Description);
+                          var m = wizard.GetModel<NewModuleDescription>();
+                          var module = Instances.Create(m.Type.Value, m.Name, m.Description);
                       }
                       StateHasChanged();
                   })
@@ -68,10 +60,10 @@ namespace Bb.Pages
 
         }
 
-        private async Task OpenDialogDeleteFeature(CellContext<FeatureInstance> arg)
+        private async Task OpenDialogDeleteModule(CellContext<ModuleInstance> arg)
         {
 
-            FeatureInstance feature = arg.Item;
+            ModuleInstance module = arg.Item;
 
             var options = new DialogOptions()
             {
@@ -84,25 +76,22 @@ namespace Bb.Pages
 
             var cancel = ModuleConstants.Cancel.Translate(this);
             var title = ModuleConstants.Delete.Translate(this);
-            var message = ModuleConstants.DoYouWantToDeleteItem.Translate(this, "feature", feature.Label);
+            var message = ModuleConstants.DoYouWantToDeleteItem.Translate(this, "module", module.Label);
 
             bool? result = await DialogService.ShowMessageBox(title, message, yesText: title + "!", cancelText: cancel, options: options);
             var state = result.HasValue ? result.Value : false;
             if (state)
             {
-                FeatureInstances.Remove(feature);
+                Instances.Remove(module);
                 StateHasChanged();
             }
 
         }
 
 
-        public MudDataGrid<FeatureInstance> Grid { get; set; }
-
-
-        private Func<FeatureInstance, bool> _quickFilter => x =>
+        private Func<ModuleInstance, bool> _quickFilter => x =>
         {
-
+            
             if (string.IsNullOrWhiteSpace(_searchString))
                 return true;
 
@@ -112,7 +101,7 @@ namespace Bb.Pages
             if (x.Label.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (x.FeatureSpecification.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (x.ModuleSpecification.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;
@@ -120,9 +109,6 @@ namespace Bb.Pages
         };
 
         private string _searchString;
-
-
-        private ModuleInstance _module;
 
     }
 

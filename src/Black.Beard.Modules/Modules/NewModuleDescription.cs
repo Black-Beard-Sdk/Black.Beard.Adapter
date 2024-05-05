@@ -23,11 +23,4 @@ namespace Bb.Modules
 
     }
 
-    public enum Enum1
-    {
-        Value1,
-        Value2,
-        Value3,
-    }
-
 }

@@ -6,7 +6,7 @@ using System.Globalization;
 namespace Site.Services
 {
 
-     
+
 
 
     [ExposeClass("Service", ExposedType = typeof(ITranslateService), LifeCycle = IocScopeEnum.Singleton)]
@@ -24,17 +24,20 @@ namespace Site.Services
         //public TranslateServiceDataAccess DataAccess { get; }
 
 
-        public string Translate(TranslatedKeyLabel key)
+        public string Translate(TranslatedKeyLabel key, params TranslatedKeyLabel[] arguments)
         {
-            return Translate(CultureInfo.CurrentUICulture, key);
+            return Translate(CultureInfo.CurrentUICulture, key, arguments);
         }
 
         public CultureInfo[] AvailableCultures => new CultureInfo[] { Thread.CurrentThread.CurrentUICulture }; // DataAccess.AvailableCultures;
 
         ITranslateContainer ITranslateService.Container { get; set; }
 
-        public string Translate(CultureInfo culture, TranslatedKeyLabel label)
+        public string Translate(CultureInfo culture, TranslatedKeyLabel label, params TranslatedKeyLabel[] arguments)
         {
+
+
+
 
             //if (!label.IsNotValidKey)
             //{
@@ -89,7 +92,12 @@ namespace Site.Services
 
             //}
 
-            return label.DefaultDisplay;
+            var result = label.DefaultDisplay;
+
+            if (arguments != null && arguments.Length > 0)
+                result = string.Format(result, arguments.Select(c => this.Translate(c)).ToArray());
+
+            return result;
 
         }
 

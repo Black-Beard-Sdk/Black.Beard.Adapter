@@ -21,40 +21,15 @@ namespace Bb.Modules
             this.Name = name;
             this.Description = description;
 
-            GetFeatures();
-
         }
 
         /// <summary>
         /// Return all features
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<FeatureSpecification> GetFeatures()
+        public IEnumerable<FeatureSpecification> GetFeatures()
         {
-
-            if (_items == null)
-                lock (_lock)
-                    if (_items == null)
-                    {
-                        var items = new Dictionary<Guid, FeatureSpecification>();
-
-                        var assembly = GetType().Assembly;
-                        var types = assembly.GetTypes()
-                            .Where(c => typeof(FeatureSpecification).IsAssignableFrom(c))
-                            .ToList();
-
-                        foreach (var item in types)
-                        {
-                            var module = (FeatureSpecification)Activator.CreateInstance(item);
-                            items.Add(module.Uuid, module);
-                        }
-
-                        _items = items;
-
-                    }
-
-            return _items.Values;
-
+            return Parent.FeatureSpecifications.GetFeatures().Where(c => c.Owner == this.Uuid);
         }
 
         /// <summary>
@@ -72,8 +47,8 @@ namespace Bb.Modules
         /// </summary>
         public string Description { get; }
 
-        private volatile object _lock = new object();
-        private Dictionary<Guid, FeatureSpecification> _items;
+        public ModuleSpecifications Parent { get; internal set; }
+
 
     }
 
