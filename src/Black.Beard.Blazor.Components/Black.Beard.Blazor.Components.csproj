@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Diagrams\DiagramModel.cs" />
     <Compile Remove="PropertyGrid\ComponentArea.razor.cs" />
     <Compile Remove="PropertyGrid\ComponentDate.razor.cs" />
     <Compile Remove="PropertyGrid\ComponentDateOffset.razor.cs" />
@@ -43,9 +44,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.94" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.94" />
-    <PackageReference Include="MudBlazor" Version="6.19.1" />
+    <None Remove="Diagrams\DiagramUI.razor.css" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Diagrams\DiagramUI.razor.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.95" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.95" />
+    <PackageReference Include="MudBlazor" Version="6.19.1" />
+    <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.2" />
+  </ItemGroup>
+	
 </Project>

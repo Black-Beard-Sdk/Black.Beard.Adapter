@@ -17,6 +17,10 @@ namespace Bb
         public static TranslatedKeyLabel Submit => new TranslatedKeyLabel("Submit");
 
 
+        public static TranslatedKeyLabel Tools => new TranslatedKeyLabel("Tools");
+        public static TranslatedKeyLabel Relationships => new TranslatedKeyLabel("Links");
+
+
     }
 
 }

@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.94" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.95" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
     <PackageReference Include="MudBlazor" Version="6.19.1" />
   </ItemGroup>

@@ -15,7 +15,7 @@ namespace Bb.Diagrams
 
         public Guid Type { get; set; }
 
-        public DiagramItemSpecificationBase Specification { get; set; }
+        public DiagramToolBase Specification { get; set; }
 
     }
 

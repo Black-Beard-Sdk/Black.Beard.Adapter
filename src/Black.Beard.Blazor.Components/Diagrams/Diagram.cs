@@ -8,7 +8,7 @@ namespace Bb.Diagrams
 
         public Diagram()
         {
-            Specifications = new List<DiagramItemSpecificationBase>();
+            Specifications = new List<DiagramToolBase>();
             Models = new List<Diagram>();
             Relationships = new List<DiagramRelationship>();
 
@@ -19,7 +19,7 @@ namespace Bb.Diagrams
         public string Description { get; set; }
 
         [JsonIgnore]
-        public List<DiagramItemSpecificationBase> Specifications { get; set; }
+        public List<DiagramToolBase> Specifications { get; set; }
 
         public List<Diagram> Models { get; set; }
 

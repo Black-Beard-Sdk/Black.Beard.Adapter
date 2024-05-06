@@ -93,9 +93,10 @@ namespace Bb.Modules
 
         public virtual object GetModel(FeatureInstance featureInstance)
         {            
-            if (Model == null)
+            if (featureInstance.Model == null)
                 return Activator.CreateInstance(Model);
-            var result = featureInstance.Model.ToJsonString().Deserialize(Model);
+            var payload = featureInstance.Model.ToJsonString();
+            var result = payload.Deserialize(Model);
             return result;
         }
 

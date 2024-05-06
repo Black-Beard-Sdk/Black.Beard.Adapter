@@ -14,6 +14,9 @@ namespace Bb.Modules.Etl.Pages
         [Inject]
         public FeatureInstances FeatureInstances { get; set; }
 
+        public Diagrams.Diagram DiagramModel { get => (Diagrams.Diagram)FeatureInstance.GetModel(); }
+
+
         public FeatureInstance FeatureInstance => _featureInstance ?? (_featureInstance = FeatureInstances.GetFeature(Uuid));
 
 

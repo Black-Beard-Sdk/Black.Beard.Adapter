@@ -4,8 +4,8 @@ using Bb.UIComponents.Glyphs;
 
 namespace Bb.Modules.Etl.DiagramTools
 {
-    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramItemSpecificationBase))]
-    public class CallRelationshipTool : DiagramRelationshipSpecificationBase
+    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
+    public class CallRelationshipTool : DiagramToolRelationshipBase
     {
 
         public CallRelationshipTool()

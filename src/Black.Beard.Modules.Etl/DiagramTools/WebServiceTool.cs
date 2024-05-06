@@ -6,8 +6,8 @@ namespace Bb.Modules.Etl.DiagramTools
 {
 
 
-    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramItemSpecificationBase))]
-    public class WebServiceTool : DiagramModelSpecificationBase
+    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
+    public class WebServiceTool : DiagramToolBase
     {
 
         public WebServiceTool()

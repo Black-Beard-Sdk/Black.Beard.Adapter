@@ -1,0 +1,35 @@
+﻿@using Blazor.Diagrams.Components
+@using MudBlazor
+
+
+<MudPaper Height="10" Elevation="25">
+    <MudToolBar WrapContent="true">
+
+        <MudIconButton Size="Size.Small" Class="mr-1" Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" />
+        <MudIconButton Size="Size.Small" Class="mr-1" Icon="@Icons.Material.Outlined.Add" />
+        <MudIconButton Size="Size.Small" Class="mr-1" Icon="@Icons.Material.Outlined.Edit" />
+        <MudIconButton Size="Size.Small" Class="mr-1" Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
+        <MudIconButton Size="Size.Small" Class="mr-1" Icon="@Icons.Material.Outlined.Settings" Color="Color.Inherit" />
+        <MudIconButton Size="Size.Small" Class="mr-1" Icon="@Icons.Material.Outlined.Notifications" />
+        <MudIconButton Size="Size.Small" Class="mr-1" Icon="@Icons.Material.Outlined.PushPin" />
+        <MudIconButton Size="Size.Small" Class="mr-1" Icon="@Icons.Material.Outlined.PeopleAlt" />
+        <MudIconButton Size="Size.Small" Class="mr-1" Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+
+    </MudToolBar>
+</MudPaper>
+
+<MudGrid>
+
+    <MudItem xs="1">
+        <Toolbox Tools="@Toolbox" />
+    </MudItem>
+
+    <MudItem xs="11">
+        <div class="diagram-container">
+            <CascadingValue Value="Diagram" IsFixed="true">
+                <DiagramCanvas></DiagramCanvas>
+            </CascadingValue>
+        </div>
+    </MudItem>
+
+</MudGrid>

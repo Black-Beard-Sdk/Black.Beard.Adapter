@@ -1,0 +1,23 @@
+﻿@using MudBlazor
+
+
+@foreach (var tool in Tools.Items)
+{
+    <MudDivider />
+    <MudStack Spacing="1">
+        <MudButton OnClick="@tool.Toggle">@tool.Name</MudButton>        
+        <MudCollapse Expanded="@tool.IsExpanded">
+            <MudToolBar WrapContent="true">
+
+                @foreach (var item in tool.Items)
+                {
+                    <MudTooltip Text="@item.ToolTip.Translate(this)">
+                    <MudIconButton Class="mr-1" Icon="@item.Icon" Color="Color.Inherit" Size="Size.Small"></MudIconButton>
+                    </MudTooltip>
+                }
+
+            </MudToolBar>
+        </MudCollapse>        
+    </MudStack>
+
+}

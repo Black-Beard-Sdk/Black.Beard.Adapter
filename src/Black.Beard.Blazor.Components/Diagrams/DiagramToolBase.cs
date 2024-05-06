@@ -5,15 +5,17 @@ using System.ComponentModel.Design;
 namespace Bb.Diagrams
 {
 
-    public class DiagramItemSpecificationBase
+    public class DiagramToolBase
     {
 
-        public DiagramItemSpecificationBase(Guid uuid, TranslatedKeyLabel name, TranslatedKeyLabel description, string icon)
+        public DiagramToolBase(Guid uuid, TranslatedKeyLabel name, TranslatedKeyLabel description, string icon)
         {
             this.Uuid = uuid;
             this.Name = name;
             this.ToolTip = description;
             Icon = icon;
+
+            Category = Bb.ComponentConstants.Tools;
 
         }
 
@@ -21,6 +23,8 @@ namespace Bb.Diagrams
         /// Unique identifier
         /// </summary>
         public Guid Uuid { get; set; }
+
+        public TranslatedKeyLabel Category { get; protected set; }
 
         /// <summary>
         /// Name of the entity tool
