@@ -1,6 +1,5 @@
 ﻿@using MudBlazor
 
-
 @foreach (var tool in Tools.Items)
 {
     <MudDivider />
@@ -12,7 +11,14 @@
                 @foreach (var item in tool.Items)
                 {
                     <MudTooltip Text="@item.ToolTip.Translate(this)">
-                    <MudIconButton Class="mr-1" Icon="@item.Icon" Color="Color.Inherit" Size="Size.Small"></MudIconButton>
+                    <MudIconButton 
+                        draggable="true" 
+                        ondragstart="@(DragStart(item))"
+                        Class="draggable mr-1" 
+                        Icon="@item.Icon" 
+                        Color="Color.Inherit" 
+                        Size="Size.Small">
+                    </MudIconButton>
                     </MudTooltip>
                 }
 

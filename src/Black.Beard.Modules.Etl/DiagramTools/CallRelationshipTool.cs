@@ -4,15 +4,15 @@ using Bb.UIComponents.Glyphs;
 
 namespace Bb.Modules.Etl.DiagramTools
 {
-    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
-    public class CallRelationshipTool : DiagramToolRelationshipBase
+    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramSpecificationBase))]
+    public class CallRelationshipTool : DiagramSpecificationRelationshipBase
     {
 
         public CallRelationshipTool()
             : base(new Guid(Key),
                    "Call",
                    "Call a WebService",
-                   GlyphSharp.CleaningServices.Value)
+                   GlyphFilled.ArrowUpward)
         {
             
         }

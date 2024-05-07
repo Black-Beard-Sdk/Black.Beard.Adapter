@@ -27,15 +27,9 @@ namespace Bb.Modules.Etl
 
         public override object GetModel(FeatureInstance featureInstance)
         {
-
             var result =  (Diagram)base.GetModel(featureInstance);
-
-            var tools = GetTools();
-            foreach (var item in tools)
-                result.Specifications.Add(item);
-
+            result.SetSpecifications(GetTools());
             return result;
-
         }
 
         public override void SetModel(FeatureInstance featureInstance, object model)
@@ -47,7 +41,7 @@ namespace Bb.Modules.Etl
         /// Return all modules
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<DiagramToolBase> GetTools()
+        public IEnumerable<DiagramSpecificationBase> GetTools()
         {
 
             if (_items == null)
@@ -56,15 +50,15 @@ namespace Bb.Modules.Etl
                     {
 
                         var filter = Filter;
-                        var items = new Dictionary<Guid, DiagramToolBase>();
+                        var items = new Dictionary<Guid, DiagramSpecificationBase>();
 
                         var types = ComponentModel.TypeDiscovery.Instance
                             .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object),
-                            c => c.ExposedType == typeof(DiagramToolBase) && c.Context == filter).ToList();
+                            c => c.ExposedType == typeof(DiagramSpecificationBase) && c.Context == filter).ToList();
 
                         foreach (var item in types)
                         {
-                            var module = (DiagramToolBase)Activator.CreateInstance(item);
+                            var module = (DiagramSpecificationBase)Activator.CreateInstance(item);
                             items.Add(module.Uuid, module);
                         }
 
@@ -78,7 +72,7 @@ namespace Bb.Modules.Etl
         public const string Filter = "C9119B69-5DD9-45D2-A28A-617D6CB9D7F9";
 
         private volatile object _lock = new object();
-        private Dictionary<Guid, DiagramToolBase> _items;
+        private Dictionary<Guid, DiagramSpecificationBase> _items;
 
     }
 
