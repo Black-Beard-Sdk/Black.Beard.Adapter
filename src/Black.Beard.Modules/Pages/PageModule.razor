@@ -11,7 +11,7 @@
              ColumnResizeMode="@ResizeMode.Column"
              ShowMenuIcon="true"
              Dense="true"
-             Items="@FeatureInstances.GetFeatures()">
+             Items="@Module.GetFeatures()">
 
     <ToolBarContent>
         <MudButton OnClick="OpenDialogCreateNewFeature" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.AddANewFeature.Translate(this)</MudButton>

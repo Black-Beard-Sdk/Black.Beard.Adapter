@@ -9,9 +9,9 @@ namespace Bb.Diagrams
         public Diagram()
         {
             Specifications = new List<DiagramSpecificationBase>();
-            Models = new List<DiagramItemBase>();
+            Models = new List<DiagramNode>();
             Relationships = new List<DiagramRelationship>();
-            _dicModels = new Dictionary<Guid, DiagramSpecificationModelBase>();
+            _dicModels = new Dictionary<Guid, DiagramSpecificationNodeBase>();
             _dicLinks = new Dictionary<Guid, DiagramSpecificationRelationshipBase>();
         }
 
@@ -22,17 +22,17 @@ namespace Bb.Diagrams
         [JsonIgnore]
         public IEnumerable<DiagramSpecificationBase> Specifications { get; private set; }
 
-        public List<DiagramItemBase> Models { get; set; }
+        public List<DiagramNode> Models { get; set; }
 
         public List<DiagramRelationship> Relationships { get; set; }
 
-        public DiagramItemBase AddModel(Guid specification, double x, double y, string? name = null, string? description = null, Guid? uuid = null)
+        public DiagramNode AddModel(Guid specification, double x, double y, string? name = null, Guid? uuid = null)
         {
-            var spec = Specifications.OfType<DiagramSpecificationModelBase>().Where(c => c.Uuid == specification).FirstOrDefault();
-            return AddModel(spec, x, y, name, description ?? name, uuid);
+            var spec = Specifications.OfType<DiagramSpecificationNodeBase>().Where(c => c.Uuid == specification).FirstOrDefault();
+            return AddModel(spec, x, y, name, uuid);
         }
 
-        public DiagramItemBase AddModel(DiagramSpecificationModelBase specification, double x, double y, string? name = null, string? description = null, Guid? uuid = null)
+        public DiagramNode AddModel(DiagramSpecificationNodeBase specification, double x, double y, string? name = null, Guid? uuid = null)
         {
 
             if (string.IsNullOrEmpty(name))
@@ -43,7 +43,7 @@ namespace Bb.Diagrams
                     count++;
             }
 
-            var result = AddModel(specification.CreateModel(x, y, name, description ?? name, uuid));
+            var result = AddModel(specification.CreateModel(x, y, name, uuid));
 
             if (_diagram != null)
                 ApplyToUI(specification, result);
@@ -51,18 +51,17 @@ namespace Bb.Diagrams
             return result;
         }
 
-        public DiagramItemBase AddModel(DiagramItemBase customizedNodeModel)
+        public DiagramNode AddModel(DiagramNode customizedNodeModel)
         {
             this.Models.Add(customizedNodeModel);
             this.Models.Sort((x, y) => x.Uuid.CompareTo(y.Uuid));
             return customizedNodeModel;
         }
 
-        public DiagramItemBase GetModel(Guid id)
+        public DiagramNode GetModel(Guid id)
         {
             return this.Models.FirstOrDefault(c => c.Uuid == id);
         }
-
 
         public DiagramRelationship AddLink(Guid specification, Port left, Port right, string name, Guid? uuid = null)
         {
@@ -86,7 +85,7 @@ namespace Bb.Diagrams
         }
 
 
-        public DiagramItemBase? GetModelByPort(Guid id)
+        public DiagramNode? GetModelByPort(Guid id)
         {
 
             foreach (var item in this.Models)
@@ -103,14 +102,17 @@ namespace Bb.Diagrams
             Specifications = specifications.ToList();
             foreach (var item in specifications)
             {
-                if (item is DiagramSpecificationModelBase model)
+                if (item is DiagramSpecificationNodeBase model)
                     _dicModels.Add(model.Uuid, model);
                 else if (item is DiagramSpecificationRelationshipBase link)
                     _dicLinks.Add(link.Uuid, link);
             }
         }
 
-        private readonly Dictionary<Guid, DiagramSpecificationModelBase> _dicModels;
+        [JsonIgnore]
+        public Action<Diagram> Save { get; set; }
+
+        private readonly Dictionary<Guid, DiagramSpecificationNodeBase> _dicModels;
         private readonly Dictionary<Guid, DiagramSpecificationRelationshipBase> _dicLinks;
 
     }

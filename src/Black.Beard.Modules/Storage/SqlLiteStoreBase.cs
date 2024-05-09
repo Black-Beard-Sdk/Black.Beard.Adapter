@@ -6,6 +6,7 @@ using SQLitePCL;
 using System.ComponentModel;
 using System.Data;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -136,11 +137,20 @@ namespace Bb.Modules.Storage
         public virtual bool Remove(TKey key)
         {
 
-            var sql = _table.CreateDelete();
+            var sql = _table.CreateDelete(true);
             var results = _db.ExecuteNonQuery(sql, (_Uuid.ToLower(), key));
 
             return results > 0;
 
+        }
+
+
+        public int Remove((string, object) parameter)
+        {
+            var sql = _table.CreateDelete(false);
+            _table.Where(sql, parameter);
+            var results = _db.ExecuteNonQuery(sql, (parameter.Item1.ToLower(), parameter.Item2));
+            return results;
         }
 
 
@@ -204,7 +214,6 @@ namespace Bb.Modules.Storage
                         }
 
                     }
-
 
 
             }

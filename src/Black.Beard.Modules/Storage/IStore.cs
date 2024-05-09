@@ -37,6 +37,9 @@ namespace Bb.Modules.Storage
         bool Remove(TKey key);
 
 
+        int Remove((string, object) parameter);
+
+
         /// <summary>
         /// Return the list of values
         /// </summary>

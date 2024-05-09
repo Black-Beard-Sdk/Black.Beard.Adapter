@@ -13,23 +13,29 @@ namespace Bb.Modules.Etl
 
         public EtlDiagramFeature()
             : base(new Guid(Filter),
-            "data flow diagram",
-            "Design data flow for your module",
-            new Guid(ModuleDataFlow.Filter),
-            typeof(Diagram)
-                  )
+                "data flow diagram",
+                "Design data flow for your module",
+                new Guid(ModuleDataFlow.Filter),
+                typeof(Diagram)
+            )
         {
-
             this.Page = typeof(DiagramPage);
-
         }
 
 
         public override object GetModel(FeatureInstance featureInstance)
         {
             var result =  (Diagram)base.GetModel(featureInstance);
+
+            result.Save = d =>
+            {
+                SetModel(featureInstance, d);
+                featureInstance.Parent.Save(featureInstance); 
+            };
+
             result.SetSpecifications(GetTools());
             return result;
+
         }
 
         public override void SetModel(FeatureInstance featureInstance, object model)

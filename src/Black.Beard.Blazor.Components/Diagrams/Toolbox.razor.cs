@@ -1,6 +1,7 @@
 ﻿using Bb.ComponentModel.Translations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MudBlazor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,34 +19,18 @@ namespace Bb.Diagrams
         [Inject]
         public ITranslateService TranslationService { get; set; }
 
-        public DiagramSpecificationBase LastDrag { get; private set; }
+        public DiagramSpecificationBase CurrentDragStarted { get; private set; }
 
-        public object DragStart(DiagramSpecificationBase item)
+        public async Task DragStart(DragEventArgs args, DiagramSpecificationBase item)
         {
-
-            //e.DataTransfer?.SetData("text", item.Uuid.ToString());
-
-            var e = new DragEventArgs();
-            e.DataTransfer = new DataTransfer();
-            e.DataTransfer.Types = new string[] { item.Category.Key, item.Kind.ToString() };
-            e.DataTransfer.Items = new DataTransferItem[] { new DataTransferItem() { Kind = item.Kind.ToString(), Type = item.Uuid.ToString() } };
-
-            e.DataTransfer.DropEffect = "copy";
-            e.DataTransfer.EffectAllowed = "copy";
-
-            this.LastDrag = item;
-
-            return e;
-
+            this.CurrentDragStarted = item;
         }
-
+        
     }
-
 
 
     public class ToolboxList
     {
-
 
         public ToolboxList(IEnumerable<DiagramSpecificationBase> items)
         {
@@ -58,10 +43,21 @@ namespace Bb.Diagrams
                 var category = new ToolboxCategory(this, display, item);
                 Items.Add(category);
             }
+
+            var links = items.OfType<DiagramSpecificationRelationshipBase>().ToList();
+            if (links.Count ==1)
+                CurrentLink = links[0];
+            else
+                CurrentLink = links.FirstOrDefault(c => c.IsDefaultLink);
+
         }
 
         public List<ToolboxCategory> Items { get; }
+
         public string Current { get; internal set; }
+
+        public DiagramSpecificationRelationshipBase CurrentLink         { get; set; }
+
 
         public void EnsureCategoryIsShown(DiagramSpecificationBase item)
         {
@@ -74,6 +70,8 @@ namespace Bb.Diagrams
                 }
 
         }
+
+
     }
 
 
@@ -104,8 +102,39 @@ namespace Bb.Diagrams
         }
 
         private readonly ToolboxList _parent;
-        private ToolboxCategory _current;
 
+    }
+
+
+    public class ClickAbleMudToggleIconButton : MudToggleIconButton
+    {
+
+        public ClickAbleMudToggleIconButton()
+        {
+            ToggledChanged = new EventCallback<bool>(this, LinkMudToggleIconButton_ToggledChanged);
+        }
+
+        [Parameter]
+        public ToolboxList ToolboxList { get; set; }
+
+        [Parameter]
+        public DiagramSpecificationBase Instance { get; set; }
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            if (ToolboxList.CurrentLink == this.Instance)
+                Toggled = true;
+        }
+
+
+        public Action<bool> LinkMudToggleIconButton_ToggledChanged1 { get; }
+
+        public void LinkMudToggleIconButton_ToggledChanged(bool toggled)
+        {
+            ToolboxList.CurrentLink = this.Instance as DiagramSpecificationRelationshipBase;
+        }
+        
     }
 
 }

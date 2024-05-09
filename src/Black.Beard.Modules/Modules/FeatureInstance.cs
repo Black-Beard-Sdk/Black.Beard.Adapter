@@ -28,6 +28,9 @@ namespace Bb.Modules
         [JsonIgnore]
         public FeatureSpecification FeatureSpecification { get; set; }
 
+        [JsonIgnore]
+        public FeatureInstances Parent { get; internal set; }
+
         public string GetRoute()
         {
             return FeatureSpecification.GetRoute(Uuid);

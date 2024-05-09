@@ -1,7 +1,10 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.UIComponents;
 using Blazor.Diagrams.Core.Anchors;
+using Blazor.Diagrams.Core.Events;
 using Blazor.Diagrams.Core.Models;
+using Blazor.Diagrams.Core.Models.Base;
+using ICSharpCode.Decompiler.Metadata;
 
 namespace Bb.Diagrams
 {
@@ -21,15 +24,73 @@ namespace Bb.Diagrams
         }
 
 
-        public virtual LinkModel CreateLink(PortModel source, PortModel target)
-        {
-            var sourceAnchor = new SinglePortAnchor(source);
-            var targetAnchor = new SinglePortAnchor(target);
+        public bool IsDefaultLink { get; protected set; }
 
-            var link = new LinkModel(sourceAnchor, targetAnchor);
-            return link;
+        public virtual Anchor CreateAnchor(NodeModel model)
+        {
+            return new ShapeIntersectionAnchor(model);
+        }
+
+        public virtual Anchor CreateAnchor(PortModel model)
+        {
+            return new SinglePortAnchor(model);
+        }
+
+        public virtual CustomizedLinkModel CreateLink(Guid uuid, PortModel source, PortModel target)
+        {
+            return CreateLink(uuid, CreateAnchor(source), CreateAnchor(target));
+        }
+
+        public virtual CustomizedLinkModel CreateLink(Guid uuid, Anchor source, Anchor target)
+        {
+
+            Guid sourceId = source.Model.GetId();
+            Guid targetId = target.Model.GetId();
+
+            DiagramRelationship relationship = new DiagramRelationship()
+            {
+                Name = string.Empty,
+                Uuid = uuid,
+                Type = Uuid,
+                Source = sourceId,
+                Target = targetId,
+            };
+
+            return CreateLink(relationship, source, target);
+
+        }
+
+        public virtual CustomizedLinkModel CreateLink(DiagramRelationship link, PortModel source, PortModel target)
+        {
+            var l = CreateLink(link, CreateAnchor(source), CreateAnchor(target));
+            return l;
+        }
+
+        public virtual CustomizedLinkModel CreateLink(DiagramRelationship link, Anchor source, Anchor target)
+        {
+            var l = new CustomizedLinkModel(link, source, target);
+            return l;
+        }
+    }
+
+
+    internal static class LinkableExtensions
+    {
+
+        public static Guid GetId(this ILinkable source)
+        {
+
+            if (source is NodeModel model)
+                return new Guid(model.Id);
+
+            if (source is PortModel port)
+                return new Guid(port.Id);
+
+            return Guid.Empty;
+
         }
 
     }
+
 
 }

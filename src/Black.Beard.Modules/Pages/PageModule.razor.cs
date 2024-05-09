@@ -39,6 +39,7 @@ namespace Bb.Pages
         }
 
         public ModuleInstance Module => _module ?? (_module = Instances.GetModule(Uuid));
+        
 
 
         private void OpenDialogCreateNewFeature()

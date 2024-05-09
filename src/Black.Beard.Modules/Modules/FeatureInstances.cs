@@ -28,6 +28,7 @@ namespace Bb.Modules
         public FeatureInstance GetFeature(Guid uuid)
         {
             FeatureInstance module = _store.Load(uuid);
+            module.Parent = this;
             return module;
         }
 
@@ -41,8 +42,11 @@ namespace Bb.Modules
         {
             Initialize();
             var result = new ObservableCollection<FeatureInstance>(_store.Values());
+            foreach (var item in result)
+                item.Parent = this;
             return result;
         }
+
 
 
         /// <summary>
@@ -71,8 +75,9 @@ namespace Bb.Modules
                 ModuleUuid = moduleUuid,
                 Label = name,
                 Description = description,
-            };
+                Parent = this
 
+        };
 
             _store.Save(result);
 
@@ -81,10 +86,22 @@ namespace Bb.Modules
         }
 
 
+        public void RemoveAllFeatureOf(ModuleInstance module)
+        {
+            _store.Remove(("ModuleUuid", module.Uuid));
+        }
+
         public void Remove(FeatureInstance module)
         {
             _store.Remove(module.Uuid);
         }
+
+
+        public void Save(FeatureInstance instance)
+        {
+            _store.Save(instance);
+        }
+
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

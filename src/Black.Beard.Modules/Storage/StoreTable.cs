@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using ICSharpCode.Decompiler.IL;
+using System.Text;
 using static MudBlazor.CategoryTypes;
 
 
@@ -29,7 +30,7 @@ namespace Bb.Modules.Storage
             List<TableField> result = new List<TableField>();
 
             var s = sql.IndexOf('(');
-            var e = sql.IndexOf( ')', s);
+            var e = sql.IndexOf(')', s);
             var txt = sql.Substring(s, e - s).Trim(' ', '(', ')');
             var fields = txt.Split(',');
             foreach (var item in fields)
@@ -44,7 +45,7 @@ namespace Bb.Modules.Storage
             }
 
             return result;
-        }        
+        }
 
 
         public StringBuilder GetTableStructure()
@@ -140,11 +141,6 @@ namespace Bb.Modules.Storage
                 else if (col.OptimistLock)
                     sb.Append($"{comma} {col.Name} = @old_{col.Variable}");
 
-                else
-                {
-
-                }
-
                 comma = " AND";
             }
 
@@ -156,7 +152,7 @@ namespace Bb.Modules.Storage
         public StringBuilder CreateExists()
         {
 
-            var sb = new  StringBuilder();
+            var sb = new StringBuilder();
 
             sb.Append($"SELECT 1 FROM {_table} WHERE");
 
@@ -171,16 +167,38 @@ namespace Bb.Modules.Storage
 
         }
 
-        public StringBuilder CreateDelete()
+
+        public void Where(StringBuilder sb, params (string, object)[] parameters)
         {
 
             string comma = string.Empty;
-            var sb = new StringBuilder($"DELETE FROM {_table} WHERE");
-            foreach (var col in _columns.Where(c => c.IsPrimary))
+
+            sb.AppendLine(" WHERE");
+            foreach (var col in parameters)
             {
-                sb.Append($"{comma} {col.Name} = @{col.Variable}");
+                sb.Append($"{comma} {col.Item1} = @{col.Item1.ToLower()}");
                 comma = " AND";
             }
+
+
+        }
+
+        public StringBuilder CreateDelete(bool withDeleteOnPrimaryKey)
+        {
+
+            string comma = string.Empty;
+            var sb = new StringBuilder($"DELETE FROM {_table}");
+
+            if (withDeleteOnPrimaryKey)
+            {
+                sb.AppendLine(" WHERE");
+                foreach (var col in _columns.Where(c => c.IsPrimary))
+                {
+                    sb.Append($"{comma} {col.Name} = @{col.Variable}");
+                    comma = " AND";
+                }
+            }
+
             return sb;
         }
 

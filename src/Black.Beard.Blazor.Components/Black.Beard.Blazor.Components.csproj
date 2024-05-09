@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Diagrams\DiagramModel.cs" />
     <Compile Remove="PropertyGrid\ComponentArea.razor.cs" />
     <Compile Remove="PropertyGrid\ComponentDate.razor.cs" />
     <Compile Remove="PropertyGrid\ComponentDateOffset.razor.cs" />

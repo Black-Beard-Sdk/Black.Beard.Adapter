@@ -106,8 +106,15 @@ namespace Bb.Modules
                 featureInstance.Model = null;
             else
             {
-                var modelText = model.Serialize(true);
-                featureInstance.Model = JsonObject.Parse(modelText);
+                try
+                {
+                    var modelText = model.Serialize(true);
+                    featureInstance.Model = JsonObject.Parse(modelText);
+                }
+                catch (Exception ex)
+                {
+
+                }
             }
 
         }

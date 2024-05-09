@@ -84,6 +84,7 @@ namespace Bb.Modules
 
         public void Remove(ModuleInstance module)
         {
+            module.FeatureInstances.RemoveAllFeatureOf(module);
             _store.Remove(module.Uuid);
         }
 

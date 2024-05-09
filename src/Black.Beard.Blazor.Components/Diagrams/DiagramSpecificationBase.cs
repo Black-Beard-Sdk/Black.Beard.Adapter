@@ -30,6 +30,11 @@ namespace Bb.Diagrams
         /// </summary>
         public Guid Uuid { get; set; }
 
+
+        public Type TypeModel { get; set; } = typeof(CustomizedNodeModel);
+
+        public Type TypeUI { get; set; } 
+
         public TranslatedKeyLabel Category { get; protected set; }
 
         /// <summary>

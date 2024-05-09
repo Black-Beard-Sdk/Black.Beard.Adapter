@@ -1,29 +1,51 @@
-﻿@using MudBlazor
+﻿@using Microsoft.AspNetCore.Components.Web
+@using MudBlazor
 
-@foreach (var tool in Tools.Items)
+@foreach (var toolCategory in Tools.Items)
 {
     <MudDivider />
     <MudStack Spacing="1">
-        <MudButton OnClick="@tool.Toggle">@tool.Name</MudButton>        
-        <MudCollapse Expanded="@tool.IsExpanded">
+        <MudButton OnClick="@toolCategory.Toggle">@toolCategory.Name</MudButton>
+        <MudCollapse Expanded="@toolCategory.IsExpanded">
             <MudToolBar WrapContent="true">
 
-                @foreach (var item in tool.Items)
+                @foreach (var item in toolCategory.Items)
                 {
                     <MudTooltip Text="@item.ToolTip.Translate(this)">
-                    <MudIconButton 
-                        draggable="true" 
-                        ondragstart="@(DragStart(item))"
-                        Class="draggable mr-1" 
-                        Icon="@item.Icon" 
-                        Color="Color.Inherit" 
-                        Size="Size.Small">
-                    </MudIconButton>
+                        @if (item.Kind == ToolKind.Node)
+                        {
+                            <MudIconButton draggable="true"
+                                           ondragstart="@((DragEventArgs args) => { DragStart(args, item); })"
+                                           Class="draggable mr-1"
+                                           Icon="@item.Icon"
+                                           Color="Color.Inherit"
+                                           Size="Size.Small">
+                            </MudIconButton>
+                        }
+                        @if (item.Kind == ToolKind.Link)
+                        {
+                            <ClickAbleMudToggleIconButton
+                                
+                                ToolboxList="@Tools"
+                                Instance="@item"
+                                Icon="@item.Icon" 
+                                ToggledIcon="@item.Icon" 
+                                Color="@Color.Default" 
+                                ToggledColor="@Color.Warning" 
+                                Title="Off"                                                 
+                                ToggledTitle="On" />
+
+                        }
+                        @if (item.Kind == ToolKind.Group)
+                        {
+
+
+                        }
                     </MudTooltip>
                 }
 
             </MudToolBar>
-        </MudCollapse>        
+        </MudCollapse>
     </MudStack>
 
 }

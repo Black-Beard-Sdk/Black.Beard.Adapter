@@ -15,6 +15,8 @@ namespace Bb.Modules.Etl.DiagramTools
                    GlyphFilled.ArrowUpward)
         {
             
+            IsDefaultLink = true;
+
         }
 
         public const string Key = "802E6C01-E521-40CB-AE28-B35375974F22";

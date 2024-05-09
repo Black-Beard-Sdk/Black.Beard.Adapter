@@ -4,10 +4,11 @@ using Blazor.Diagrams.Core.Models;
 
 namespace Bb.Diagrams
 {
-    public class DiagramSpecificationModelBase : DiagramSpecificationBase
+
+    public class DiagramSpecificationNodeBase : DiagramSpecificationBase
     {
 
-        public DiagramSpecificationModelBase(Guid uuid, TranslatedKeyLabel name, TranslatedKeyLabel description, string icon)
+        public DiagramSpecificationNodeBase(Guid uuid, TranslatedKeyLabel name, TranslatedKeyLabel description, string icon)
             : base(uuid, name, description, icon)
         {
             this.Ports = new HashSet<PortAlignment>();
@@ -26,25 +27,24 @@ namespace Bb.Diagrams
             return this;
         }
 
-        public virtual CustomizedNodeModel CreateUI(DiagramItemBase model)
+        public virtual CustomizedNodeModel CreateUI(double x, double y, string name)
         {
-            var node = new CustomizedNodeModel(model);
+            var model = CreateModel(x, y, name);
+            var node = CreateUI(model);
             return node;
         }
 
-        public virtual CustomizedNodeModel CreateUI(double x, double y, string name, string? description = null)
+        public virtual CustomizedNodeModel CreateUI(DiagramNode model)
         {
-            var node = new CustomizedNodeModel(CreateModel(x, y, name, description ?? name));
-            return node;
+            return (CustomizedNodeModel)Activator.CreateInstance(TypeModel, new object[] { model });
         }
 
-        public virtual DiagramItemBase CreateModel(double x, double y, string name, string? description = null, Guid? uuid = null)
+        public virtual DiagramNode CreateModel(double x, double y, string name, Guid? uuid = null)
         {
 
             var model = Create();
             model.Position = new Position(x, y);
             model.Name = name;
-            model.Description = description ?? name;
             model.Uuid = uuid.HasValue ? uuid.Value : Guid.NewGuid();
             model.Type = Uuid;
 
@@ -55,11 +55,9 @@ namespace Bb.Diagrams
 
         }
 
-        protected virtual DiagramItemBase Create()
+        protected virtual DiagramNode Create()
         {
-
-            return (DiagramItemBase)Activator.CreateInstance(typeof(DiagramItemBase), new object[] { });
-
+            return (DiagramNode)Activator.CreateInstance(typeof(DiagramNode), new object[] { });
         }
 
         public HashSet<PortAlignment> Ports { get; }
