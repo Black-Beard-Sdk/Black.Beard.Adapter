@@ -5,10 +5,6 @@ VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Blazor.Components", "Black.Beard.Blazor.Components\Black.Beard.Blazor.Components.csproj", "{BB663770-8AAA-498C-B1CE-4D4C7F9DE2F6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bb.Adapter", "Bb.Adapter\Bb.Adapter.csproj", "{6A718EE2-9C59-4C95-9F9A-1CFAFC9C5DBC}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Web.Server", "..\..\Net.Server\src\Black.Beard.Web.Server\Black.Beard.Web.Server.csproj", "{5B22903F-A241-4840-B21B-347459B482EB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Modules", "Black.Beard.Modules\Black.Beard.Modules.csproj", "{3BA2159D-3DD7-4C9C-BE68-9FAAC5CDB7F0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Modules.Etl", "Black.Beard.Modules.Etl\Black.Beard.Modules.Etl.csproj", "{D3BFDFB8-C4D2-41CD-8D70-9F2B898A509A}"
@@ -25,14 +21,6 @@ Global
 		{BB663770-8AAA-498C-B1CE-4D4C7F9DE2F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB663770-8AAA-498C-B1CE-4D4C7F9DE2F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB663770-8AAA-498C-B1CE-4D4C7F9DE2F6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A718EE2-9C59-4C95-9F9A-1CFAFC9C5DBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A718EE2-9C59-4C95-9F9A-1CFAFC9C5DBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A718EE2-9C59-4C95-9F9A-1CFAFC9C5DBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A718EE2-9C59-4C95-9F9A-1CFAFC9C5DBC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B22903F-A241-4840-B21B-347459B482EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B22903F-A241-4840-B21B-347459B482EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B22903F-A241-4840-B21B-347459B482EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B22903F-A241-4840-B21B-347459B482EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3BA2159D-3DD7-4C9C-BE68-9FAAC5CDB7F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3BA2159D-3DD7-4C9C-BE68-9FAAC5CDB7F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BA2159D-3DD7-4C9C-BE68-9FAAC5CDB7F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
