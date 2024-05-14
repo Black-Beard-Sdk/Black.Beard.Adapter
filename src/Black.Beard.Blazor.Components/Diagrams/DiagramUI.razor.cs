@@ -5,6 +5,7 @@ using Blazor.Diagrams.Core.Routers;
 using Blazor.Diagrams.Options;
 using Blazor.Diagrams.Core.Behaviors;
 using Microsoft.AspNetCore.Components.Web;
+using Bb.PropertyGrid;
 
 namespace Bb.Diagrams
 {
@@ -123,6 +124,9 @@ namespace Bb.Diagrams
         private ToolboxList _toolboxList;
         private LinkFactory _linkFactory;
         private AnchorFactory _anchorFactory;
+
+        private PropertyGridView PropertyGrid;
+
     }
 
 }

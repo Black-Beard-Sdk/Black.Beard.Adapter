@@ -1,6 +1,7 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Loaders;
+using Microsoft.Fast.Components.FluentUI;
 using MudBlazor.Services;
 using NLog;
 using NLog.Web;
@@ -35,7 +36,7 @@ namespace Site.Loaders
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             services.AddMudServices();
-
+            services.AddFluentUIComponents();
 
         }
 

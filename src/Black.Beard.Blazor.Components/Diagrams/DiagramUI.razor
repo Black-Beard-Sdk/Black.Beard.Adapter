@@ -1,22 +1,32 @@
 ﻿@using Blazor.Diagrams.Components
 @using Blazor.Diagrams.Components.Widgets
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Fast.Components.FluentUI
 @using MudBlazor
-
+@using Bb.PropertyGrid
 
 <MudPaper Height="10" Elevation="25">
     <MudToolBar WrapContent="true">
-        <MudIconButton Size="Size.Small" Class="mr-5" Icon="@Icons.Material.Filled.Save" Color="Color.Inherit" OnClick="Save" />
+        <MudIconButton Size="Size.Small" Class="mr-5" Icon="@Icons.Material.Filled.Save" Color="MudBlazor.Color.Inherit" OnClick="Save" />
     </MudToolBar>
 </MudPaper>
 
-<MudGrid>
 
-    <MudItem xs="1">
-        <Toolbox @ref=_toolbox Tools="@Toolbox" />
-    </MudItem>
+<FluentSplitter Orientation="@Microsoft.Fast.Components.FluentUI.Orientation.Horizontal"
+                BarSize="6"
+                Panel1Size="20%"
+                Panel1MinSize="15%"
+                Panel2MinSize="50px">
+    <Panel1>
 
-    <MudItem xs="11">
+        <MudStack>
+            <Toolbox @ref=_toolbox Tools="@Toolbox" />
+            <PropertyGridView @ref="PropertyGrid" />
+        </MudStack>
+       
+    </Panel1>
+
+    <Panel2>
 
         <div class="diagram-container dropzone @dropClass"
              ondrop="@((DragEventArgs args)=>{HandleDrop(args);})"
@@ -46,6 +56,6 @@
                 </DiagramCanvas>
             </CascadingValue>
         </div>
-    </MudItem>
 
-</MudGrid>
+    </Panel2>
+</FluentSplitter>
