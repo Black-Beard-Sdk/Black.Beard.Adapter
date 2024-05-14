@@ -11,10 +11,12 @@ using Blazor.Diagrams.Core.Models.Base;
 namespace Bb.Diagrams
 {
 
-    public partial class DiagramUI : ComponentBase
+    public partial class DiagramUI : ComponentBase,  IDisposable
     {
 
 
+        [Inject]
+        public IFocusedService FocusedService { get; set; }
 
         [Parameter]
         public Diagram DiagramModel { get; set; }
@@ -61,51 +63,29 @@ namespace Bb.Diagrams
             _anchorFactory = new AnchorFactory();
 
             Diagram = CreateDiagram();
-
             Diagram.PointerClick += PointerClick;
             Diagram.SelectionChanged += SelectionChanged;
-            this.OnSelectionChanged += HasSelectionChanged;
-
+            FocusedService.FocusChanged += FocusedService_FocusChanged;
             DiagramModel.Apply(Diagram);
         }
 
-        private void HasSelectionChanged(object? sender, SelectionChangedEventArgs e)
+        private void FocusedService_FocusChanged(object? sender, EventArgs e)
         {
-
-            this.PropertyGrid.SelectedObject = e.CurrentSelection;
+            this.PropertyGrid.SelectedObject = sender;
         }
-
-        public object CurrentSelection
-        {
-            get => _currentSelection;
-            set
-            {
-                if (_currentSelection != value)
-                {
-                    _currentSelection = value;
-                    if (OnSelectionChanged != null)
-                        OnSelectionChanged.Invoke(this, new SelectionChangedEventArgs(_currentSelection));
-                }
-            }
-        }
-
-        public event EventHandler<SelectionChangedEventArgs> OnSelectionChanged;
 
         private void PointerClick(Model? model, Blazor.Diagrams.Core.Events.PointerEventArgs args)
         {
-
             if (model == null)
-                CurrentSelection = Diagram;
+                FocusedService.FocusChange(DiagramModel);
             else
-            {
-                CurrentSelection = model;
-            }
+                FocusedService.FocusChange(model);
         }
 
         private void SelectionChanged(SelectableModel model)
         {
             if (model != null)
-                CurrentSelection = model;
+                FocusedService.FocusChange(model);
         }
 
         private BlazorDiagram CreateDiagram()
@@ -201,8 +181,37 @@ namespace Bb.Diagrams
 
         private PropertyGridView PropertyGrid;
         private object _currentSelection;
+        private bool disposedValue;
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    FocusedService.FocusChanged -= FocusedService_FocusChanged;
+                    // TODO: supprimer l'état managé (objets managés)
+                }
 
+                // TODO: libérer les ressources non managées (objets non managés) et substituer le finaliseur
+                // TODO: affecter aux grands champs une valeur null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: substituer le finaliseur uniquement si 'Dispose(bool disposing)' a du code pour libérer les ressources non managées
+        // ~DiagramUI()
+        // {
+        //     // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 
 

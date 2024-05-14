@@ -90,50 +90,5 @@ namespace Bb.Diagrams
 
     }
 
-    public class Port
-    {
-
-        public Port()
-        {
-
-        }
-
-        public Guid Uuid { get; set; }
-
-        public PortAlignment Alignment { get; set; }
-
-    }
-
-
-    public class Position
-    {
-
-        public Position()
-        {
-
-        }
-
-        public Position(double x, double y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public double X { get; set; }
-
-        public double Y { get; set; }
-
-    }
-
-
-    public class Property
-    {
-
-        public string Name { get; set; }
-
-        public string Value { get; set; }
-
-    }
-
 
 }

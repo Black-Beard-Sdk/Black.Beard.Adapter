@@ -24,7 +24,11 @@ namespace Bb.Modules.Sgbd.Components
 
 
         [Inject]
+        public IFocusedService FocusedService { get; set; }
+
+        [Inject]
         public ITranslateService TranslationService { get; set; }
+
 
 
         public bool HasLinks => Table.GetPort(Column)?.Links.Count > 0;
@@ -54,7 +58,12 @@ namespace Bb.Modules.Sgbd.Components
             StateHasChanged();
         }
 
-     
+        public void OnClick(MouseEventArgs eventArgs)
+        {
+            FocusedService.FocusChange(this.Column);
+        }
+
+
         public void OnEditName(MouseEventArgs eventArgs)
         {
 

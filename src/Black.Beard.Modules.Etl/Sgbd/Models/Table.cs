@@ -36,6 +36,7 @@ namespace Bb.Modules.Sgbd.Models
             if (!_columns.Contains(column))
             {
                 _columns.Add(column);
+                column.Table = this;
                 AddPort(column, column.Primary ? PortAlignment.Right : PortAlignment.Left);
                 column.PropertyChanged += Column_PropertyChanged;
             }
@@ -46,6 +47,7 @@ namespace Bb.Modules.Sgbd.Models
             if (_columns.Contains(column))
             {
                 _columns.Remove(column);
+                column.Table = null;
                 RemovePort(column);
                 column.PropertyChanged -= Column_PropertyChanged;
             }

@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.Diagrams;
+using Bb.Modules.Etl.Models;
 
 namespace Bb.Modules.Etl
 {
@@ -14,7 +15,7 @@ namespace Bb.Modules.Etl
                 "data flow diagram",
                 "Design data flow for your module",
                 new Guid(ModuleDatas.Filter),
-                typeof(Diagram)
+                typeof(EtlDiagram)
             )
         {
             this.Page = typeof(EtlDiagramPage);

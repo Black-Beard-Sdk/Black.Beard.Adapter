@@ -22,17 +22,12 @@ namespace Bb.Modules
 
             if (Instance != null && Property != null)
             {
-
                 var items = _moduleSpecifications.GetModules();
                 foreach (var item in items)
-                {
-                    var value = item.Uuid;
-                    var text = item.Name;
                     list.Add(CreateItem( item, item.Name, item.Uuid, c =>
                     {
 
                     }));
-                }
             }
 
             return list;

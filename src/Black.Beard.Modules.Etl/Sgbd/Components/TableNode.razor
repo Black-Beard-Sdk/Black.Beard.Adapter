@@ -33,10 +33,8 @@
 
                 <tbody>
                     @foreach (var column in Node.Columns.OrderByDescending(c => c.Primary))
-                    {                        
-                        <tr class="mud-table-row cursor-pointer">
-                            <TableColumn @key="column" Table="Node" Column="column" Parent="@this"></TableColumn>
-                        </tr>
+                    {
+                        <TableColumn @key="column" Table="Node" Column="column" Parent="@this"></TableColumn>
                     }
                 </tbody>
 

@@ -31,14 +31,10 @@ namespace Bb.Modules
                     items = _featureSpecifications.GetFeatures();
 
                 foreach (var item in items)
-                {
-                    var value = item.Uuid;
-                    var text = item.Name;
                     list.Add(CreateItem(item, item.Name, item.Uuid, c =>
                     {
 
                     }));
-                }
             }
 
             return list;

@@ -3,6 +3,7 @@ using Bb.ComponentModel.Attributes;
 
 namespace Bb
 {
+
     [ExposeClass(ConstantsCore.Service, ExposedType = typeof(IRefreshService), LifeCycle = IocScopeEnum.Scoped)]
     public class RefreshService : IRefreshService
     {

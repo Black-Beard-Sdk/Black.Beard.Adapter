@@ -11,9 +11,8 @@ namespace Bb.Diagrams
 
         public void ApplyToUI(DiagramSpecificationNodeBase specification, DiagramNode model)
         {
-            var ui = specification.CreateUI(model);
+            var ui = _diagram.Nodes.Add(specification.CreateUI(model));
             ui.Source.Diagram = this;
-            var firstNode = _diagram.Nodes.Add(ui);
         }
 
         public void Apply(BlazorDiagram diagram)
@@ -43,8 +42,9 @@ namespace Bb.Diagrams
                 if (_dicModels.TryGetValue(item.Type, out var specModel))
                 {
 
-                    var firstNode = _diagram.Nodes.Add(specModel.CreateUI(item));
-                    foreach (var port in firstNode.Ports)
+                    var ui = _diagram.Nodes.Add(specModel.CreateUI(item));
+                    ui.Source.Diagram = this;
+                    foreach (var port in ui.Ports)
                         dic.Add(new Guid(port.Id), port);
                 }
                 else

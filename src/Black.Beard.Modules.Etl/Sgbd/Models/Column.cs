@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Bb.ComponentModel.Attributes;
+using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Bb.Modules.Sgbd.Models
 {
@@ -15,8 +18,14 @@ namespace Bb.Modules.Sgbd.Models
 
         public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+        [JsonIgnore]
+        [Browsable(false)]
+        public Table Table { get; set; }    
+
+        [Browsable(false)]
         public Guid Id { get; set; }
 
+        [Description("Column name")]
         public string Name
         {
             get => _name;
@@ -30,6 +39,8 @@ namespace Bb.Modules.Sgbd.Models
             }
         }
 
+        [Description("Column type")]
+        [ListProvider(typeof(ListProviderColumnTypeTechnologies))]
         public string Type
         {
             get => _type;
@@ -43,6 +54,7 @@ namespace Bb.Modules.Sgbd.Models
             }
         }
 
+        [Browsable(false)]
         public bool Primary
         {
             get => isPrimary;
@@ -57,9 +69,10 @@ namespace Bb.Modules.Sgbd.Models
             }
         }
 
+        [Description("Column is nullable")]
         public bool Nullable { get; set; }
 
-        public bool DefaultValue { get; set; }
+        public string DefaultValue { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
