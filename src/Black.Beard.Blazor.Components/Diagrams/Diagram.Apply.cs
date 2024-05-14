@@ -35,7 +35,7 @@ namespace Bb.Diagrams
             foreach (var item in this.Specifications)
                 if (item is DiagramSpecificationNodeBase specModel)
                     if (item.TypeUI != null)
-                        _diagram.RegisterComponent(item.TypeModel, item.TypeUI, true);
+                        _diagram.RegisterComponent(specModel.TypeModel, specModel.TypeUI, true);
 
             var dic = new Dictionary<Guid, PortModel>();
             foreach (var item in this.Models)
@@ -54,10 +54,14 @@ namespace Bb.Diagrams
             foreach (DiagramRelationship item in this.Relationships)
                 if (_dicLinks.TryGetValue(item.Type, out var specLink))
                 {
-                    PortModel source = dic[item.Source];
-                    PortModel target = dic[item.Target];
-                    var link = specLink.CreateLink(item, source, target);
-                    var linkUI = _diagram.Links.Add(link);
+
+                    if (dic.TryGetValue(item.Source, out PortModel source))
+                        if (dic.TryGetValue(item.Target, out PortModel target))
+                        {
+                            var link = specLink.CreateLink(item, source, target);
+                            var linkUI = _diagram.Links.Add(link);
+                        }
+
                 }
                 else
                 {

@@ -1,21 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Blazor.Diagrams;
 using Blazor.Diagrams.Core.PathGenerators;
 using Blazor.Diagrams.Core.Routers;
 using Blazor.Diagrams.Options;
-using Blazor.Diagrams.Core.Models;
-using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Behaviors;
-using MudBlazor;
-using Blazor.Diagrams.Core.Events;
-using Blazor.Diagrams.Core.Models.Base;
 using Microsoft.AspNetCore.Components.Web;
-using Blazor.Diagrams.Core.Options;
-using ICSharpCode.Decompiler.Metadata;
-using Blazor.Diagrams.Core;
 
 namespace Bb.Diagrams
 {

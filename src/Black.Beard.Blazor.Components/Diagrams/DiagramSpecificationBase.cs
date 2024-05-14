@@ -1,8 +1,6 @@
 ﻿using Bb.ComponentModel.Translations;
-using Bb.UIComponents;
-using Blazor.Diagrams.Core.Models.Base;
-using Microsoft.AspNetCore.Http;
-using System.ComponentModel.Design;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using System.ComponentModel;
 
 namespace Bb.Diagrams
 {
@@ -31,9 +29,22 @@ namespace Bb.Diagrams
         public Guid Uuid { get; set; }
 
 
-        public Type TypeModel { get; set; } = typeof(CustomizedNodeModel);
+        public virtual void SetTypeModel<T>()
+            where T : CustomizedNodeModel
+        {
+            var type = typeof(T);
+            TypeModel = type;
+        }
 
-        public Type TypeUI { get; set; } 
+        public Type TypeModel { get; private set; } = typeof(CustomizedNodeModel);
+
+        public virtual void SetTypeUI<T>()
+            where T : Microsoft.AspNetCore.Components.IComponent
+        {
+            TypeUI = typeof(T);
+        }
+
+        public Type TypeUI { get; private set; } 
 
         public TranslatedKeyLabel Category { get; protected set; }
 

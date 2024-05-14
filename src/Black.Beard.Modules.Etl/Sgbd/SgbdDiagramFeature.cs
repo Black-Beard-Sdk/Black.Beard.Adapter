@@ -1,36 +1,34 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.Diagrams;
-using Bb.Modules.Etl.Pages;
-using static MudBlazor.CategoryTypes;
 
-namespace Bb.Modules.Etl
+namespace Bb.Modules.Sgbd
 {
 
-
-    [ExposeClass(Bb.ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(FeatureSpecification), LifeCycle = IocScopeEnum.Transiant)]
-    public class EtlDiagramFeature : FeatureSpecification
+    [ExposeClass(ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(FeatureSpecification), LifeCycle = IocScopeEnum.Transiant)]
+    public class SgbdDiagramFeature : FeatureSpecification
     {
 
-        public EtlDiagramFeature()
+        public SgbdDiagramFeature()
             : base(new Guid(Filter),
-                "data flow diagram",
-                "Design data flow for your module",
-                new Guid(ModuleDataFlow.Filter),
+                "Sgbd diagram",
+                "Design database structure",
+                new Guid(ModuleDatas.Filter),
                 typeof(Diagram)
             )
         {
-            this.Page = typeof(DiagramPage);
+            Page = typeof(SgbdDiagramPage);
         }
 
 
         public override object GetModel(FeatureInstance featureInstance)
         {
-            var result =  (Diagram)base.GetModel(featureInstance);
+
+            var result = (Diagram)base.GetModel(featureInstance);
 
             result.Save = d =>
             {
                 SetModel(featureInstance, d);
-                featureInstance.Parent.Save(featureInstance); 
+                featureInstance.Parent.Save(featureInstance);
             };
 
             result.SetSpecifications(GetTools());
@@ -75,13 +73,12 @@ namespace Bb.Modules.Etl
 
         }
 
-        public const string Filter = "C9119B69-5DD9-45D2-A28A-617D6CB9D7F9";
+        public const string Filter = "487E5B0F-C9E8-47A2-B72C-11DABCAE9C00";
 
         private volatile object _lock = new object();
         private Dictionary<Guid, DiagramSpecificationBase> _items;
 
     }
-
 
 
 }

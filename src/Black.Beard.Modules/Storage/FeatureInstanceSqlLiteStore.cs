@@ -22,6 +22,10 @@ namespace Bb.Modules.Storage
         {
             var result = base.MapInstance(reader);
             result.FeatureSpecification = _featureSpecifications.GetFeature(result.Specification);
+            if (result.FeatureSpecification == null)
+            {
+
+            }
             return result;
         }
 

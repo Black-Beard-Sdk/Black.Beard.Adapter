@@ -1,10 +1,7 @@
 ﻿using Bb.ComponentModel.Translations;
-using Bb.UIComponents;
 using Blazor.Diagrams.Core.Anchors;
-using Blazor.Diagrams.Core.Events;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
-using ICSharpCode.Decompiler.Metadata;
 
 namespace Bb.Diagrams
 {

@@ -1,5 +1,4 @@
-﻿using Bb.ComponentModel.Translations;
-
+﻿
 namespace Bb.Diagrams
 {
 

@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Black.Beard.Blazor.Components\Black.Beard.Blazor.Components.csproj" />
-    <ProjectReference Include="..\Black.Beard.Modules.Etl\Black.Beard.Modules.Etl.csproj" />
+    <ProjectReference Include="..\Black.Beard.Modules.Etl\Black.Beard.Modules.Datas.csproj" />
     <ProjectReference Include="..\Black.Beard.Modules\Black.Beard.Modules.csproj" />
   </ItemGroup>
 

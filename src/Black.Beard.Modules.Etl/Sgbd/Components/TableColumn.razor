@@ -1,0 +1,78 @@
+﻿@using Blazor.Diagrams.Components.Renderers
+@using Blazor.Diagrams.Core.Models
+@using MudBlazor
+
+
+
+
+<td class="mud-table-cell">
+    @if (!Column.Primary && Table.GetPort(Column) != null)
+    {
+        <PortRenderer Port="Table.GetPort(Column)">
+            <MudIcon Icon="@Icons.Material.Filled.CheckBoxOutlineBlank" />
+        </PortRenderer>
+    }
+    else
+    {
+        <MudIcon Icon="@Icons.Material.Filled.Key" />
+    }
+
+</td>
+
+<td class="mud-table-cell" ondblclick="@OnEditName">
+    @if (_editName)
+    {
+        <MudTextField @bind-Value="Column.Name"
+                      Variant="Variant.Filled"
+                      Outlined="true"
+                      FullWidth="true"
+                      OnBlur="@LostFocus"
+                      OnKeyDown="@OnKeyDown"
+                      Class="xs-4">
+        </MudTextField>
+    }
+    else
+    {
+
+        <MudMenu ActivationEvent="@MouseEvent.RightClick" Dense="true">
+            <ActivatorContent>
+                @Column.Name
+            </ActivatorContent>
+            <ChildContent>
+                <MudMenuItem OnClick="DelColumn">@DatasComponentConstants.DelColumn.Translate(this)</MudMenuItem>
+            </ChildContent>
+
+        </MudMenu>
+
+    }
+</td>
+
+<td class="mud-table-cell">
+    <MudMenu ActivationEvent="@MouseEvent.RightClick" Dense="true">
+        <ActivatorContent>
+            @Column.Type.ToString()
+        </ActivatorContent>
+        <ChildContent>
+            <MudMenuItem OnClick="DelColumn">@DatasComponentConstants.DelColumn.Translate(this)</MudMenuItem>
+        </ChildContent>
+    </MudMenu>
+</td>
+
+<td class="mud-table-cell">
+
+    <MudSwitch @bind-Value="@Column.Nullable" Color="Color.Info" />
+
+</td>
+
+<td class="mud-table-cell">
+
+    @if (Column.Primary && Table.GetPort(Column) != null)
+    {
+        <PortRenderer Port="Table.GetPort(PortAlignment.Right)">
+            <MudIcon Icon="@Icons.Material.Filled.CheckBoxOutlineBlank" />
+        </PortRenderer>
+    }
+
+</td>
+
+

@@ -59,9 +59,7 @@ namespace Bb.Loaders
 
                                 subMenu.WithDisplay(itemFeature.Label)
                                        .NavigateTo(itemFeature.GetRoute())
-                                    //.NavigateTo<PageModule>(c => c.MapArgument(() => itemFeature.Uuid, d => d.Uuid))
                                     ;
-
 
                             })
 

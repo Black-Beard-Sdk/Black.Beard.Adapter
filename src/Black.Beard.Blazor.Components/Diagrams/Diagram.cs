@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Blazor.Diagrams.Core.Models;
+using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
 {
@@ -84,6 +85,13 @@ namespace Bb.Diagrams
             return link;
         }
 
+        //private PortModel? ResolvePort(Guid id)
+        //{
+        //    foreach (var item in this.Models)
+        //        foreach (var port in item.Ports)
+        //            if (port.Uuid == id)
+        //                return port;
+        //}
 
         public DiagramNode? GetModelByPort(Guid id)
         {

@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Bb.Modules.Etl.Pages
+
+namespace Bb.Modules.Etl
 {
-    public partial class DiagramPage : ComponentBase
+
+    public partial class EtlDiagramPage : ComponentBase
     {
 
         [Parameter]
@@ -23,4 +22,5 @@ namespace Bb.Modules.Etl.Pages
         private FeatureInstance _featureInstance;
 
     }
+
 }

@@ -1,0 +1,51 @@
+﻿@using Bb.Modules.Sgbd.Models
+@using Blazor.Diagrams.Components.Renderers
+@using Blazor.Diagrams.Core.Models
+@using Microsoft.AspNetCore.Components.Web
+@using MudBlazor
+@using Bb.Modules
+
+
+<MudPaper>
+
+    <MudTextField @bind-Value="TableName"
+                  Variant="Variant.Filled"
+                  Outlined="true"
+                  FullWidth="true"
+                  Class="mb-4">
+    </MudTextField>
+
+    <div class="mud-table mud-sm-table mud-table-dense mud-table-hover mud-elevation-1">
+
+        <div class="mud-table-container card @(Node.Selected ? "selected" : "")" style=" ">
+
+            <table>
+
+                <thead class="mud-table-head" ondblclick="@AutoAddColumn">
+                    <tr class="mud-table-row">
+                        <th scope="col" class="mud-table-cell"></th>
+                        <th scope="col" class="mud-table-cell">@DatasComponentConstants.Columns.Translate(this)</th>
+                        <th scope="col" class="mud-table-cell">@DatasComponentConstants.Types.Translate(this)</th>
+                        <th scope="col" class="mud-table-cell">@DatasComponentConstants.Nullable.Translate(this)</th>
+                        <th scope="col" class="mud-table-cell"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var column in Node.Columns.OrderByDescending(c => c.Primary))
+                    {                        
+                        <tr class="mud-table-row cursor-pointer">
+                            <TableColumn @key="column" Table="Node" Column="column" Parent="@this"></TableColumn>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</MudPaper>
+
+

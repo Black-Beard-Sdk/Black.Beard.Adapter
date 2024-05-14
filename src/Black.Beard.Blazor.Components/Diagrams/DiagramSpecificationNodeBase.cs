@@ -1,5 +1,4 @@
 ﻿using Bb.ComponentModel.Translations;
-using Bb.UIComponents;
 using Blazor.Diagrams.Core.Models;
 
 namespace Bb.Diagrams
@@ -32,6 +31,33 @@ namespace Bb.Diagrams
             var model = CreateModel(x, y, name);
             var node = CreateUI(model);
             return node;
+        }
+
+        public override void SetTypeModel<T>()
+        {
+
+            var type = typeof(T);
+            var ctors = type.GetConstructors();
+
+            bool test = false;
+            foreach (var item in ctors)
+            {
+                var parameters = item.GetParameters();
+                if (parameters.Length == 1)
+                {
+                    var parameter = parameters[0];
+                    if (parameter.ParameterType == typeof(DiagramNode))
+                    {
+                        test = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!test)
+                throw new System.Exception($"The type {type.Name} must have a constructor with a single parameter of type DiagramNode");
+
+            base.SetTypeModel<T>();
         }
 
         public virtual CustomizedNodeModel CreateUI(DiagramNode model)

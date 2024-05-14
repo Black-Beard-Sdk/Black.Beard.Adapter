@@ -7,9 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Blazor.Componen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Modules", "Black.Beard.Modules\Black.Beard.Modules.csproj", "{3BA2159D-3DD7-4C9C-BE68-9FAAC5CDB7F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Modules.Etl", "Black.Beard.Modules.Etl\Black.Beard.Modules.Etl.csproj", "{D3BFDFB8-C4D2-41CD-8D70-9F2B898A509A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Modules.Datas", "Black.Beard.Modules.Etl\Black.Beard.Modules.Datas.csproj", "{D3BFDFB8-C4D2-41CD-8D70-9F2B898A509A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site", "Site\Site.csproj", "{9E23BE17-C92B-4621-9038-E995E128BD6F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseDesigner.Core", "C:\Users\g.beard\Downloads\Blazor.DatabaseDesigner-master\Blazor.DatabaseDesigner-master\DatabaseDesigner.Core\DatabaseDesigner.Core.csproj", "{C9FC9BE2-8203-41CE-9202-8A760BBC3756}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseDesigner.Wasm", "C:\Users\g.beard\Downloads\Blazor.DatabaseDesigner-master\Blazor.DatabaseDesigner-master\DatabaseDesigner.Wasm\DatabaseDesigner.Wasm.csproj", "{6F549153-B7F3-491F-90A3-E2E75B9AACB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{9E23BE17-C92B-4621-9038-E995E128BD6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E23BE17-C92B-4621-9038-E995E128BD6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E23BE17-C92B-4621-9038-E995E128BD6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9FC9BE2-8203-41CE-9202-8A760BBC3756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9FC9BE2-8203-41CE-9202-8A760BBC3756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9FC9BE2-8203-41CE-9202-8A760BBC3756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9FC9BE2-8203-41CE-9202-8A760BBC3756}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F549153-B7F3-491F-90A3-E2E75B9AACB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F549153-B7F3-491F-90A3-E2E75B9AACB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F549153-B7F3-491F-90A3-E2E75B9AACB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F549153-B7F3-491F-90A3-E2E75B9AACB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

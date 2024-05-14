@@ -1,6 +1,5 @@
-﻿using Bb.ComponentModel.Translations;
-using Blazor.Diagrams.Core.Models;
-using System.Text.Json.Serialization;
+﻿using Blazor.Diagrams.Core.Models;
+using System.Text.Json.Nodes;
 
 namespace Bb.Diagrams
 {
@@ -56,8 +55,21 @@ namespace Bb.Diagrams
 
         public Port AddPort(PortAlignment alignment, Guid id)
         {
-            var p = new Port() { Uuid = id, Alignment = alignment };
-            Ports.Add(p);
+
+            var p = Ports.FirstOrDefault(c => c.Uuid == id);
+            if (p == null)
+            {
+                p = new Port() { Uuid = id, Alignment = alignment };
+                Ports.Add(p);
+            }
+            else
+            {
+                if (p.Alignment != alignment)
+                {
+                    p.Alignment = alignment;
+                }
+
+            }
             return p;
         }
 
@@ -87,6 +99,7 @@ namespace Bb.Diagrams
 
     }
 
+
     public class Position
     {
 
@@ -107,10 +120,15 @@ namespace Bb.Diagrams
 
     }
 
+
     public class Property
     {
+
         public string Name { get; set; }
+
         public string Value { get; set; }
+
     }
+
 
 }

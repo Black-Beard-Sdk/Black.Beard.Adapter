@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 
 namespace Bb.Diagrams
