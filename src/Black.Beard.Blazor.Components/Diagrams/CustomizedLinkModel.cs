@@ -3,6 +3,7 @@ using Bb.ComponentModel.Accessors;
 using Bb.Expressions;
 using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Models.Base;
+using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
 {

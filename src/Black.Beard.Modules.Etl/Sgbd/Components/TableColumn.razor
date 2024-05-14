@@ -50,7 +50,7 @@
 <td class="mud-table-cell">
     <MudMenu ActivationEvent="@MouseEvent.RightClick" Dense="true">
         <ActivatorContent>
-            @Column.Type.ToString()
+            @Column.Type?.ToString()
         </ActivatorContent>
         <ChildContent>
             <MudMenuItem OnClick="DelColumn">@DatasComponentConstants.DelColumn.Translate(this)</MudMenuItem>

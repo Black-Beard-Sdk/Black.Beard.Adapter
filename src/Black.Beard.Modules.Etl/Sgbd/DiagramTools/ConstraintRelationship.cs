@@ -20,6 +20,8 @@ namespace Bb.Modules.Sgbd.DiagramTools
 
             IsDefaultLink = true;
 
+
+
         }
 
 
@@ -35,7 +37,13 @@ namespace Bb.Modules.Sgbd.DiagramTools
 
         public override CustomizedLinkModel CreateLink(DiagramRelationship link, Anchor source, Anchor target)
         {
-            return base.CreateLink(link, source, target);
+
+            var result = base.CreateLink(link, source, target);
+
+            //result.Router = Routers.OrthogonalRouter;
+            //result.PathGenerator = PathGenerators.Straight;
+
+            return result;
         }
 
         public override CustomizedLinkModel CreateLink(DiagramRelationship link, PortModel source, PortModel target)

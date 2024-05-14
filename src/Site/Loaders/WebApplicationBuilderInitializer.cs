@@ -6,7 +6,6 @@ using NLog;
 using NLog.Web;
 using Site.Data;
 using Site.Loaders.SiteExtensions;
-using System.Reflection.PortableExecutable;
 
 namespace Site.Loaders
 {

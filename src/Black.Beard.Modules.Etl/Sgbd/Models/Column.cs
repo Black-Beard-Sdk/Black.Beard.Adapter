@@ -7,6 +7,12 @@ namespace Bb.Modules.Sgbd.Models
     public class Column : INotifyPropertyChanged
     {
 
+        public Column()
+        {
+            
+        }
+
+
         public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public Guid Id { get; set; }
@@ -24,7 +30,7 @@ namespace Bb.Modules.Sgbd.Models
             }
         }
 
-        public ColumnType Type
+        public string Type
         {
             get => _type;
             set
@@ -59,19 +65,8 @@ namespace Bb.Modules.Sgbd.Models
 
         private bool isPrimary;
         private string _name;
-        private ColumnType _type;
+        private string _type;
 
-    }
-
-    public enum ColumnType
-    {
-        Boolean,
-        Char,
-        String,
-        SByte,
-        Short,
-        Integer,
-        Long
     }
 
 }

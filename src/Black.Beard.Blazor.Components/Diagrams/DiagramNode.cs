@@ -1,5 +1,6 @@
 ﻿using Blazor.Diagrams.Core.Models;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
 {
@@ -82,6 +83,10 @@ namespace Bb.Diagrams
         {
             return Ports.FirstOrDefault(c => c.Uuid == id);
         }
+
+
+        [JsonIgnore]
+        public Diagram Diagram { get; internal set; }
 
     }
 

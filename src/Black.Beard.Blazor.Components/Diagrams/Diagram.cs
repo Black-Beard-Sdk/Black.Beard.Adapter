@@ -20,9 +20,6 @@ namespace Bb.Diagrams
 
         public string Description { get; set; }
 
-        [JsonIgnore]
-        public IEnumerable<DiagramSpecificationBase> Specifications { get; private set; }
-
         public List<DiagramNode> Models { get; set; }
 
         public List<DiagramRelationship> Relationships { get; set; }
@@ -85,14 +82,6 @@ namespace Bb.Diagrams
             return link;
         }
 
-        //private PortModel? ResolvePort(Guid id)
-        //{
-        //    foreach (var item in this.Models)
-        //        foreach (var port in item.Ports)
-        //            if (port.Uuid == id)
-        //                return port;
-        //}
-
         public DiagramNode? GetModelByPort(Guid id)
         {
 
@@ -116,6 +105,10 @@ namespace Bb.Diagrams
                     _dicLinks.Add(link.Uuid, link);
             }
         }
+
+
+        [JsonIgnore]
+        public IEnumerable<DiagramSpecificationBase> Specifications { get; private set; }
 
         [JsonIgnore]
         public Action<Diagram> Save { get; set; }

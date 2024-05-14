@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.Diagrams;
+using Bb.Modules.Sgbd.Models;
 
 namespace Bb.Modules.Sgbd
 {
@@ -13,7 +14,7 @@ namespace Bb.Modules.Sgbd
                 "Sgbd diagram",
                 "Design database structure",
                 new Guid(ModuleDatas.Filter),
-                typeof(Diagram)
+                typeof(SgbdDiagram)
             )
         {
             Page = typeof(SgbdDiagramPage);
@@ -23,7 +24,7 @@ namespace Bb.Modules.Sgbd
         public override object GetModel(FeatureInstance featureInstance)
         {
 
-            var result = (Diagram)base.GetModel(featureInstance);
+            var result = (SgbdDiagram)base.GetModel(featureInstance);
 
             result.Save = d =>
             {

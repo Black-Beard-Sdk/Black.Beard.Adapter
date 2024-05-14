@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace Bb.Diagrams
 {
 
@@ -50,6 +52,9 @@ namespace Bb.Diagrams
                 return property.Value;
             return null;
         }
+
+        [JsonIgnore]
+        public Diagram Diagram { get; internal set; }
 
     }
 

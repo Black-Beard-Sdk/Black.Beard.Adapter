@@ -27,7 +27,7 @@ namespace Bb.Modules.Sgbd.Components
           AddColumn();
         }
 
-        public void AddColumn()
+        public Column AddColumn()
         {
 
             string title = TranslationService.Translate(DatasComponentConstants.Column) + " ";
@@ -35,13 +35,22 @@ namespace Bb.Modules.Sgbd.Components
             while (Node.Columns.Any(c => c.Name == (title + count.ToString())))
                 count++;
 
-            Node.AddColumn(new Column()
+            var column = new Column()
             {
                 Name = title + count.ToString(),
                 Primary = false,
-                Type = ColumnType.Integer,
                 Id = Guid.NewGuid()
-            });
+            };
+
+            var diagram = this.Node.Source.Diagram as SgbdDiagram;
+            var t = diagram.GetTechnology();
+            if (t != null)
+                column.Type = t.DefaultColumnType.Label;
+
+            Node.AddColumn(column);
+
+            return column;
+
         }
 
         public void Refresh()

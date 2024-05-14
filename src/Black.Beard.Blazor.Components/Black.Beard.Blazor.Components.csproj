@@ -56,6 +56,7 @@
     <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.95" />
     <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.95" />
     <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.37" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.7.0" />
     <PackageReference Include="MudBlazor" Version="6.19.1" />
     <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.2" />
   </ItemGroup>

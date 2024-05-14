@@ -62,7 +62,8 @@ namespace Bb.Diagrams
 
         public virtual CustomizedNodeModel CreateUI(DiagramNode model)
         {
-            return (CustomizedNodeModel)Activator.CreateInstance(TypeModel, new object[] { model });
+            var result = (CustomizedNodeModel)Activator.CreateInstance(TypeModel, new object[] { model });
+            return result;
         }
 
         public virtual DiagramNode CreateModel(double x, double y, string name, Guid? uuid = null)

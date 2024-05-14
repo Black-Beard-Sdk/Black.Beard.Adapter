@@ -12,6 +12,7 @@ namespace Bb.Diagrams
         public void ApplyToUI(DiagramSpecificationNodeBase specification, DiagramNode model)
         {
             var ui = specification.CreateUI(model);
+            ui.Source.Diagram = this;
             var firstNode = _diagram.Nodes.Add(ui);
         }
 
@@ -90,6 +91,7 @@ namespace Bb.Diagrams
             if (m == null)
                 if (link is CustomizedLinkModel c)
                 {
+                    c.Source.Diagram = this;
                     this.Relationships.Add(c.Source);
                     link.TargetAttached += Links_TargetMapped;
                 }

@@ -5,6 +5,7 @@ using Bb.Expressions;
 using Blazor.Diagrams.Core.Models.Base;
 using ICSharpCode.Decompiler.Metadata;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
 {
@@ -23,9 +24,9 @@ namespace Bb.Diagrams
         public CustomizedNodeModel(DiagramNode source)
             : this(source.Uuid.ToString(), new Point(source.Position.X, source.Position.Y))
         {
-
+           
             this.Source = source;
-            this.Title = source.Name;
+            this.Title = source.Name;            
 
             CreatePort();
 
@@ -38,6 +39,7 @@ namespace Bb.Diagrams
                 var value = source.GetProperty(item.Name);
                  if (!string.IsNullOrEmpty(value))
                 {
+                    
                     var r = value.Deserialize(item.Type);
                     item.SetValue(this, r);
                 }
