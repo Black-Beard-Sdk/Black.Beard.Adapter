@@ -25,14 +25,15 @@ namespace Bb.CustomComponents
             this.Display = property.DisplayName.GetTranslation(property.Name);
             this.Description = property.Description;
             this.Category = property.Category.GetTranslation();
-            this.Browsable = true;
-            this.ReadOnly = false;
+            this.Browsable = property.IsBrowsable;
+            this.ReadOnly = property.IsReadOnly;
             this.DefaultValue = null;
             this.Minimum = Int32.MinValue;
             this.Maximum = Int32.MaxValue;
             this.Type = PropertyDescriptor.PropertyType;
             this.Step = 1;
             this.Line = 1;
+            this.ComponentType = property.ComponentType;
 
             if (this.Type.IsGenericType && this.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
@@ -206,6 +207,8 @@ namespace Bb.CustomComponents
         public Type ListProvider { get; set; }
 
         public int Line { get; set; }
+
+        public Type ComponentType { get; }
 
         public StringType Mask { get; set; }
 

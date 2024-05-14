@@ -16,6 +16,21 @@ namespace Bb.Modules.Sgbd.Models
 
         }
 
+
+        public string Name
+        {
+            get => this.Title;
+            set
+            {
+                if (this.Title != value)
+                {
+                    this.Title = value;
+                    OnPropertyChanged(nameof(Name));
+                }
+            }
+        }
+
+
         public void AddColumn(Column column)
         {
             if (!_columns.Contains(column))
@@ -50,7 +65,7 @@ namespace Bb.Modules.Sgbd.Models
             }
         }
 
-
+        [Browsable(false)]
         public List<Column> Columns
         {
             get => _columns ?? (_columns = new List<Column>());
@@ -66,6 +81,7 @@ namespace Bb.Modules.Sgbd.Models
             }
         }
 
+        [Browsable(false)]
         public bool HasPrimaryColumn => Columns.Any(c => c.Primary);
 
 

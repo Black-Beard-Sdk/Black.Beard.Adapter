@@ -6,6 +6,7 @@ using Blazor.Diagrams.Options;
 using Blazor.Diagrams.Core.Behaviors;
 using Microsoft.AspNetCore.Components.Web;
 using Bb.PropertyGrid;
+using Blazor.Diagrams.Core.Models.Base;
 
 namespace Bb.Diagrams
 {
@@ -24,6 +25,35 @@ namespace Bb.Diagrams
 
         private BlazorDiagram Diagram { get; set; } = null!;
 
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            base.OnAfterRender(firstRender);
+            if (firstRender)
+            {
+                PropertyGrid.PropertyFilter = (p) =>
+                {
+                    if (p.Browsable)
+                    {
+                        var type = p.Parent.Instance.GetType();
+                        var property = p.ComponentType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                        .Where(c => c.Name == p.Name && c.DeclaringType == type)
+                        .FirstOrDefault();
+                        if (property != null)
+                        {
+
+
+                            return true;
+                        }
+                    }
+                    return false;
+
+                };
+
+            }
+
+        }
+
         protected override void OnInitialized()
         {
 
@@ -31,7 +61,51 @@ namespace Bb.Diagrams
             _anchorFactory = new AnchorFactory();
 
             Diagram = CreateDiagram();
+
+            Diagram.PointerClick += PointerClick;
+            Diagram.SelectionChanged += SelectionChanged;
+            this.OnSelectionChanged += HasSelectionChanged;
+
             DiagramModel.Apply(Diagram);
+        }
+
+        private void HasSelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+
+            this.PropertyGrid.SelectedObject = e.CurrentSelection;
+        }
+
+        public object CurrentSelection
+        {
+            get => _currentSelection;
+            set
+            {
+                if (_currentSelection != value)
+                {
+                    _currentSelection = value;
+                    if (OnSelectionChanged != null)
+                        OnSelectionChanged.Invoke(this, new SelectionChangedEventArgs(_currentSelection));
+                }
+            }
+        }
+
+        public event EventHandler<SelectionChangedEventArgs> OnSelectionChanged;
+
+        private void PointerClick(Model? model, Blazor.Diagrams.Core.Events.PointerEventArgs args)
+        {
+
+            if (model == null)
+                CurrentSelection = Diagram;
+            else
+            {
+                CurrentSelection = model;
+            }
+        }
+
+        private void SelectionChanged(SelectableModel model)
+        {
+            if (model != null)
+                CurrentSelection = model;
         }
 
         private BlazorDiagram CreateDiagram()
@@ -126,7 +200,10 @@ namespace Bb.Diagrams
         private AnchorFactory _anchorFactory;
 
         private PropertyGridView PropertyGrid;
+        private object _currentSelection;
+
 
     }
+
 
 }
