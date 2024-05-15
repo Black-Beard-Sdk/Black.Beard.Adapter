@@ -6,6 +6,9 @@ namespace Bb
     public static class ComponentConstants
     {
 
+        public static TranslatedKeyLabel Properties => new TranslatedKeyLabel("Properties");
+
+
         public static TranslatedKeyLabel Cancel => new TranslatedKeyLabel("Cancel");
 
         public static TranslatedKeyLabel Previous => new TranslatedKeyLabel("Previous");

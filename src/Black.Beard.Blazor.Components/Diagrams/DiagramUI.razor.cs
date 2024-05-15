@@ -7,13 +7,17 @@ using Blazor.Diagrams.Core.Behaviors;
 using Microsoft.AspNetCore.Components.Web;
 using Bb.PropertyGrid;
 using Blazor.Diagrams.Core.Models.Base;
+using Bb.ComponentModel.Translations;
 
 namespace Bb.Diagrams
 {
 
-    public partial class DiagramUI : ComponentBase,  IDisposable
+    public partial class DiagramUI : ComponentBase,  IDisposable, ITranslateHost
     {
 
+
+        [Inject]
+        public ITranslateService TranslationService { get; set; }
 
         [Inject]
         public IFocusedService FocusedService { get; set; }

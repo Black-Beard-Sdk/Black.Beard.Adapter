@@ -27,6 +27,11 @@ namespace Bb.Modules.Sgbd.Components
           AddColumn();
         }
 
+        public void AutoAddIndex(MouseEventArgs eventArgs)
+        {
+            AddIndex();
+        }
+
         public Column AddColumn()
         {
 
@@ -48,6 +53,34 @@ namespace Bb.Modules.Sgbd.Components
                 column.Type = t.DefaultColumnType.Label;
 
             Node.AddColumn(column);
+
+            return column;
+
+        }
+
+        public Models.Index AddIndex()
+        {
+
+            string title = TranslationService.Translate(DatasComponentConstants.Index) + " ";
+            int count = 1;
+            while (Node.Indexes.Any(c => c.Name == (title + count.ToString())))
+                count++;
+
+            var column = new Models.Index()
+            {
+                Name = title + count.ToString(),
+                Primary = false,
+                Id = Guid.NewGuid()
+            };
+
+            var diagram = this.Node.Source.Diagram as SgbdDiagram;
+            var t = diagram.GetTechnology();
+            if (t != null)
+            {
+
+            }
+
+            Node.AddIndex(column);
 
             return column;
 

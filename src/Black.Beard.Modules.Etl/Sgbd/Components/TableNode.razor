@@ -15,34 +15,61 @@
                   Class="mb-4">
     </MudTextField>
 
-    <div class="mud-table mud-sm-table mud-table-dense mud-table-hover mud-elevation-1">
 
-        <div class="mud-table-container card @(Node.Selected ? "selected" : "")" style=" ">
+    <MudTabs>
 
-            <table>
+        <MudTabPanel Text="@DatasComponentConstants.Columns.Translate(this)">
 
-                <thead class="mud-table-head" ondblclick="@AutoAddColumn">
-                    <tr class="mud-table-row">
-                        <th scope="col" class="mud-table-cell"></th>
-                        <th scope="col" class="mud-table-cell">@DatasComponentConstants.Columns.Translate(this)</th>
-                        <th scope="col" class="mud-table-cell">@DatasComponentConstants.Types.Translate(this)</th>
-                        <th scope="col" class="mud-table-cell">@DatasComponentConstants.Nullable.Translate(this)</th>
-                        <th scope="col" class="mud-table-cell"></th>
-                    </tr>
-                </thead>
+            <div class="mud-table mud-sm-table mud-table-dense mud-table-hover mud-elevation-1">
 
-                <tbody>
-                    @foreach (var column in Node.Columns.OrderByDescending(c => c.Primary))
-                    {
-                        <TableColumn @key="column" Table="Node" Column="column" Parent="@this"></TableColumn>
-                    }
-                </tbody>
+                <div class="mud-table-container card @(Node.Selected ? "selected" : "")" style=" ">
 
-            </table>
+                    <table>
 
-        </div>
+                        <thead class="mud-table-head">
+                            <tr class="mud-table-row">
+                                <th scope="col" class="mud-table-cell">
+                                    <MudTooltip Text="@DatasComponentConstants.AddColumn.Translate(this)">
+                                        <MudIcon Icon="@Icons.Material.Filled.AddCircle" Title="Add" onclick="@AutoAddColumn" />
+                                    </MudTooltip>
+                                </th>
+                                <th scope="col" class="mud-table-cell">@DatasComponentConstants.Columns.Translate(this)</th>
+                                <th scope="col" class="mud-table-cell">@DatasComponentConstants.Types.Translate(this)</th>
+                                <th scope="col" class="mud-table-cell">@DatasComponentConstants.Nullable.Translate(this)</th>
+                                <th scope="col" class="mud-table-cell"></th>
+                            </tr>
+                        </thead>
 
-    </div>
+                        <tbody>
+                            @foreach (var column in Node.Columns.OrderByDescending(c => c.Primary))
+                            {
+                                <TableColumn @key="column" Table="Node" Column="column" Parent="@this"></TableColumn>
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </MudTabPanel>
+
+        <MudTabPanel Text="@DatasComponentConstants.Indexes.Translate(this)">
+            <MudTooltip Text="@DatasComponentConstants.AddIndex.Translate(this)">
+                <MudIcon Icon="@Icons.Material.Filled.AddCircle" Title="Add" onclick="@AutoAddIndex" />
+            </MudTooltip>
+
+            <MudStack>
+                @foreach (var index in Node.Indexes.OrderByDescending(c => c.Primary))
+                {
+                    <TableIndex @key="index" Table="Node" Index="index" Parent="@this"></TableIndex>
+                }
+            </MudStack>
+
+        </MudTabPanel>
+
+    </MudTabs>
 
 </MudPaper>
 

@@ -2,24 +2,30 @@
 using Bb.Modules.Sgbd.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-
+using System.Linq;
+using System.Reflection.PortableExecutable;
 
 namespace Bb.Modules.Sgbd.Components
 {
-    public partial class TableColumn : IDisposable, ITranslateHost
+    
+    public partial class TableColumnIndex : ComponentBase, IDisposable, ITranslateHost
     {
 
 
-        [Parameter]
-        public Table Table { get; set; }
+
+        public Table Table  => Index.Table;
 
         [Parameter]
-        public TableNode Parent { get; set; }
+        public Models.Index Index { get; set; }
 
         [Parameter]
-        public Column Column { get; set; }
+        public TableIndex Parent { get; set; }
 
+        [Parameter]
+        public ColumnIndex Column { get; set; }
 
 
         [Inject]
@@ -27,9 +33,6 @@ namespace Bb.Modules.Sgbd.Components
 
         [Inject]
         public ITranslateService TranslationService { get; set; }
-
-
-        public bool HasLinks => Table.GetPort(Column)?.Links.Count > 0;
 
         public void Dispose()
         {
@@ -59,11 +62,11 @@ namespace Bb.Modules.Sgbd.Components
         public void OnClick(MouseEventArgs eventArgs)
         {
             FocusedService.FocusChange(this.Column);
-        }
-       
+        }       
+
         public void DelColumn()
         {
-            Table.RemoveColumn(Column);
+            Index.RemoveColumn(Column);
             _shouldRender = true;
             StateHasChanged();
             Parent.Refresh();

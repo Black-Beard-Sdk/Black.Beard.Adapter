@@ -2,6 +2,7 @@
 using Blazor.Diagrams.Core.Models;
 using ICSharpCode.Decompiler.CSharp.Transforms;
 using System.ComponentModel;
+using System.Linq;
 
 
 namespace Bb.Modules.Sgbd.Models
@@ -17,6 +18,76 @@ namespace Bb.Modules.Sgbd.Models
         }
 
 
+
+        private void Index_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            //if (e.PropertyName == nameof(Column.Primary))
+            //{
+            //    var column = (Index)sender!;
+            //    var port = GetPort(column);
+            //    if (port != null)
+            //    {
+            //        RemovePort(column);
+            //        AddPort(CreatePort(column));
+            //    }
+            //}
+        }
+
+        public void AddIndex(Index index)
+        {
+            if (!_indexes.Contains(index))
+            {
+                _indexes.Add(index);
+                index.Table = this;
+                index.PropertyChanged += Index_PropertyChanged;
+            }
+        }
+
+        public void RemoveIndex(Index index)
+        {
+            if (_indexes.Contains(index))
+            {
+                _indexes.Remove(index);
+                index.Table = null;
+                index.PropertyChanged -= Index_PropertyChanged;
+            }
+        }
+
+        [Browsable(false)]
+        public List<Index> Indexes
+        {
+            get => _indexes ?? (_indexes = new List<Index>());
+            set
+            {
+
+                if (_indexes == null)
+                    _indexes = new List<Index>();
+
+                foreach (Index index in value)
+                    AddIndex(index);
+
+            }
+        }
+
+
+
+        [Browsable(false)]
+        public Index PrimaryKey
+        {
+            get => _primaryKey ?? new Index() { Table = this};
+            set
+            {
+                _primaryKey = value;
+            }
+        }
+
+
+
+        [Browsable(false)]
+        public bool HasPrimaryColumn => Columns.Any(c => c.Primary);
+
+
+
         public string Name
         {
             get => this.Title;
@@ -30,6 +101,8 @@ namespace Bb.Modules.Sgbd.Models
             }
         }
 
+
+        #region Columns
 
         public void AddColumn(Column column)
         {
@@ -83,9 +156,10 @@ namespace Bb.Modules.Sgbd.Models
             }
         }
 
-        [Browsable(false)]
-        public bool HasPrimaryColumn => Columns.Any(c => c.Primary);
+        #endregion Columns
 
+
+        #region Links
 
         public ColumnPort GetPort(Column column) => Ports.Cast<ColumnPort>().FirstOrDefault(p => p.Column == column);
 
@@ -100,7 +174,6 @@ namespace Bb.Modules.Sgbd.Models
             else
                 p.Column = column;
         }
-
 
         public override PortModel CreatePort(Port port)
         {
@@ -119,12 +192,17 @@ namespace Bb.Modules.Sgbd.Models
                 base.RemovePort(p);
         }
 
+        #endregion Links
+
+
         public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
 
         private List<Column> _columns;
+        private List<Index> _indexes;
+        private Index _primaryKey;
 
     }
 }

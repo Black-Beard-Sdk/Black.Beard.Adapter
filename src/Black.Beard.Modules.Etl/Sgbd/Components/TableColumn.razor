@@ -20,32 +20,15 @@
 
     </td>
 
-    <td class="mud-table-cell" ondblclick="@OnEditName">
-        @if (_editName)
-        {
-            <MudTextField @bind-Value="Column.Name"
-                          Variant="Variant.Filled"
-                          Outlined="true"
-                          FullWidth="true"
-                          OnBlur="@LostFocus"
-                          OnKeyDown="@OnKeyDown"
-                          Class="xs-4">
-            </MudTextField>
-        }
-        else
-        {
-
-            <MudMenu ActivationEvent="@MouseEvent.RightClick" Dense="true">
-                <ActivatorContent>
-                    @Column.Name
-                </ActivatorContent>
-                <ChildContent>
-                    <MudMenuItem OnClick="DelColumn">@DatasComponentConstants.DelColumn.Translate(this)</MudMenuItem>
-                </ChildContent>
-
-            </MudMenu>
-
-        }
+    <td class="mud-table-cell">
+        <MudMenu ActivationEvent="@MouseEvent.RightClick" Dense="true">
+            <ActivatorContent>
+                @Column.Name
+            </ActivatorContent>
+            <ChildContent>
+                <MudMenuItem OnClick="DelColumn">@DatasComponentConstants.DelColumn.Translate(this)</MudMenuItem>
+            </ChildContent>
+        </MudMenu>
     </td>
 
     <td class="mud-table-cell">

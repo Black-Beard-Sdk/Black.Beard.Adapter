@@ -1,0 +1,18 @@
+﻿@using MudBlazor
+
+<tr class="mud-table-row cursor-pointer" onclick="@OnClick">
+
+    <td class="mud-table-cell">
+    </td>
+
+    <td class="mud-table-cell" onclick="@OnClick">
+        <MudMenu ActivationEvent="@MouseEvent.RightClick" Dense="true">
+            <ActivatorContent>
+                @Column.Name
+            </ActivatorContent>
+            <ChildContent>
+                <MudMenuItem OnClick="DelColumn">@DatasComponentConstants.DelColumn.Translate(this)</MudMenuItem>
+            </ChildContent>
+        </MudMenu>
+    </td>
+</tr>

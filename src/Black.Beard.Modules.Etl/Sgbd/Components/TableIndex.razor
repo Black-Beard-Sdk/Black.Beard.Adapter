@@ -1,0 +1,41 @@
+﻿@using MudBlazor
+
+<div class="mud-table mud-sm-table mud-table-dense mud-table-hover mud-elevation-1">
+
+    <MudTextField @bind-Value="Index.Name"
+                  Variant="Variant.Filled"
+                  Outlined="true"
+                  FullWidth="true"
+                  OnBlur="@LostFocus"
+                  OnKeyDown="@OnKeyDown"
+                  onclick="@OnClick"
+                  Class="xs-4">
+    </MudTextField>
+
+    <div class="mud-table-container card" style=" ">
+
+        <table>
+
+            <thead class="mud-table-head">
+                <tr class="mud-table-row">
+                    <th scope="col" class="mud-table-cell">
+                        <MudTooltip Text="@DatasComponentConstants.AddIndex.Translate(this)">
+                            <MudIcon Icon="@Icons.Material.Filled.AddCircle" Title="Add" onclick="@AutoAddColumn" />
+                        </MudTooltip>
+                    </th>
+                    <th scope="col" class="mud-table-cell">@DatasComponentConstants.Columns.Translate(this)</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var column in Index.Columns)
+                {
+                    <TableColumnIndex @key="column" Index="Index" Column="column" Parent="@this"></TableColumnIndex>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

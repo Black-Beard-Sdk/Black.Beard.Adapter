@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 namespace Bb.Modules.Sgbd.Models
 {
 
+
     public class Column : INotifyPropertyChanged
     {
 
@@ -14,7 +15,6 @@ namespace Bb.Modules.Sgbd.Models
         {
             
         }
-
 
         public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
@@ -81,5 +81,6 @@ namespace Bb.Modules.Sgbd.Models
         private string _type;
 
     }
+
 
 }
