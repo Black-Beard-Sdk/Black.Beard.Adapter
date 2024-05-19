@@ -24,6 +24,8 @@ namespace Bb.PropertyGrid
             set
             {
                 _property = value;
+                if (Enum.TryParse(typeof(InputType), Property.Mask.ToString(), out var valueResult))
+                    InputType = (InputType)valueResult;
                 PropertyChange();
             }
         }
@@ -47,7 +49,9 @@ namespace Bb.PropertyGrid
         public bool IsReadOnly => Property?.ReadOnly ?? false;
 
         public bool Changed { get; internal set; }
-            
+
+
+        public InputType InputType { get; set; }
 
         protected virtual void PropertyChange()
         {

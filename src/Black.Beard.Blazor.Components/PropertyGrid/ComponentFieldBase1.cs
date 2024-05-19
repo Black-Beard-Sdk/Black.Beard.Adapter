@@ -18,7 +18,6 @@ namespace Bb.PropertyGrid
             return base.OnInitializedAsync();
         }
 
-
         public T? Value
         {
             get
@@ -48,9 +47,7 @@ namespace Bb.PropertyGrid
 
         }
 
-
-
-        public string? GetStep()
+        public T? GetStep()
         {
 
             var step = this.Property.Step;
@@ -59,11 +56,11 @@ namespace Bb.PropertyGrid
             if (object.Equals(result, 0))
                 result = 1;
 
-            return result.ToString();
+            return (T)result;
 
         }
 
-        public string? GetMinimum()
+        public T? GetMinimum()
         {
 
             var step = this.Property.Minimum;
@@ -72,11 +69,11 @@ namespace Bb.PropertyGrid
             if (object.Equals(result, 0))
                 result = 1;
 
-            return result.ToString();
+            return (T)result;
 
         }
 
-        public string GetMaximum()
+        public T? GetMaximum()
         {
 
             var step = this.Property.Maximum;
@@ -85,7 +82,7 @@ namespace Bb.PropertyGrid
             if (object.Equals(result, 0))
                 result = 1;
 
-            return result.ToString();
+            return (T)result;
 
         }
 

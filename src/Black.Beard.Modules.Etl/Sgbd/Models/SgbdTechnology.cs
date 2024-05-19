@@ -1,10 +1,28 @@
-﻿using Bb.UIComponents;
+﻿using Bb.TypeDescriptors;
+using Bb.UIComponents;
 
 namespace Bb.Modules.Sgbd.Models
 {
 
     public class SgbdTechnology
     {
+
+
+        static SgbdTechnology()
+        {
+
+            var config = DynamicTypeDescriptionProvider.Configuration;
+            config.Add<Table>(c =>
+            {
+                c.RemoveProperties("ControlledSize", "Title", "Selected", "Id", "Locked", "Visible");
+            });
+
+            config.Add<SgbdDiagram>(c =>
+            {
+                c.RemoveProperties("Models", "Relationships");
+            });
+
+        }
 
         protected SgbdTechnology(string name, string description)
         {

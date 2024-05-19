@@ -1,4 +1,5 @@
 ﻿using Bb.Diagrams;
+using Bb.TypeDescriptors;
 using Blazor.Diagrams.Core.Models;
 using ICSharpCode.Decompiler.CSharp.Transforms;
 using System.ComponentModel;
@@ -71,15 +72,15 @@ namespace Bb.Modules.Sgbd.Models
 
 
 
-        [Browsable(false)]
-        public Index PrimaryKey
-        {
-            get => _primaryKey ?? new Index() { Table = this};
-            set
-            {
-                _primaryKey = value;
-            }
-        }
+        //[Browsable(false)]
+        //public Index PrimaryKey
+        //{
+        //    get => _primaryKey ?? new Index() { Table = this};
+        //    set
+        //    {
+        //        _primaryKey = value;
+        //    }
+        //}
 
 
 

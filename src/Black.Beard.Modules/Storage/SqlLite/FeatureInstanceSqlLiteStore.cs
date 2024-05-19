@@ -1,8 +1,10 @@
 ﻿using Bb.ComponentModel.Attributes;
+using Bb.Modules;
+using Bb.Modules.Storage;
 using System.Data;
 
 
-namespace Bb.Modules.Storage
+namespace Bb.Storage.SqlLite
 {
     [ExposeClass("Service", ExposedType = typeof(IStore<Guid, FeatureInstance>), LifeCycle = IocScopeEnum.Singleton)]
     public class FeatureInstanceSqlLiteStore : SqlLiteStoreBase<Guid, FeatureInstance>

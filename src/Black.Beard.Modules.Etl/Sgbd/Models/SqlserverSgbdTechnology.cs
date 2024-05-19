@@ -1,4 +1,5 @@
 ﻿using Bb.ComponentModel.Attributes;
+using Bb.TypeDescriptors;
 
 namespace Bb.Modules.Sgbd.Models
 {
@@ -9,11 +10,72 @@ namespace Bb.Modules.Sgbd.Models
     {
 
 
+
         public SqlserverSgbdTechnology()
             : base("Sqlserver", "Microsoft Sqlserver")
         {
+
             AddTypes();
 
+            var config = DynamicTypeDescriptionProvider.Configuration;
+
+            config.Add<Table>(c =>
+            {
+                // c.AddProperty("Year", typeof(int), i =>
+                // {
+                //     i.IsBrowsable(true)
+                //     .CanResetValue(true)
+                //     ;
+                // });
+            });
+
+            config.Add<Column>(c =>
+            {
+                c.AddProperty("AutoIncrement", typeof(bool), i =>
+                {
+                    i.IsBrowsable(true)
+                    .Description("Auto increment")
+                    ;
+                })
+                 .AddProperty("IncrementStart", typeof(int), i =>
+                {
+                    i.IsBrowsable(true)
+                    .Description("Auto start")
+                    .DefaultValue(1)
+                    
+                    ;
+                })
+                 .AddProperty("IncrementStep", typeof(int), i =>
+                {
+                    i.IsBrowsable(true)
+                    .Description("increment step")
+                    .DefaultValue(1)
+                    ;
+                });
+            }, d =>
+            {
+                return true;
+            });
+
+            config.Add<Index>(c =>
+            {
+                // c.AddProperty("Year", typeof(int), i =>
+                // {
+                //     i.IsBrowsable(true)
+                //     .CanResetValue(true)
+                //     ;
+                // });
+            });
+
+            config.Add<ColumnIndex>(c =>
+            {
+                // c.AddProperty("Year", typeof(int), i =>
+                // {
+                //     i.IsBrowsable(true)
+                //     .CanResetValue(true)
+                //     ;
+                // });
+            });
         }
 
 
@@ -34,14 +96,14 @@ namespace Bb.Modules.Sgbd.Models
             AddColumnType("Guid", "uniqueidentifier");
             AddColumnType("HierarchyId", "hierarchyid"); AddColumnType("Time", "time");
             AddColumnType("Image", "image");
-            IsDefaultColumnType( AddColumnType("Integer", "int"));
+            IsDefaultColumnType(AddColumnType("Integer", "int"));
             AddColumnType("Json", "json");
             AddColumnType("Long", "bigint");
             AddColumnType("Money", "money");
             AddColumnType("NText", "ntext");
             AddColumnType("RowVersion", "rowversion");
             AddColumnType("SByte", "tinyint");
-            AddColumnType("Short", "smallint"); 
+            AddColumnType("Short", "smallint");
             AddColumnType("SmallDateTime", "smalldatetime");
             AddColumnType("SmallMoney", "smallmoney");
             AddColumnType("String", "varchar");
@@ -54,7 +116,7 @@ namespace Bb.Modules.Sgbd.Models
             AddColumnType("Xml", "xml");
         }
 
-        
+
     }
 
 }

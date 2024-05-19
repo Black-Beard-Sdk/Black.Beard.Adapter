@@ -1,5 +1,7 @@
-﻿using Bb.ComponentModel.Translations;
+﻿using Bb.ComponentModel.Factories;
+using Bb.ComponentModel.Translations;
 using Bb.PropertyGrid;
+using ICSharpCode.Decompiler.TypeSystem;
 using System.Collections;
 using System.ComponentModel;
 
@@ -80,8 +82,8 @@ namespace Bb.CustomComponents
 
                 object result = PropertyDescriptor.GetValue(Parent.Instance);
 
-                if (result == null)
-                    return this.DefaultValue;
+                //if (result == null)
+                //    return this.DefaultValue;
 
                 return result;
 
@@ -112,7 +114,10 @@ namespace Bb.CustomComponents
             this.EditorType = strategy.ComponentView;
             this.KindView = strategy.PropertyKingView;
 
-            var i = strategy.Initializer;
+            if (strategy.Initializer != null)
+                strategy.Initializer(_strategy, this);
+
+            var i = strategy.AttributeInitializers;
             if (i != null)
             {
                 var attributes = PropertyDescriptor.Attributes.OfType<Attribute>().ToList();
@@ -214,9 +219,6 @@ namespace Bb.CustomComponents
 
         public bool Enabled { get; set; }
 
-        //private static Dictionary<Type, StrategyEditor> _strategies;
-
     }
-
 
 }

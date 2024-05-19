@@ -1,4 +1,5 @@
 ﻿using Bb.ComponentModel.Attributes;
+using Bb.TypeDescriptors;
 using Blazor.Diagrams.Core.Models;
 using MudBlazor;
 using System.ComponentModel;
@@ -8,12 +9,13 @@ namespace Bb.Modules.Sgbd.Models
 {
 
 
-    public class Index : INotifyPropertyChanged
+    public class Index : INotifyPropertyChanged, IDynamicDescriptorInstance
     {
 
         public Index()
         {
             _columnIndices = new List<ColumnIndex>();
+            this._container = new DynamicDescriptorInstanceContainer(this);
         }
 
         public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -84,21 +86,34 @@ namespace Bb.Modules.Sgbd.Models
                 PropertyChanged(this, e);
         }
 
+        public object GetProperty(string name)
+        {
+            return this._container.GetProperty(name);
+        }
+
+
+        public void SetProperty(string name, object value)
+        {
+            this._container.SetProperty(name, value);
+        }
+
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private List<ColumnIndex> _columnIndices;
+        private DynamicDescriptorInstanceContainer _container;
         private string _name;
 
     }
 
 
 
-    public class ColumnIndex : INotifyPropertyChanged
+    public class ColumnIndex : INotifyPropertyChanged, IDynamicDescriptorInstance
     {
 
         public ColumnIndex()
         {
-
+            this._container = new DynamicDescriptorInstanceContainer(this);
         }
 
         public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -147,9 +162,22 @@ namespace Bb.Modules.Sgbd.Models
         [Description("Column name")]
         public string Name { get; set; }
 
+        public object GetProperty(string name)
+        {
+            return this._container.GetProperty(name);
+        }
+
+
+        public void SetProperty(string name, object value)
+        {
+            this._container.SetProperty(name, value);
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private Guid _id;
+        private readonly DynamicDescriptorInstanceContainer _container;
+
 
     }
 

@@ -1,9 +1,11 @@
 ﻿using Bb.ComponentModel.Accessors;
 using Bb.ComponentModel.Attributes;
+using Bb.Modules;
+using Bb.Modules.Storage;
 using System.Data;
 
 
-namespace Bb.Modules.Storage
+namespace Bb.Storage.SqlLite
 {
 
 

@@ -9,37 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="PropertyGrid\ComponentArea.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentDate.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentDateOffset.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentDecimal.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentDouble.razor.cs" />
     <Compile Remove="PropertyGrid\ComponentFieldTree.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentFloat.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentInt16.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentInt32.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentInt64.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentTime.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentUInt16.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentUInt32.razor.cs" />
-    <Compile Remove="PropertyGrid\ComponentUInt64.razor.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="PropertyGrid\ComponentArea.razor" />
-    <Content Remove="PropertyGrid\ComponentDate.razor" />
-    <Content Remove="PropertyGrid\ComponentDateOffset.razor" />
-    <Content Remove="PropertyGrid\ComponentDecimal.razor" />
-    <Content Remove="PropertyGrid\ComponentDouble.razor" />
     <Content Remove="PropertyGrid\ComponentFieldTree.razor" />
-    <Content Remove="PropertyGrid\ComponentFloat.razor" />
-    <Content Remove="PropertyGrid\ComponentInt16.razor" />
-    <Content Remove="PropertyGrid\ComponentInt32.razor" />
-    <Content Remove="PropertyGrid\ComponentInt64.razor" />
-    <Content Remove="PropertyGrid\ComponentTime.razor" />
-    <Content Remove="PropertyGrid\ComponentUInt16.razor" />
-    <Content Remove="PropertyGrid\ComponentUInt32.razor" />
-    <Content Remove="PropertyGrid\ComponentUInt64.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,7 +29,7 @@
   <ItemGroup>
     <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.95" />
     <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.95" />
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.37" />
+    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.38" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.7.0" />
     <PackageReference Include="MudBlazor" Version="6.19.1" />
     <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.2" />

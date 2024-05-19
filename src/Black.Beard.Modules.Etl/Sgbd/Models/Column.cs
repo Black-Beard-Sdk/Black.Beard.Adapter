@@ -1,4 +1,5 @@
 ﻿using Bb.ComponentModel.Attributes;
+using Bb.TypeDescriptors;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -8,19 +9,19 @@ namespace Bb.Modules.Sgbd.Models
 {
 
 
-    public class Column : INotifyPropertyChanged
+    public class Column : INotifyPropertyChanged, IDynamicDescriptorInstance
     {
 
         public Column()
         {
-            
+            this._container = new DynamicDescriptorInstanceContainer(this);
         }
 
         public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         [JsonIgnore]
         [Browsable(false)]
-        public Table Table { get; set; }    
+        public Table Table { get; set; }
 
         [Browsable(false)]
         public Guid Id { get; set; }
@@ -74,11 +75,16 @@ namespace Bb.Modules.Sgbd.Models
 
         public string DefaultValue { get; set; }
 
+        public object GetProperty(string name) => this._container.GetProperty(name);
+
+        public void SetProperty(string name, object value) => this._container.SetProperty(name, value);
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private bool isPrimary;
         private string _name;
         private string _type;
+        private readonly DynamicDescriptorInstanceContainer _container;
 
     }
 

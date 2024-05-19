@@ -2,7 +2,7 @@
 using System.Data;
 using System.Text;
 
-namespace Bb.Modules.Storage
+namespace Bb.Storage.SqlLite
 {
 
     public class SqlLite

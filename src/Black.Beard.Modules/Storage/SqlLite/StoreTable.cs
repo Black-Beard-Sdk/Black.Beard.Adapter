@@ -3,7 +3,7 @@ using System.Text;
 using static MudBlazor.CategoryTypes;
 
 
-namespace Bb.Modules.Storage
+namespace Bb.Storage.SqlLite
 {
 
 

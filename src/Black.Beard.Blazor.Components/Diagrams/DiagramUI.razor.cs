@@ -12,7 +12,7 @@ using Bb.ComponentModel.Translations;
 namespace Bb.Diagrams
 {
 
-    public partial class DiagramUI : ComponentBase,  IDisposable, ITranslateHost
+    public partial class DiagramUI : ComponentBase, IDisposable, ITranslateHost
     {
 
 
@@ -37,24 +37,12 @@ namespace Bb.Diagrams
             base.OnAfterRender(firstRender);
             if (firstRender)
             {
-                PropertyGrid.PropertyFilter = (p) =>
-                {
-                    if (p.Browsable)
-                    {
-                        var type = p.Parent.Instance.GetType();
-                        var property = p.ComponentType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
-                        .Where(c => c.Name == p.Name && c.DeclaringType == type)
-                        .FirstOrDefault();
-                        if (property != null)
-                        {
-
-
-                            return true;
-                        }
-                    }
-                    return false;
-
-                };
+                //PropertyGrid.PropertyFilter = (p) =>
+                //{
+                //    if (p.Browsable)
+                //        return true;
+                //    return false;
+                //};
 
             }
 
@@ -144,7 +132,7 @@ namespace Bb.Diagrams
 
             foreach (var node in Diagram.Nodes)
                 if (node is CustomizedNodeModel model)
-                    model.Synchronize();
+                    model.SynchronizeSource();
 
             DiagramModel?.Save(DiagramModel);
 

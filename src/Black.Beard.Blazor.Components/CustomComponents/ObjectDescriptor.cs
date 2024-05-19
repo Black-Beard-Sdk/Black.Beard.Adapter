@@ -58,9 +58,9 @@ namespace Bb.CustomComponents
                 else
                 {
 
-                    var properties = TypeDescriptor.GetProperties(this._type);
+                    var properties = TypeDescriptor.GetProperties(Instance);
                     foreach (PropertyDescriptor property in properties)
-                        if (PropertyDescriptorFilter(property))
+                        if (PropertyDescriptorFilter(property) && property.IsBrowsable)
                         {
                             var p = new PropertyObjectDescriptor(property, this, this.StrategyName)
                                 .Build();

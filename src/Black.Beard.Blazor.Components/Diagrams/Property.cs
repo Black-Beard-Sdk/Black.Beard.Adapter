@@ -1,5 +1,9 @@
-﻿namespace Bb.Diagrams
+﻿using System.Diagnostics;
+
+namespace Bb.Diagrams
 {
+
+    [DebuggerDisplay("{Name} = {Value}")]
     public class Property
     {
 

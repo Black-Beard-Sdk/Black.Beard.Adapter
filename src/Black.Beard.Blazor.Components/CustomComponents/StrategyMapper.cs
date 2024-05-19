@@ -19,7 +19,7 @@ namespace Bb.CustomComponents
             this.Key = key;
             _strategySource = new Dictionary<Type, string>();
             _strategySourceCreators = new Dictionary<Type, Func<object>>();
-            _strategyTargets = new Dictionary<string, Type>();
+            _strategyTargets = new Dictionary<string, (Type, Action<StrategyMapper, PropertyObjectDescriptor>)>();
             _strategies = new Dictionary<Type, StrategyEditor>();
             _strategyInitializer = new Dictionary<Type, Action<Attribute, StrategyMapper, PropertyObjectDescriptor>>();
             _strategyInitializer2 = new List<(Func<Type, bool>, Action<Type, StrategyMapper, PropertyObjectDescriptor>)>();
@@ -71,22 +71,22 @@ namespace Bb.CustomComponents
             return this;
         }
 
-        public StrategyMapper ToTarget<T>(PropertyKingView targetStrategyName)
+        public StrategyMapper ToTarget<T>(PropertyKingView targetStrategyName, Action<StrategyMapper, PropertyObjectDescriptor> initializer = null)
         {
             var key = targetStrategyName.ToString();
             if (!_strategyTargets.ContainsKey(key))
-                _strategyTargets.Add(key, typeof(T));
+                _strategyTargets.Add(key, (typeof(T), initializer));
             else
-                _strategyTargets[key] = typeof(T);
+                _strategyTargets[key] = (typeof(T), initializer);
             return this;
         }
 
-        public StrategyMapper ToTarget<T>(string targetStrategyName)
+        public StrategyMapper ToTarget<T>(string targetStrategyName, Action<StrategyMapper, PropertyObjectDescriptor> initializer = null)
         {
             if (!_strategyTargets.ContainsKey(targetStrategyName))
-                _strategyTargets.Add(targetStrategyName, typeof(T));
+                _strategyTargets.Add(targetStrategyName, (typeof(T), initializer));
             else
-                _strategyTargets[targetStrategyName] = typeof(T);
+                _strategyTargets[targetStrategyName] = (typeof(T), initializer);
             return this;
         }
 
@@ -133,15 +133,15 @@ namespace Bb.CustomComponents
                 {
                     _strategySourceCreators.TryGetValue(type, out var creator);
                     strategy = new StrategyEditor(strategyName, type, target, creator) { Source = this.Key };
-                    strategy.Initializer = _strategyInitializer;
+                    strategy.AttributeInitializers = _strategyInitializer;
                     return strategy;
                 }
 
-            strategy = new StrategyEditor(this.Key, type, null, null) { Source = this.Key };
+            strategy = new StrategyEditor(this.Key, type, (null, null), null) { Source = this.Key };
             foreach (var item in _strategyInitializer2)
                 if (item.Item1(type))
                 {
-                    strategy = new StrategyEditor(this.Key, type, null, null) { Source = this.Key };
+                    strategy = new StrategyEditor(this.Key, type, (null, null), null) { Source = this.Key };
                     strategy.Initializers.Add(item.Item2);
                 }
 
@@ -232,7 +232,7 @@ namespace Bb.CustomComponents
         private Dictionary<Type, StrategyEditor> _strategies;
         private volatile object _lock = new object();
         private static object _lock1 = new object();
-        private Dictionary<string, Type> _strategyTargets;
+        private Dictionary<string, (Type, Action<StrategyMapper, PropertyObjectDescriptor>)> _strategyTargets;
         private static Dictionary<string, StrategyMapper> _mappers;
 
     }

@@ -6,12 +6,15 @@ using Blazor.Diagrams.Core.Models.Base;
 using ICSharpCode.Decompiler.Metadata;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
+using Bb.TypeDescriptors;
+using static MudBlazor.CategoryTypes;
+using System.Text.Json;
 
 namespace Bb.Diagrams
 {
 
 
-    public class CustomizedNodeModel : NodeModel
+    public class CustomizedNodeModel : NodeModel, IDynamicDescriptorInstance
     {
 
         static CustomizedNodeModel()
@@ -24,31 +27,21 @@ namespace Bb.Diagrams
         public CustomizedNodeModel(DiagramNode source)
             : this(source.Uuid.ToString(), new Point(source.Position.X, source.Position.Y))
         {
-           
+
+            this._container = new DynamicDescriptorInstanceContainer(this);
             this.Source = source;
-            this.Title = source.Name;            
+            this.Title = source.Name;
 
             CreatePort();
 
-            var properties = PropertyAccessor.GetProperties(GetType(), true)
-                .Where(c => !_typeToExcludes.Contains(c.DeclaringType) && c.CanRead && c.CanWrite)
-                .ToList();
-
+            var properties = _container.Properties().Where(c => !c.IsReadOnly).OrderBy(c => c.Name).ToList();
             foreach (var item in properties)
-            {
-                var value = source.GetProperty(item.Name);
-                 if (!string.IsNullOrEmpty(value))
-                {
-                    
-                    var r = value.Deserialize(item.Type);
-                    item.SetValue(this, r);
-                }
-            }
+                item.Map(this, source.Properties.PropertyExists(item.Name), source.GetProperty(item.Name));
 
         }
 
         protected virtual void CreatePort()
-         {
+        {
             foreach (var port in Source.Ports)
                 AddPort(CreatePort(port));
         }
@@ -71,29 +64,22 @@ namespace Bb.Diagrams
         }
 
 
-        public void Synchronize()
+        public void SynchronizeSource()
         {
-
-            var properties = PropertyAccessor.GetProperties(GetType(), true)
-                .Where(c => !_typeToExcludes.Contains(c.DeclaringType) && c.CanRead && c.CanWrite)
-                .ToList();
-
-            foreach (var item in properties)
-            {
-                var value = item.GetValue(this);
-                var txt = value.Serialize(false);
-                Source.SetProperty(item.Name, txt);
-            }
-
+            Source.Properties.CopyFrom(_container);
             Source.Position.X = this.Position.X;
             Source.Position.Y = this.Position.Y;
             Source.Name = this.Title;
-
-
             foreach (PortModel item in Ports)
                 Source.AddPort(item.Alignment, new Guid(item.Id));
-
         }
+
+
+        public object GetProperty(string name) => this._container.GetProperty(name);
+
+        public void SetProperty(string name, object value) => this._container.SetProperty(name, value);
+
+        private readonly DynamicDescriptorInstanceContainer _container;
 
         public DiagramNode Source { get; }
 

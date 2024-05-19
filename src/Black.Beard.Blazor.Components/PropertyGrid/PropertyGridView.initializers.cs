@@ -201,29 +201,35 @@ namespace Bb.PropertyGrid
 				{
 					descriptor.Required = true;
 				})
-			;
 
-		}
+                .ToTarget<DesignerAttribute>((attribute, mapper, descriptor) =>
+                {
+                    descriptor.EditorType = Type.GetType(attribute.DesignerTypeName);
+                })
+
+            ;
+
+        }
 
 		private static void InitializeMapping(StrategyMapper strategy)
 		{
 
 			strategy
-				.ToTarget<ComponentChar>(PropertyKingView.Char)
 				.ToTarget<ComponentBool>(PropertyKingView.Bool)
+                .ToTarget<ComponentChar>(PropertyKingView.Char)
+				.ToTarget<ComponentDate>(PropertyKingView.Date)
+                .ToTarget<ComponentDateOffset>(PropertyKingView.DateOffset)
+				.ToTarget<ComponentDecimal>(PropertyKingView.Decimal)
+				.ToTarget<ComponentDouble>(PropertyKingView.Double)
+				.ToTarget<ComponentFloat>(PropertyKingView.Float)
+                .ToTarget<ComponentInt16>(PropertyKingView.Int16)
+                .ToTarget<ComponentInt32>(PropertyKingView.Int32)
+                .ToTarget<ComponentInt64>(PropertyKingView.Int64)
 				.ToTarget<ComponentString>(PropertyKingView.String)
-				//.ToTarget<ComponentTime>(PropertyKingView.Time)
-				//.ToTarget<ComponentInt16>(PropertyKingView.Int16)
-				//.ToTarget<ComponentInt32>(PropertyKingView.Int32)
-				//.ToTarget<ComponentInt64>(PropertyKingView.Int64)
-				//.ToTarget<ComponentUInt16>(PropertyKingView.UInt16)
-				//.ToTarget<ComponentUInt32>(PropertyKingView.UInt32)
-				//.ToTarget<ComponentUInt64>(PropertyKingView.UInt64)
-				//.ToTarget<ComponentDate>(PropertyKingView.Date)
-				//.ToTarget<ComponentDateOffset>(PropertyKingView.DateOffset)
-				//.ToTarget<ComponentFloat>(PropertyKingView.Float)
-				//.ToTarget<ComponentDouble>(PropertyKingView.Double)
-				//.ToTarget<ComponentDecimal>(PropertyKingView.Decimal)
+				.ToTarget<ComponentTime>(PropertyKingView.Time, (c, d) => { d.Mask = StringType.Time; })
+				.ToTarget<ComponentUInt16>(PropertyKingView.UInt16)
+				.ToTarget<ComponentUInt32>(PropertyKingView.UInt32)
+				.ToTarget<ComponentUInt64>(PropertyKingView.UInt64)
 			;
 
 		}

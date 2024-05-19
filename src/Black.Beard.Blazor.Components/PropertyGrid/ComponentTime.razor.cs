@@ -9,20 +9,20 @@ namespace Bb.PropertyGrid
 
         public ComponentTime()
         {
-
+            InputType = MudBlazor.InputType.Time;
         }
 
-        public DateTime? Time
-        {
-            get
-            {
-                return new DateTime(base.Value.Ticks);
-            }
-            set
-            {
-                base.Value = new TimeSpan(0, value.Value.Hour, value.Value.Minute, value.Value.Second);
-            }
-        }
+        //public DateTime? Time
+        //{
+        //    get
+        //    {
+        //        return new DateTime(base.Value.Ticks);
+        //    }
+        //    set
+        //    {
+        //        base.Value = new TimeSpan(0, value.Value.Hour, value.Value.Minute, value.Value.Second);
+        //    }
+        //}
 
 
     }

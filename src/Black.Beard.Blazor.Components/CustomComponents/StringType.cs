@@ -5,7 +5,6 @@
         Undefined,
         Email,
         Number,
-        //Search,
         Telephone,
         Url,
         Color,
@@ -14,6 +13,10 @@
         Month,
         Time,
         Week,
+        Text,
+        Password,
+        Hidden,
+        Search,
     }
 
 

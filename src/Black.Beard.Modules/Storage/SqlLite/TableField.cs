@@ -2,7 +2,7 @@
 using System.Text;
 
 
-namespace Bb.Modules.Storage
+namespace Bb.Storage.SqlLite
 {
     [System.Diagnostics.DebuggerDisplay("{Name} {Type}")]
     public class TableField
@@ -11,7 +11,7 @@ namespace Bb.Modules.Storage
 
         public TableField(string name, string Type)
         {
-            this.Name = name;
+            Name = name;
             this.Type = Type;
         }
 
@@ -104,7 +104,7 @@ namespace Bb.Modules.Storage
 
         internal void Parse(Queue<string> sql)
         {
-                 
+
             while (sql.Count > 0)
             {
                 var item = sql.Dequeue();
@@ -122,8 +122,8 @@ namespace Bb.Modules.Storage
                         sql.Dequeue();
                         break;
 
-                        case "DEFAULT":
-                            DefaultValue = sql.Dequeue();
+                    case "DEFAULT":
+                        DefaultValue = sql.Dequeue();
                         break;
 
 
@@ -132,7 +132,7 @@ namespace Bb.Modules.Storage
                 }
 
             }
-        
+
         }
     }
 
