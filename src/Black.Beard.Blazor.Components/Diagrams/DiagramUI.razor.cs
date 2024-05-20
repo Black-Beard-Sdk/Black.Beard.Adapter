@@ -16,6 +16,10 @@ namespace Bb.Diagrams
     {
 
 
+
+        public Diagnostics Diagnostics { get; set; }
+
+
         [Inject]
         public ITranslateService TranslationService { get; set; }
 
@@ -123,7 +127,9 @@ namespace Bb.Diagrams
 
         public void Save()
         {
+
             SaveToMyServer(Diagram);
+
         }
 
 
@@ -133,6 +139,16 @@ namespace Bb.Diagrams
             foreach (var node in Diagram.Nodes)
                 if (node is CustomizedNodeModel model)
                     model.SynchronizeSource();
+
+            var diagnostic = new Diagnostics()
+            {
+                Translator = TranslationService
+            };
+
+            diagnostic.EvaluateModel(DiagramModel);
+
+            Diagnostics = diagnostic;
+
 
             DiagramModel?.Save(DiagramModel);
 

@@ -25,10 +25,32 @@
             @ComponentConstants.Properties.Translate(this)
             <PropertyGridView @ref="PropertyGrid" />
         </MudStack>
-       
+
     </Panel1>
 
     <Panel2>
+
+        <MudExpansionPanels>
+            <MudExpansionPanel Dense="true" >
+                <MudSimpleTable>
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Description</th>
+                            <th>Source</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Diagnostics != null)
+                            @foreach (var row in Diagnostics)
+                            {
+                                <DiagnosticRow Row="@row" />
+                            }
+                    </tbody>
+
+                </MudSimpleTable>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
 
         <div class="diagram-container dropzone @dropClass"
              ondrop="@((DragEventArgs args)=>{HandleDrop(args);})"

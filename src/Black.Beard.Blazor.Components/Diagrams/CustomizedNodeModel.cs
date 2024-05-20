@@ -14,7 +14,7 @@ namespace Bb.Diagrams
 {
 
 
-    public class CustomizedNodeModel : NodeModel, IDynamicDescriptorInstance
+    public class CustomizedNodeModel : NodeModel, IDynamicDescriptorInstance, IValidationService
     {
 
         static CustomizedNodeModel()
@@ -52,7 +52,7 @@ namespace Bb.Diagrams
         }
 
 
-        public CustomizedNodeModel(string id, Point? position = null)
+        private CustomizedNodeModel(string id, Point? position = null)
             : base(id, position)
         {
 
@@ -78,6 +78,11 @@ namespace Bb.Diagrams
         public object GetProperty(string name) => this._container.GetProperty(name);
 
         public void SetProperty(string name, object value) => this._container.SetProperty(name, value);
+
+        public virtual void Validate(Diagnostics Diagnostics)
+        {
+            
+        }
 
         private readonly DynamicDescriptorInstanceContainer _container;
 

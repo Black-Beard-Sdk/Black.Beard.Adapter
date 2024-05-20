@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bb.CustomComponents;
+using System;
 using System.ComponentModel;
 
 namespace Bb.TypeDescriptors
@@ -12,9 +13,7 @@ namespace Bb.TypeDescriptors
             : base(configuration.Name, configuration.Attributes)
         {
             this._configuration = configuration;
-            //this._oldValue = GetValue(instance);
         }
-
 
         public override string Category => _configuration.Category ?? base.Category;
 

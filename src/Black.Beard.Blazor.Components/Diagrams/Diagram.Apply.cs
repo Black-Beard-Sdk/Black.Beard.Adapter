@@ -132,9 +132,6 @@ namespace Bb.Diagrams
 
         }
 
-
-
-
         private void Nodes_Added(NodeModel obj)
         {
             if (obj is CustomizedNodeModel m)
@@ -147,7 +144,6 @@ namespace Bb.Diagrams
                 }
             }
         }
-
 
         private void Nodes_Removed(NodeModel model)
         {

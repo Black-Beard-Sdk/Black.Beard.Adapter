@@ -1,10 +1,12 @@
-﻿using Blazor.Diagrams.Core.Models;
+﻿using Bb.CustomComponents;
+using Blazor.Diagrams.Core.Models;
 using System.Text.Json.Serialization;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
 
-    public partial class Diagram
+    public partial class Diagram : IValidationService
     {
 
         public Diagram()
@@ -104,6 +106,20 @@ namespace Bb.Diagrams
                 else if (item is DiagramSpecificationRelationshipBase link)
                     _dicLinks.Add(link.Uuid, link);
             }
+        }
+
+
+        public virtual void Validate(Diagnostics Diagnostics)
+        {
+
+            // Diagnostics.EvaluateModel(this);
+
+            //foreach (var item in this.Models)
+            //    Diagnostics.EvaluateModel(item);
+
+            //foreach (var item in this.Relationships)
+            //    Diagnostics.EvaluateModel(item);
+
         }
 
 

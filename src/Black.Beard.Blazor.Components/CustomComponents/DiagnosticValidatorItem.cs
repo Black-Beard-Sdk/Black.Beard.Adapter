@@ -16,6 +16,7 @@ namespace Bb.CustomComponents
             _diagnostics.Add(message);
         }
 
+        public IEnumerable<string> Messages => _diagnostics;
 
         public string Message => String.Concat(_diagnostics.Select(c => ", " + c)).Trim(',', ' ');
 
@@ -24,6 +25,7 @@ namespace Bb.CustomComponents
         public List<string> MessageService => _diagnostics;
 
         public PropertyDescriptor Descriptor { get; }
+        public object Value { get; internal set; }
 
         private readonly List<string> _diagnostics;
 

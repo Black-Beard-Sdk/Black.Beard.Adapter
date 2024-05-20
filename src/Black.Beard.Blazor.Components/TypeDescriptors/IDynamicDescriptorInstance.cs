@@ -21,8 +21,6 @@ namespace Bb.TypeDescriptors
 
 
 
-
-
     public class DynamicDescriptorInstanceJsonConverter : JsonConverterFactory
     {
 

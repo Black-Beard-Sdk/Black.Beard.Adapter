@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace Bb.Diagrams
 {
-    public class CustomizedLinkModel : LinkModel, IDynamicDescriptorInstance
+    public class CustomizedLinkModel : LinkModel, IDynamicDescriptorInstance, IValidationService
     {
 
 
@@ -47,6 +47,11 @@ namespace Bb.Diagrams
         public void SetProperty(string name, object value)
         {
             this._container.SetProperty(name, value);
+        }
+
+        public virtual void Validate(Diagnostics Diagnostics)
+        {
+
         }
 
         private readonly DynamicDescriptorInstanceContainer _container;
