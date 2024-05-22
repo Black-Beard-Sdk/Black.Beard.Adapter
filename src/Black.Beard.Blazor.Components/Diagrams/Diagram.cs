@@ -127,7 +127,30 @@ namespace Bb.Diagrams
         public IEnumerable<DiagramSpecificationBase> Specifications { get; private set; }
 
         [JsonIgnore]
-        public Action<Diagram> Save { get; set; }
+        public Action<Diagram> Save { get; private set; }
+
+        [JsonIgnore]
+        public Diagnostics LastDiagnostics { get; internal set; }
+
+        public void SetSave(Action<Diagram> save)
+        {
+
+            Action<Diagram> _save = model =>
+            {
+
+                save(model);
+
+                if (model.OnModelSaved != null)
+                    model.OnModelSaved.Invoke(model, model);
+
+            };
+
+            Save = _save;
+
+
+        }
+
+        public event EventHandler<Diagram>? OnModelSaved;
 
         private readonly Dictionary<Guid, DiagramSpecificationNodeBase> _dicModels;
         private readonly Dictionary<Guid, DiagramSpecificationRelationshipBase> _dicLinks;

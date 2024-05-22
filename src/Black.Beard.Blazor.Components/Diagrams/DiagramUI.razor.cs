@@ -84,6 +84,7 @@ namespace Bb.Diagrams
                 FocusedService.FocusChange(model);
         }
 
+
         private BlazorDiagram CreateDiagram()
         {
             var options = new BlazorDiagramOptions
@@ -127,9 +128,7 @@ namespace Bb.Diagrams
 
         public void Save()
         {
-
             SaveToMyServer(Diagram);
-
         }
 
 
@@ -150,10 +149,10 @@ namespace Bb.Diagrams
             Diagnostics = diagnostic;
 
 
+            DiagramModel.LastDiagnostics = diagnostic;
             DiagramModel?.Save(DiagramModel);
 
         }
-
 
         private async Task HandleDragEnter()
         {
@@ -188,7 +187,6 @@ namespace Bb.Diagrams
         private AnchorFactory _anchorFactory;
 
         private PropertyGridView PropertyGrid;
-        private object _currentSelection;
         private bool disposedValue;
 
         protected virtual void Dispose(bool disposing)

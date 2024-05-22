@@ -9,10 +9,21 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Remove="Sgbd\Templates\Table.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Sgbd\Templates\Table.cshtml">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Bb.RazorEngine.NetCore\Bb.RazorEngine.csproj" />
 		<ProjectReference Include="..\Black.Beard.Modules\Black.Beard.Modules.csproj" />
 	</ItemGroup>
 

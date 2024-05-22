@@ -1,5 +1,12 @@
-﻿using Bb.TypeDescriptors;
+﻿using Bb.Diagrams;
+using Bb.Generators;
+using Bb.Modules.Sgbd.DiagramTools;
+using Bb.TypeDescriptors;
 using Bb.UIComponents;
+using System.Reflection;
+using System.Security.Permissions;
+using System.Security.Policy;
+using System.Security;
 
 namespace Bb.Modules.Sgbd.Models
 {
@@ -21,6 +28,44 @@ namespace Bb.Modules.Sgbd.Models
             {
                 c.RemoveProperties("Models", "Relationships");
             });
+
+        }
+
+
+        public Generator GetGenerator(ContextGenerator context)
+        {
+
+            if (_generator == null)
+            {
+
+                _generator = new Generator()
+                {
+                    Context = context,
+                }
+
+                .AddRazorTemplate<SgbdDiagram>(".sql", c =>
+                {
+
+                    c.Configure(d =>
+                    {
+
+                    });
+
+                    c.GetModels(
+                        c => c.Models.OfType<DiagramNode>().Where(c => c.Type == new Guid(TableTool.Key)),
+                        c => c.Name,
+                        c => "Tables"
+                        );
+
+                    c.WithTemplateFromResource("Bb.Modules.Sgbd.Templates.Table.cshtml");
+
+                })
+
+                ;
+
+            }
+
+            return _generator;
 
         }
 
@@ -55,9 +100,8 @@ namespace Bb.Modules.Sgbd.Models
 
         public SgbdTechnologies Parent { get; internal set; }
 
-
-
         private List<ColumnType> _columnTypes;
+        private Generator _generator;
 
     }
 

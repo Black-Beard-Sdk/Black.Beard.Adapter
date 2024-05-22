@@ -26,11 +26,11 @@ namespace Bb.Modules.Sgbd
 
             var result = (SgbdDiagram)base.GetModel(featureInstance);
 
-            result.Save = d =>
+            result.SetSave( d =>
             {
                 SetModel(featureInstance, d);
                 featureInstance.Parent.Save(featureInstance);
-            };
+            });
 
             result.SetSpecifications(GetTools());
             return result;

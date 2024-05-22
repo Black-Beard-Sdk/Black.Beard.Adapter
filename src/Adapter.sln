@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Modules.Datas",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site", "Site\Site.csproj", "{9E23BE17-C92B-4621-9038-E995E128BD6F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bb.RazorEngine", "Bb.RazorEngine.NetCore\Bb.RazorEngine.csproj", "{71A4FF1C-BE89-4AA2-AD1A-4A73F0FAD090}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{9E23BE17-C92B-4621-9038-E995E128BD6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E23BE17-C92B-4621-9038-E995E128BD6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E23BE17-C92B-4621-9038-E995E128BD6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71A4FF1C-BE89-4AA2-AD1A-4A73F0FAD090}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71A4FF1C-BE89-4AA2-AD1A-4A73F0FAD090}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71A4FF1C-BE89-4AA2-AD1A-4A73F0FAD090}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71A4FF1C-BE89-4AA2-AD1A-4A73F0FAD090}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
