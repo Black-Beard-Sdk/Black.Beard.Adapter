@@ -26,6 +26,8 @@ namespace Bb.Modules.Sgbd.Models
         [Browsable(false)]
         public Guid Id { get; set; }
 
+        [MaxLength(128, ErrorMessage = DatasComponentConstants.ValueCantBeExceed)]
+        [RegularExpression(SqlserverConstants.NameConstraint, ErrorMessage = DatasComponentConstants.ColumnValidationMessage)]
         [Description("Column name")]
         public string Name
         {

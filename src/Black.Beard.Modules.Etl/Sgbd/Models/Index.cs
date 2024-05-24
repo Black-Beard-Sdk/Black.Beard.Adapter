@@ -3,6 +3,7 @@ using Bb.TypeDescriptors;
 using Blazor.Diagrams.Core.Models;
 using MudBlazor;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Bb.Modules.Sgbd.Models
@@ -30,6 +31,8 @@ namespace Bb.Modules.Sgbd.Models
         [Browsable(false)]
         public Guid Id { get; set; }
 
+        [MaxLength(128, ErrorMessage = DatasComponentConstants.ValueCantBeExceed)]
+        [RegularExpression(SqlserverConstants.NameConstraint, ErrorMessage = DatasComponentConstants.IndexValidationMessage)]
         [Description("index name")]
         public string Name
         {

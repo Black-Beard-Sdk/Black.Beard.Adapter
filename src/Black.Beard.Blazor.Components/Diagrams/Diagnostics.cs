@@ -41,7 +41,7 @@ namespace Bb.Diagrams
                 if (model is IValidationService v)
                     v.Validate(this);
 
-                var properties = TypeDescriptor.GetProperties(model).Where(c => !c.IsReadOnly).ToList();
+                var properties = TypeDescriptor.GetProperties(model).Where(c => !c.Attributes.OfType<EvaluateValidationAttribute>().Where(d => d.ToEvaluate).Any()).ToList();
                 foreach (PropertyDescriptor item in properties)
                     if (item.ToEvaluate())
                     {

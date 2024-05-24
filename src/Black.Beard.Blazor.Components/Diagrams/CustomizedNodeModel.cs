@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using Bb.TypeDescriptors;
 using static MudBlazor.CategoryTypes;
 using System.Text.Json;
+using Bb.CustomComponents;
 
 namespace Bb.Diagrams
 {
@@ -86,6 +87,7 @@ namespace Bb.Diagrams
 
         private readonly DynamicDescriptorInstanceContainer _container;
 
+        [EvaluateValidation(false)]
         public DiagramNode Source { get; }
 
         private static List<Type> _typeToExcludes;

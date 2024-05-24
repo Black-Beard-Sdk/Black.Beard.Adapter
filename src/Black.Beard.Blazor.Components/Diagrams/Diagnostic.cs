@@ -38,6 +38,7 @@ namespace Bb.Diagrams
 
         public List<Guid> Target { get; set; }
 
+        public object Model => model;
 
     }
 

@@ -3,6 +3,7 @@ using Bb.TypeDescriptors;
 using Blazor.Diagrams.Core.Models;
 using ICSharpCode.Decompiler.CSharp.Transforms;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 
@@ -72,23 +73,14 @@ namespace Bb.Modules.Sgbd.Models
 
 
 
-        //[Browsable(false)]
-        //public Index PrimaryKey
-        //{
-        //    get => _primaryKey ?? new Index() { Table = this};
-        //    set
-        //    {
-        //        _primaryKey = value;
-        //    }
-        //}
-
-
-
         [Browsable(false)]
         public bool HasPrimaryColumn => Columns.Any(c => c.Primary);
 
 
 
+        [Required]
+        [MaxLength(128, ErrorMessage = DatasComponentConstants.ValueCantBeExceed)]
+        [RegularExpression(SqlserverConstants.NameConstraint, ErrorMessage = DatasComponentConstants.TableValidationMessage) ]
         public string Name
         {
             get => this.Title;

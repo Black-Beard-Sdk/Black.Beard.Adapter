@@ -31,7 +31,7 @@
     <Panel2>
 
         <MudExpansionPanels>
-            <MudExpansionPanel Dense="true" >
+            <MudExpansionPanel @ref=ExpansionDiagnostic Dense="true" >
                 <MudSimpleTable>
                     <thead>
                         <tr>
@@ -44,7 +44,7 @@
                         @if (Diagnostics != null)
                             @foreach (var row in Diagnostics)
                             {
-                                <DiagnosticRow Row="@row" />
+                                <DiagnosticRow Row="@row" PropertyGridView="PropertyGrid" />
                             }
                     </tbody>
 

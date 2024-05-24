@@ -1,6 +1,6 @@
 ﻿@using MudBlazor
-<tr>
-    <td><MudIcon Icon="@Row.Level.ConvertToIcon()" Title="@Row.Level.ToString()" Color="@Row.Level.ConvertToColor()" /></td>
-    <td>@Row.Message</td>
-    <td>@Row.Source</td>
+<tr class="mud-table-row cursor-pointer" onclick="@OnClick">
+    <td class="mud-table-cell"><MudIcon Icon="@Row.Level.ConvertToIcon()" Title="@Row.Level.ToString()" Color="@Row.Level.ConvertToColor()" /></td>
+    <td class="mud-table-cell">@Row.Message</td>
+    <td class="mud-table-cell">@Row.Source</td>
 </tr>

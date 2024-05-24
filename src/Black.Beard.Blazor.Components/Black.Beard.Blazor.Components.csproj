@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Compile Remove="PropertyGrid\ComponentFieldTree.razor.cs" />
+    <Compile Remove="TypeDescriptors\DynamicExistingTypeDescriptor.cs" />
   </ItemGroup>
 
   <ItemGroup>

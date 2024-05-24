@@ -9,7 +9,8 @@ using static MudBlazor.CategoryTypes;
 namespace Bb.TypeDescriptors
 {
 
-    class DynamicTypeDescriptor : CustomTypeDescriptor
+
+    class DynamicTypeDescriptor : CustomTypeDescriptor, INotifyPropertyChanged
     {
 
         public DynamicTypeDescriptor(ICustomTypeDescriptor parent, object instance, ConfigurationDescriptorSelector configuration)
@@ -26,7 +27,7 @@ namespace Bb.TypeDescriptors
             var initialList = base.GetProperties();
 
             if (_configurationSelector != null)
-                return BuildNewListOfProperty(initialList);
+                return BuildNewListOfProperty(BuidExistingProperties(initialList));
 
             return initialList;
 
@@ -38,40 +39,94 @@ namespace Bb.TypeDescriptors
             var initialList = base.GetProperties(attributes);
 
             if (_configurationSelector != null)
-                return BuildNewListOfProperty(initialList);
+                return BuildNewListOfProperty(BuidExistingProperties(initialList));
 
             return initialList;
 
         }
 
+
+        /// <summary>
+        /// Raises the <see cref="PropertyChanged"/> event.
+        /// </summary>
+        /// <param name="propertyName">The name of the property that changed.</param>
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private PropertyDescriptorCollection BuildNewListOfProperty(PropertyDescriptorCollection initialList)
+        private Dictionary<string, PropertyDescriptor> BuidExistingProperties(PropertyDescriptorCollection initialList)
         {
 
-            var toExcluded = _configurationSelector.ExcludedProperties;
+            _toExcluded = _configurationSelector.ExcludedProperties;
 
             var customFields = initialList
                 .Cast<PropertyDescriptor>()
-                .Where(c => !toExcluded.Contains(c.Name))
+                .Where(c => !_toExcluded.Contains(c.Name))
                 .ToDictionary(c => c.Name);
 
-            foreach (var item in _configurationSelector.Get(_instance))
+            IEnumerable<ConfigurationDescriptor> u = _configurationSelector.Get(_instance);
+            foreach (var item in u)
                 if (item.ComponentType.IsInstanceOfType(_instance))
-                    foreach (var property in item.Properties)
-                        if (!toExcluded.Contains(property.Name))
+                    foreach (var property in item.ExistingProperties.Where(c => !_toExcluded.Contains(c.Key)))
+                    {
+
+                        DynamicExistingPropertyDescriptor dynamicPropertyDescriptor = null;
+
+                        if (customFields.TryGetValue(property.Key, out var propertyDescriptor))
                         {
-                            if (!customFields.ContainsKey(property.Name))
-                                customFields.Add(property.Name, property);
-                            else
-                                customFields[property.Name] = property;
+
+                            dynamicPropertyDescriptor = propertyDescriptor as DynamicExistingPropertyDescriptor;
+
+                            if (dynamicPropertyDescriptor == null)
+                            {
+                                var items = ComponentModel.Accessors.PropertyAccessor.GetProperties(item.ComponentType);
+                                var accessor = items[property.Key];
+                                dynamicPropertyDescriptor = new DynamicExistingPropertyDescriptor(propertyDescriptor, accessor);
+                                dynamicPropertyDescriptor.AddValueChanged(this, (s, e) => OnPropertyChanged(propertyDescriptor.Name));
+                                customFields[property.Key] = dynamicPropertyDescriptor;
+                            }
+
+                            dynamicPropertyDescriptor.Apply(property.Value);
+
                         }
 
-            return new PropertyDescriptorCollection(customFields.Values.ToArray());
+                    }
+
+            return customFields;
 
         }
 
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private PropertyDescriptorCollection BuildNewListOfProperty(Dictionary<string, PropertyDescriptor> customFields)
+        {
+
+            foreach (var item in _configurationSelector.Get(_instance))
+                if (item.ComponentType.IsInstanceOfType(_instance))
+                    foreach (var property in item.NewProperties.Where(c => !_toExcluded.Contains(c.Name)))
+                    {
+                        if (!customFields.ContainsKey(property.Name))
+                            customFields.Add(property.Name, property);
+                        else
+                            customFields[property.Name] = property;
+                    }
+
+            return new PropertyDescriptorCollection(customFields.Values.ToArray().OrderBy(c => c.Name).ToArray());
+
+        }
+
+        /// <summary>
+        /// Occurs when a property value changes.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private ConfigurationDescriptorSelector _configurationSelector;
         private object _instance;
+        private IEnumerable<string> _toExcluded;
+        //private DynamicPropertyDescriptorComparer _comparer;
     }
 
 

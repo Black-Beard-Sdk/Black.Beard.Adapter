@@ -19,6 +19,13 @@ namespace Bb.Modules
         public static TranslatedKeyLabel AddIndex => new TranslatedKeyLabel("Add index");
         public static TranslatedKeyLabel DelIndex => new TranslatedKeyLabel("Remove index");
 
+
+        public const string TableValidationMessage = "The {0} of the table is not valid.";
+        public const string ColumnValidationMessage = "The {0} of the column is not valid.";
+        public const string IndexValidationMessage = "The {0} of the index is not valid.";
+        public const string ValueCantBeExceed = "{0} Can't be exceeds 128 characters.";
+
+
     }
 
 

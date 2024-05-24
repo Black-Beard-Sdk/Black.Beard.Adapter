@@ -23,7 +23,7 @@ namespace Bb.Modules.Sgbd.Models
         public string Technology { get; set; }
 
         [JsonIgnore]
-        [Evaluate(false)]
+        [EvaluateValidation(false)]
         public SgbdTechnologies SgbdTechnologies { get; internal set; }
     
         public SgbdTechnology GetTechnology()

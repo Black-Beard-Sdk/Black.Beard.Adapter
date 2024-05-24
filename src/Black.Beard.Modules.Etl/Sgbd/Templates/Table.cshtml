@@ -9,10 +9,9 @@
 
 CREATE TABLE [@Model.Name]
 (
-
-@{
-
-  
-
-}
+    @foreach (var column in Model.Columns)
+    {
+        @column.Name @column.Type @column.Nullable @column.Default @column.Identity
+    }
+    PRIMARY KEY (@Model.PrimaryKey)
 );

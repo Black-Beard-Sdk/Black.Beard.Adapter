@@ -1,8 +1,17 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.TypeDescriptors;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bb.Modules.Sgbd.Models
 {
+
+    public static class SqlserverConstants
+    {
+
+        public const string NameConstraint = @"^[\p{L}_][\p{L}\p{N}@$#_]{0,127}$";
+
+    }
+
 
 
     [ExposeClass(ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(SgbdTechnology), LifeCycle = IocScopeEnum.Transiant)]
@@ -21,12 +30,12 @@ namespace Bb.Modules.Sgbd.Models
 
             config.Add<Table>(c =>
             {
-                // c.AddProperty("Year", typeof(int), i =>
-                // {
-                //     i.IsBrowsable(true)
-                //     .CanResetValue(true)
-                //     ;
-                // });
+
+                c.Property("Name", i =>
+                {
+                    i.AddAttributes(new RegularExpressionAttribute(SqlserverConstants.NameConstraint) { ErrorMessage = DatasComponentConstants.TableValidationMessage });
+                });
+
             });
 
             config.Add<Column>(c =>

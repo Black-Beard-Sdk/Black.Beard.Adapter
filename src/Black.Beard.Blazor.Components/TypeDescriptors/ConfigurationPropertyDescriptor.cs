@@ -22,6 +22,8 @@ namespace Bb.TypeDescriptors
             return this;
         }
 
+        public bool AddedProperty { get; internal set; }
+
         public string Name { get; set; }
 
         public Type Type { get; set; }
@@ -92,7 +94,32 @@ namespace Bb.TypeDescriptors
             return _property;
 
         }
-   
+
+        internal void Merge(ConfigurationPropertyDescriptor property)
+        {
+
+            if (!string.IsNullOrEmpty(property.Name))
+                Name = property.Name;
+
+            if (!string.IsNullOrEmpty(property.Description))
+                Description = property.Description;
+
+            if (!string.IsNullOrEmpty(property.DisplayName))
+                DisplayName = property.DisplayName;
+
+            if (!string.IsNullOrEmpty(property.Category))
+                Category = property.Category;
+
+            if (property.CanResetValue)
+                CanResetValue = property.CanResetValue;
+
+            foreach (var item in property._attributes)
+            {
+                _attributes.Add(item);
+            }
+
+        }
+
         public Attribute[] Attributes => _attributes.ToArray();
 
 

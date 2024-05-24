@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Bb.PropertyGrid;
 using Blazor.Diagrams.Core.Models.Base;
 using Bb.ComponentModel.Translations;
+using MudBlazor;
 
 namespace Bb.Diagrams
 {
@@ -29,6 +30,9 @@ namespace Bb.Diagrams
         [Parameter]
         public Diagram DiagramModel { get; set; }
 
+
+        [Parameter]
+        public MudExpansionPanel ExpansionDiagnostic { get; set; }
 
         public ToolboxList Toolbox { get => _toolboxList ?? (_toolboxList = new ToolboxList(DiagramModel.Specifications)); }
 
@@ -135,19 +139,17 @@ namespace Bb.Diagrams
         private async ValueTask SaveToMyServer(Blazor.Diagrams.Core.Diagram diagram)
         {
 
+            var diagnostic = new Diagnostics() { Translator = TranslationService };
+
+            diagnostic.EvaluateModel(Diagram);
+
+            Diagnostics = diagnostic;
+            if (Diagnostics.Where(c => c.Level == DiagnosticLevel.Error).Any())
+                ExpansionDiagnostic.Expand();
+
             foreach (var node in Diagram.Nodes)
                 if (node is CustomizedNodeModel model)
                     model.SynchronizeSource();
-
-            var diagnostic = new Diagnostics()
-            {
-                Translator = TranslationService
-            };
-
-            diagnostic.EvaluateModel(DiagramModel);
-
-            Diagnostics = diagnostic;
-
 
             DiagramModel.LastDiagnostics = diagnostic;
             DiagramModel?.Save(DiagramModel);

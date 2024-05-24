@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bb.PropertyGrid;
+using System;
 using System.Collections.Generic;
 
 namespace Bb.TypeDescriptors
@@ -38,15 +39,22 @@ namespace Bb.TypeDescriptors
         /// <param name="configure"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public ConfigurationDescriptorRepository Add<T>(Action<ConfigurationDescriptor> configure, Func<T, bool> filter = null)
-            where T : class, IDynamicDescriptorInstance
+        public ConfigurationDescriptorRepository Add<T>(Action<ConfigurationDescriptor<T>> configure, Func<T, bool> filter = null)            
         {
 
             Func<object, bool> filterTarget = null;
             if (filter != null)
                 filterTarget = o => filter((T)o);
 
-            return Add(typeof(T), configure, filterTarget);
+            var configuration = new ConfigurationDescriptor<T>() { Filter = filterTarget };
+            configure(configuration);
+
+            this.Add(configuration);
+
+            var method = typeof(DynamicTypeDescriptionProvider<>).MakeGenericType(typeof(T)).GetMethod("Initialize");
+            method.Invoke(null, new object[] { });
+
+            return this;
 
         }
 
@@ -59,6 +67,7 @@ namespace Bb.TypeDescriptors
         /// <returns></returns>
         public ConfigurationDescriptorRepository Add(Type componentType, Action<ConfigurationDescriptor> configure, Func<object, bool> filter = null)
         {
+
             var configuration = new ConfigurationDescriptor(componentType) { Filter = filter };
             configure(configuration);
             this.Add(configuration);

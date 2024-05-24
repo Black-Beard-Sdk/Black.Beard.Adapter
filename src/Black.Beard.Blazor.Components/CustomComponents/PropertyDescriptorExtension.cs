@@ -56,7 +56,8 @@ namespace Bb.CustomComponents
 
             var attributes = descriptor
                 .Attributes
-                .OfType<Attribute>()
+                .Cast<Attribute>()
+                .OfType<ValidationAttribute>()
                 .ToList();
 
             foreach (Attribute attribute in attributes)
@@ -70,12 +71,21 @@ namespace Bb.CustomComponents
                         {
                             var ll = label.Replace(descriptor.Name, "{0}");
                             label = translator.Translate(ll);
+
+                            if (label.Contains("{0}"))
+                                label = descriptor.DisplayName;
+
                         }
+
+                        // descriptor.ComponentType.Name.ToString();
+
 
                         var message = validation.FormatErrorMessage(label);
 
                         if (translator != null && validation.FormatErrorMessage(string.Empty).IsValidTranslationKey())
+                        {
                             messages.Add(translator.Translate(message));
+                        }
                         else
                             messages.Add(message);
 
@@ -91,7 +101,7 @@ namespace Bb.CustomComponents
 
             var value = self.Attributes
                 .Cast<Attribute>()
-                .OfType<EvaluateAttribute>()
+                .OfType<EvaluateValidationAttribute>()
                 .FirstOrDefault();
 
             if (value != null)
@@ -101,20 +111,6 @@ namespace Bb.CustomComponents
 
         }
 
-
-
-    }
-
-
-    public class EvaluateAttribute : Attribute
-    {
-
-        public EvaluateAttribute(bool toEvaluate)
-        {
-            this.ToEvaluate = toEvaluate;
-        }
-
-        public bool ToEvaluate { get; }
     }
 
 

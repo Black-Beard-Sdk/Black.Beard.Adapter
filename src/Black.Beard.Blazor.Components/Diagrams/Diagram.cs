@@ -1,5 +1,6 @@
 ﻿using Bb.CustomComponents;
 using Blazor.Diagrams.Core.Models;
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using static MudBlazor.CategoryTypes;
 
@@ -39,7 +40,7 @@ namespace Bb.Diagrams
             {
                 var currentNames = new HashSet<string>(Models.Select(c => c.Name));
                 int count = 1;
-                while (currentNames.Contains(name = $"{specification.GetDefaultName()} {count}"))
+                while (currentNames.Contains(name = $"{specification.GetDefaultName()}{count}"))
                     count++;
             }
 
@@ -129,6 +130,7 @@ namespace Bb.Diagrams
         [JsonIgnore]
         public Action<Diagram> Save { get; private set; }
 
+        [Browsable(false)]
         [JsonIgnore]
         public Diagnostics LastDiagnostics { get; internal set; }
 

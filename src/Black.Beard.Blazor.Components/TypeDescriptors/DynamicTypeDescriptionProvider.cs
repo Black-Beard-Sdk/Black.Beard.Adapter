@@ -69,7 +69,6 @@ namespace Bb.TypeDescriptors
     /// </code>
     /// </example>
     public class DynamicTypeDescriptionProvider<T> : DynamicTypeDescriptionProvider
-        where T : IDynamicDescriptorInstance
     {
 
         /// <summary>

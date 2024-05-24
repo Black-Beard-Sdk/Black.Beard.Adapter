@@ -7,6 +7,9 @@ using System.Reflection;
 using System.Security.Permissions;
 using System.Security.Policy;
 using System.Security;
+using System.ComponentModel;
+using Blazor.Diagrams;
+using Bb.CustomComponents;
 
 namespace Bb.Modules.Sgbd.Models
 {
@@ -21,14 +24,102 @@ namespace Bb.Modules.Sgbd.Models
             var config = DynamicTypeDescriptionProvider.Configuration;
             config.Add<Table>(c =>
             {
+
                 c.RemoveProperties("ControlledSize", "Title", "Selected", "Id", "Locked", "Visible");
+
+                c.Property(u => u.Group, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.HasPrimaryColumn, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Links, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.PortLinks, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Ports, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Position, i =>
+                {
+                    i.DisableValidation();
+                });
+
             });
 
             config.Add<SgbdDiagram>(c =>
             {
-                c.RemoveProperties("Models", "Relationships");
+                c.Property(u => u.Models, i =>
+                {
+                    i.DisableBrowsable();
+                });
+
+                c.Property(u=> u.Relationships, i =>
+                {
+                    i.DisableBrowsable();
+                });
+
             });
 
+
+            config.Add<BlazorDiagram>(c =>
+            {
+              
+                c.Property(u => u.SuspendRefresh, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u=> u.SuspendSorting, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Container, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Controls, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Options, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Pan, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Zoom, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.OrderedSelectables, i =>
+                {
+                    i.DisableValidation();
+                });
+
+
+            }); 
+            
         }
 
 

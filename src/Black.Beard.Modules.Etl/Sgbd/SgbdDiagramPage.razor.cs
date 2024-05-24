@@ -13,7 +13,7 @@ namespace Bb.Modules.Sgbd
 
         public SgbdDiagramPage()
         {
-        
+
         }
 
 
@@ -41,17 +41,21 @@ namespace Bb.Modules.Sgbd
 
         private void ModelSaved(object? sender, Diagram e)
         {
-            var ctx = new ContextGenerator()
+
+            var technology = DiagramModel.GetTechnology();
+            if (technology != null)
             {
-                RootPath = "c:\\temp",
-            };
+                var ctx = new ContextGenerator()
+                {
+                    RootPath = "c:\\temp",
+                };
 
-            var gen = DiagramModel.GetTechnology().GetGenerator(ctx);
-            
-            var items = gen.Generate(e).ToList();
+                var gen = DiagramModel.GetTechnology().GetGenerator(ctx);
 
-            ctx.WriteOnDisk(items);
+                var items = gen.Generate(e).ToList();
 
+                ctx.WriteOnDisk(items);
+            }
         }
 
         public FeatureInstance FeatureInstance => _featureInstance ?? (_featureInstance = FeatureInstances.GetFeature(Uuid));

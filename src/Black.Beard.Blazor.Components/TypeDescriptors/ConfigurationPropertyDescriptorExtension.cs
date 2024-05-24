@@ -105,6 +105,20 @@ namespace Bb.TypeDescriptors
             return self;
         }
 
+        public static ConfigurationPropertyDescriptor DisableValidation(this ConfigurationPropertyDescriptor self)
+        {
+            self.AddAttributes(new EvaluateValidationAttribute(false));
+            return self;
+        }
+
+        public static ConfigurationPropertyDescriptor DisableBrowsable(this ConfigurationPropertyDescriptor self)
+        {
+            self.AddAttributes(new BrowsableAttribute(false));
+            return self;
+        }
+
+        // ConfigurationPropertyDescriptor
+
         public static object? GetDefaultValue(this PropertyDescriptor self)
         {
             var value = self.Attributes

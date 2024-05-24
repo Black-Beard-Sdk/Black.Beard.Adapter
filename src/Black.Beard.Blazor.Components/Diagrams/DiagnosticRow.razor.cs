@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Bb.PropertyGrid;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using System;
 using System.Collections.Generic;
@@ -11,6 +13,15 @@ namespace Bb.Diagrams
 
         [Parameter]
         public Diagnostic Row { get; set; }
+
+        [Parameter]
+        public PropertyGridView PropertyGridView { get; set; }
+
+        public void OnClick(MouseEventArgs eventArgs)
+        {
+            if (Row.Target.Model != null)
+                PropertyGridView.SelectedObject = Row.Target.Model;
+        }
 
     }
 
