@@ -115,10 +115,46 @@ namespace Bb.TypeDescriptors
                     // Get the property name.
                     string? propertyName = reader.GetString();
 
+
                     if (properties.TryGetValue(propertyName, out PropertyDescriptor? property)) // Get the value.
                     {
                         var value = JsonSerializer.Deserialize(ref reader, property.PropertyType, options);
                         property.SetValue(instance, value);
+                    }
+                    else
+                    {
+
+                        reader.Read();
+
+                        switch (reader.TokenType)
+                        {
+                            case JsonTokenType.None:
+                                break;
+                            case JsonTokenType.StartObject:
+                                break;
+                            case JsonTokenType.EndObject:
+                                break;
+                            case JsonTokenType.StartArray:
+                                break;
+                            case JsonTokenType.EndArray:
+                                break;
+                            case JsonTokenType.PropertyName:
+                                break;
+                            case JsonTokenType.Comment:
+                                break;
+                            case JsonTokenType.String:
+                                break;
+                            case JsonTokenType.Number:
+                                break;
+                            case JsonTokenType.True:
+                                break;
+                            case JsonTokenType.False:
+                                break;
+                            case JsonTokenType.Null:
+                                break;
+                            default:
+                                break;
+                        }
                     }
 
                 }

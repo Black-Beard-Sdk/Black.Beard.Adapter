@@ -79,7 +79,7 @@ namespace Bb.TypeDescriptors
     public static class DynamicDescriptorInstanceExtension
     {
 
-        public static void Map(this PropertyDescriptor self, object instance, bool exists, string serialiedData)
+        public static void Map(this PropertyDescriptor self, object instance, bool exists, string serializedData)
         {
 
             var options = new JsonSerializerOptions
@@ -91,18 +91,17 @@ namespace Bb.TypeDescriptors
             };
 
             object value = null;
-            if (string.IsNullOrEmpty(serialiedData))
+            if (string.IsNullOrEmpty(serializedData))
             {
                 if (!exists)
                     value = self.GetDefaultValue();
             }
             else
-                value = serialiedData.Deserialize(self.PropertyType, options);
+                value = serializedData.Deserialize(self.PropertyType, options);
 
-
-
-            if (!string.IsNullOrEmpty(serialiedData))
+            if (!string.IsNullOrEmpty(serializedData))
                 self.SetValue(instance, value);
+
         }
 
     }

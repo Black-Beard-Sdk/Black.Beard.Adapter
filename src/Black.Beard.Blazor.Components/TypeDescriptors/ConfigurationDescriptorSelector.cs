@@ -35,14 +35,8 @@ namespace Bb.TypeDescriptors
         /// <returns></returns>
         public virtual IEnumerable<ConfigurationDescriptor> Get(object instance)
         {
-            
-            var items = List.Where(c => c.Filter != null && c.Filter(instance)).ToList();
-            
-            if (items.Count == 0)
-                items = List.Where(c => c.Filter == null).ToList();
-
+            var items = List.ToList();
             return items;
-
         }
 
         internal void Merge(ConfigurationDescriptorSelector value)

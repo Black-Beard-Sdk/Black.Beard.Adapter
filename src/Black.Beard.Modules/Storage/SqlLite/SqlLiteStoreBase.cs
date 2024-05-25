@@ -162,13 +162,16 @@ namespace Bb.Modules.Storage
 
             if (Exists(value.Uuid) && value.LastUpdate.HasValue)
             {
+                
                 count = UpdateItem(value);
-            }
+                if (count > 0)
+                {
+                    value.Version++;
+                }
 
-            if (count == 0)
-            {
-                InsertItem(value);
             }
+            else
+                InsertItem(value);
 
         }
 

@@ -46,6 +46,7 @@ namespace Bb.TypeDescriptors
 
         public string Category { get; set; }
 
+        public int? PropertyOrder { get; set; }
 
         public void _setValue(object component, object value)
         {

@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.PropertyGrid;
+using Bb.TypeDescriptors;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -8,8 +9,6 @@ namespace Bb.CustomComponents
 
     public class ObjectDescriptor
     {
-
-
 
         public ObjectDescriptor(object? instance,
             Type? type,
@@ -31,7 +30,12 @@ namespace Bb.CustomComponents
             if (propertyDescriptorFilter != null)
                 this.PropertyDescriptorFilter = propertyDescriptorFilter;
             else
-                this.PropertyDescriptorFilter = (p) => true;
+                this.PropertyDescriptorFilter = (p) =>
+                {
+                    if (p is IDynamicActiveProperty i)
+                        return i.IsActive(Instance);
+                    return true;
+                };
 
             if (propertyFilter != null)
                 this.PropertyFilter = propertyFilter;
@@ -44,7 +48,7 @@ namespace Bb.CustomComponents
         }
 
 
-        public Func<PropertyDescriptor, bool> PropertyDescriptorFilter { get; }
+        public Func< PropertyDescriptor, bool> PropertyDescriptorFilter { get; }
 
         public Func<PropertyObjectDescriptor, bool> PropertyFilter { get; }
 

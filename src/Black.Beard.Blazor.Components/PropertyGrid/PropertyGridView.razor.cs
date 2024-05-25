@@ -87,7 +87,8 @@ namespace Bb.PropertyGrid
 
         private void SubPropertyHasChanged(PropertyObjectDescriptor obj)
         {
-            // StateHasChanged();
+            Update();
+            //StateHasChanged();
             if (PropertyHasChanged != null)
                 PropertyHasChanged(obj);
         }

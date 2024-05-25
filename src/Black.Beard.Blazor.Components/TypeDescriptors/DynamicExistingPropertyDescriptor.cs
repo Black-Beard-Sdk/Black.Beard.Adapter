@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Accessors;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Bb.TypeDescriptors
 {
@@ -7,7 +8,8 @@ namespace Bb.TypeDescriptors
     /// <summary>
     /// A runtime-customizable implementation of <see cref="PropertyDescriptor"/>.
     /// </summary>
-    public sealed class DynamicExistingPropertyDescriptor : PropertyDescriptor
+    [DebuggerDisplay("{Name}")]
+    public sealed class DynamicExistingPropertyDescriptor : PropertyDescriptor, IDynamicActiveProperty, IDynamicComparerProperty
     {
 
         /// <summary>
@@ -240,17 +242,6 @@ namespace Bb.TypeDescriptors
         }
 
         /// <summary>
-        /// Sets the order in which this property will be retrieved from its type descriptor.
-        /// </summary>
-        /// <param name="propertyOrder">The order in which this property will be retrieved.</param>
-        /// <returns>This <see cref="DynamicPropertyDescriptor"/> instance.</returns>
-        public DynamicExistingPropertyDescriptor SetPropertyOrder(int? propertyOrder)
-        {
-            _propertyOrder = propertyOrder;
-            return this;
-        }
-
-        /// <summary>
         /// Sets the override for the <see cref="IsReadOnly"/> property.
         /// </summary>
         /// <param name="readOnly">The new value for the <see cref="IsReadOnly"/> property.</param>
@@ -262,6 +253,11 @@ namespace Bb.TypeDescriptors
         }
 
         #endregion
+
+        public bool IsActive(object instance) => _filter == null ? true : _filter(instance);
+
+
+        private Func<object, bool> _filter = null;
 
 
         #region properties
@@ -325,7 +321,7 @@ namespace Bb.TypeDescriptors
         /// <summary>
         /// Gets the order in which this property will be retrieved from its type descriptor.
         /// </summary>
-        public int? PropertyOrder { get => _propertyOrder; }
+        public int? PropertyOrder { get; internal set; } = 1000;
 
         /// <summary>
         /// Gets the type of the property.
@@ -336,8 +332,20 @@ namespace Bb.TypeDescriptors
 
         #endregion properties
 
-        internal void Apply(ConfigurationPropertyDescriptor property)
+        internal void Apply(ConfigurationPropertyDescriptor property, Func<object, bool> filter)
         {
+
+            if (_filter == null)
+                _filter = filter;
+            else
+            {
+                _filter = (o) =>
+                {
+                    if (filter(o))
+                        return _filter(o);
+                    return false;
+                };
+            }
 
             if (_attributes == null)
                 _attributes = new List<Attribute>(base.Attributes.OfType<Attribute>().ToArray());
@@ -353,6 +361,16 @@ namespace Bb.TypeDescriptors
 
             if (!string.IsNullOrEmpty(property.DisplayName))
                 this._displayNameOverride = property.DisplayName;
+
+            if (property.PropertyOrder.HasValue)
+                this.PropertyOrder = property.PropertyOrder;
+
+            //if (property.Converter != null)
+            //    this._converterOverride = property.Converter;
+
+            //if (property.IsReadOnly.HasValue)
+            //    this._isReadOnlyOverride = property.IsReadOnly;
+
         }
 
 
@@ -405,11 +423,6 @@ namespace Bb.TypeDescriptors
         /// otherwise, the base descriptor's IsReadOnly property will be returned.
         /// </summary>
         private bool? _isReadOnlyOverride;
-
-        /// <summary>
-        /// The order in which this property will be retrieved from its type descriptor.
-        /// </summary>
-        private int? _propertyOrder;
 
         #endregion private
 

@@ -1,18 +1,21 @@
 ﻿using Bb.CustomComponents;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Bb.TypeDescriptors
 {
 
-
-    class DynamicPropertyDescriptor : PropertyDescriptor
+    [DebuggerDisplay("{Name}")]
+    class DynamicPropertyDescriptor : PropertyDescriptor, IDynamicActiveProperty, IDynamicComparerProperty
     {
 
         internal DynamicPropertyDescriptor(ConfigurationPropertyDescriptor configuration)
             : base(configuration.Name, configuration.Attributes)
         {
             this._configuration = configuration;
+            if (configuration.PropertyOrder.HasValue)
+                this.PropertyOrder = configuration.PropertyOrder;
         }
 
         public override string Category => _configuration.Category ?? base.Category;
@@ -34,7 +37,10 @@ namespace Bb.TypeDescriptors
 
         public override bool SupportsChangeEvents => base.SupportsChangeEvents;
 
-
+        /// <summary>
+        /// Gets the order in which this property will be retrieved from its type descriptor.
+        /// </summary>
+        public int? PropertyOrder { get; internal set; } = 1000;
 
 
         public override bool CanResetValue(object component) => this._configuration.CanResetValue;
@@ -56,6 +62,10 @@ namespace Bb.TypeDescriptors
 
         public override bool ShouldSerializeValue(object component) => _configuration.ShouldSerializeValue;
 
+
+        public bool IsActive (object instance) => _filter == null ? true : _filter(instance);
+
+        internal Func<object, bool> _filter = null;
 
         private readonly ConfigurationPropertyDescriptor _configuration;
 

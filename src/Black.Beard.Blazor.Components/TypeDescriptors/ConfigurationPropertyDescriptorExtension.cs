@@ -9,6 +9,8 @@ namespace Bb.TypeDescriptors
     public static class ConfigurationPropertyDescriptorExtension
     {
 
+
+   
         /// <summary>
         /// Set the value CanResetValue of the configuration property descriptor
         /// </summary>
@@ -20,6 +22,19 @@ namespace Bb.TypeDescriptors
             self.CanResetValue = value;
             return self;
         }
+
+        /// <summary>
+        /// Set the order in the list of propetyDescriptor
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static ConfigurationPropertyDescriptor PropertyOrder(this ConfigurationPropertyDescriptor self, int value)
+        {
+            self.PropertyOrder = value;
+            return self;
+        }
+
 
         /// <summary>
         /// Set the value IsReadOnly of the configuration property descriptor

@@ -13,9 +13,11 @@ namespace Bb.TypeDescriptors
     class DynamicTypeDescriptor : CustomTypeDescriptor, INotifyPropertyChanged
     {
 
+
         public DynamicTypeDescriptor(ICustomTypeDescriptor parent, object instance, ConfigurationDescriptorSelector configuration)
             : base(parent)
         {
+            _comparer = new DynamicPropertyDescriptorComparer();
             this._instance = instance;
             _configurationSelector = configuration;
         }
@@ -32,6 +34,7 @@ namespace Bb.TypeDescriptors
             return initialList;
 
         }
+
 
         public override PropertyDescriptorCollection GetProperties(Attribute[] attributes)
         {
@@ -89,7 +92,7 @@ namespace Bb.TypeDescriptors
                                 customFields[property.Key] = dynamicPropertyDescriptor;
                             }
 
-                            dynamicPropertyDescriptor.Apply(property.Value);
+                            dynamicPropertyDescriptor.Apply(property.Value, item.Filter);
 
                         }
 
@@ -114,7 +117,10 @@ namespace Bb.TypeDescriptors
                             customFields[property.Name] = property;
                     }
 
-            return new PropertyDescriptorCollection(customFields.Values.ToArray().OrderBy(c => c.Name).ToArray());
+            var list = customFields.Values.ToList();
+            list.Sort(_comparer);
+
+            return new PropertyDescriptorCollection(list.ToArray());
 
         }
 
@@ -126,6 +132,11 @@ namespace Bb.TypeDescriptors
         private ConfigurationDescriptorSelector _configurationSelector;
         private object _instance;
         private IEnumerable<string> _toExcluded;
+        /// <summary>
+        /// Comparer to use when sorting a list of dynamic property descriptors.
+        /// </summary>
+        private readonly IComparer<PropertyDescriptor> _comparer;
+
         //private DynamicPropertyDescriptorComparer _comparer;
     }
 

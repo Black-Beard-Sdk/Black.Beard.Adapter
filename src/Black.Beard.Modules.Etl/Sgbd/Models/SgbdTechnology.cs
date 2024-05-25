@@ -27,6 +27,12 @@ namespace Bb.Modules.Sgbd.Models
 
                 c.RemoveProperties("ControlledSize", "Title", "Selected", "Id", "Locked", "Visible");
 
+                c.Property(c => c.Name, i =>
+                {
+                    i.PropertyOrder(1)
+                    ;
+                });
+
                 c.Property(u => u.Group, i =>
                 {
                     i.DisableValidation();
@@ -58,6 +64,22 @@ namespace Bb.Modules.Sgbd.Models
                 });
 
             });
+
+            config.Add<Column>(c =>
+            {
+
+                c.Property(c => c.Name, i =>
+                {
+                    i.PropertyOrder(1)
+                    ;
+                })
+                .Property(c => c.Type, i =>
+                {
+                    i.PropertyOrder(2)
+                    ;
+                });
+            });
+
 
             config.Add<SgbdDiagram>(c =>
             {
@@ -150,9 +172,7 @@ namespace Bb.Modules.Sgbd.Models
 
                     c.WithTemplateFromResource("Bb.Modules.Sgbd.Templates.Table.cshtml");
 
-                })
-
-                ;
+                });
 
             }
 
@@ -167,9 +187,9 @@ namespace Bb.Modules.Sgbd.Models
             _columnTypes = new List<ColumnType>();
         }
 
-        protected ColumnType AddColumnType(string label, string code)
+        protected ColumnType AddColumnType(string label, string code, ColumbTypeCategory category)
         {
-            var type = new ColumnType(label, code);
+            var type = new ColumnType(label, code, category);
             _columnTypes.Add(type);
             return type;
         }

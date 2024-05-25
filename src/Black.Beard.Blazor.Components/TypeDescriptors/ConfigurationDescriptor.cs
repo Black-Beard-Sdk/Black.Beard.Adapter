@@ -85,7 +85,7 @@ namespace Bb.TypeDescriptors
                 Name = name,
                 Type = type,
                 ComponentType = ComponentType,
-                AddedProperty = true
+                AddedProperty = true,
             };
 
             if (initializer != null)
@@ -111,7 +111,10 @@ namespace Bb.TypeDescriptors
             foreach (var property in customs)
             {
                 if (property.AddedProperty)
-                    this._customs.Add(new DynamicPropertyDescriptor(property));
+                    this._customs.Add(new DynamicPropertyDescriptor(property)
+                    {
+                        _filter = Filter
+                    });
                 else
                 {
                     var e = this._existings.FirstOrDefault(c => c.Name == property.Name);
@@ -153,6 +156,7 @@ namespace Bb.TypeDescriptors
         public IDictionary<string, ConfigurationPropertyDescriptor> ExistingProperties => _customsArray2 ?? (_customsArray2 = _existings.ToDictionary(c => c.Name));
 
         public Type ComponentType { get; }
+
         public Func<object, bool> Filter { get; internal set; }
 
         private List<PropertyDescriptor> _customs;

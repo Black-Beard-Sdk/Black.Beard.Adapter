@@ -35,7 +35,7 @@ namespace Bb.Modules.Sgbd.Components
         public Column AddColumn()
         {
 
-            string title = TranslationService.Translate(DatasComponentConstants.Column) + " ";
+            string title = TranslationService.Translate(DatasComponentConstants.Column);
             int count = 1;
             while (Node.Columns.Any(c => c.Name == (title + count.ToString())))
                 count++;
