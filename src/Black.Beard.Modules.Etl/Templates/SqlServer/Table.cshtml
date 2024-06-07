@@ -1,0 +1,92 @@
+﻿@inherits RazorTemplateSqlserver
+@*
+
+// https://github.com/fouadmess/RazorEngine
+// https://antaris.github.io/RazorEngine/TemplateManager.html
+
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+CREATE TABLE [@Model.Name]
+(
+    @{
+        bool first = true;
+    }
+
+    @foreach (var column in Model.Columns)
+    {
+        
+    @{
+
+        var type = column.GetColumnType();
+
+        if (!first)
+        {
+            base.Write(",");
+            base.Write(Environment.NewLine);
+        }
+        else
+            first = false;
+
+        Write(Tab, "[", column.Name, "]", Tab, Tab, column.Type, Tab);
+
+        if (type.Category == ColumbTypeCategory.Integer)
+        {
+
+            var autoIncrement = column.Value<bool>("AutoIncrement");
+            if (autoIncrement)
+            {
+
+                var incrementStart = column.Value<int>("IncrementStart");
+                if (incrementStart < 1)
+                    incrementStart = 1;
+
+                var incrementStep = column.Value<int>("IncrementStep");
+                if (incrementStep < 1)
+                    incrementStep = 1;
+
+                Write($" IDENTITY({incrementStart},{incrementStep})");
+
+            }
+
+        }
+        else if (type.Category == ColumbTypeCategory.String)
+        {
+            WriteParameters(column.Value("Lenght"));
+        }
+
+        else if (type.Category == ColumbTypeCategory.Number)
+        {
+            WriteParameters(column.Value("Precision"), ",", column.Value("Scale"));
+        }
+
+        else if (type.Category == ColumbTypeCategory.Date)
+        {
+            WriteParameters(column.Value("Precision"));
+        }
+
+        else if (type.Category == ColumbTypeCategory.Binary)
+        {
+            WriteParameters(column.Value("Lenght"));
+        }
+
+        else
+        {
+            Write("-- Not managed");
+        }
+
+        if (!column.Nullable)
+        {
+            Write(" NOT NULL");
+        }
+
+        if (!string.IsNullOrEmpty(column.DefaultValue))
+        {
+            Write(column.DefaultValue);
+        }
+
+        }
+
+    }
+
+)

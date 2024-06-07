@@ -82,11 +82,16 @@ namespace Bb.Modules.Sgbd.Models
         public void SetProperty(string name, object value) => this._container.SetProperty(name, value);
 
 
-        public SgbdDiagram Diagram () => Table?.Source.Diagram as SgbdDiagram;
+        public SgbdDiagram Diagram() => Table?.Source.Diagram as SgbdDiagram;
 
         public SgbdTechnology GetTechnology() => Diagram()?.GetTechnology();
 
-        public ColumnType GetColumnType() => GetTechnology()?.ColumnTypes.Where(c => c.Code == Type).FirstOrDefault();
+        public ColumnType GetColumnType()
+        {
+            var types = GetTechnology()?.ColumnTypes;
+            var result = types.Where(c => c.Code == Type).FirstOrDefault();
+            return result;
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

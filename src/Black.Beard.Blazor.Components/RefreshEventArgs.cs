@@ -18,4 +18,19 @@
 
     }
 
+
+    public class BusyEventArgs : EventArgs
+    {
+
+        public BusyEventArgs(BusySession source)
+        {
+            this.Source = source;
+        }
+
+        public BusySession Source { get; }
+        
+
+
+    }
+
 }

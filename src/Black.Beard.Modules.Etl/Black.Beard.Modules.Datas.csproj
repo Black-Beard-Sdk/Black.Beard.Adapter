@@ -9,11 +9,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Remove="Sgbd\Templates\Table.cshtml" />
+	  <Content Remove="Templates\SqlServer\Table.cshtml" />
+	  <Content Remove="Templates\Table.cshtml" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Sgbd\Templates\Table.cshtml">
+	  <EmbeddedResource Include="Templates\SqlServer\Table.cshtml">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	</ItemGroup>

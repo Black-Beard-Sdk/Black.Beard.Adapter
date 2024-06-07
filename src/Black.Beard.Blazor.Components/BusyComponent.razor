@@ -1,0 +1,31 @@
+﻿@using MudBlazor
+
+<MudDialog>
+
+
+    <TitleContent>
+        <MudText Typo="Typo.h6">@Session.Title</MudText>
+    </TitleContent>
+
+
+    <DialogContent>
+        <MudContainer Fixed="true">
+            <MudPaper Height="300px">
+                <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+                <MudText Typo="Typo.h6">@Session.Message</MudText>
+            </MudPaper>
+        </MudContainer>
+    </DialogContent>
+
+
+    <DialogActions>
+        <MudContainer Fixed="true">
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Class="px-10" OnClick=Closing>@ComponentConstants.Cancel.Translate(this)</MudButton>
+        </MudContainer>
+    </DialogActions>
+
+
+</MudDialog>
+
+
+

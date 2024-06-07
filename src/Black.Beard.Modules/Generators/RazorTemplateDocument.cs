@@ -3,6 +3,8 @@ using System.Text;
 using RazorEngine.Configuration;
 using System.Reflection;
 using System.Xml.Linq;
+using static MudBlazor.CategoryTypes;
+using Bb.Diagrams;
 
 namespace Bb.Generators
 {
@@ -12,10 +14,15 @@ namespace Bb.Generators
         public RazorTemplateDocument()
         {
             this._uuid = Guid.NewGuid().ToString();
+
             _config = new TemplateServiceConfiguration()
             {
-
+                AllowMissingPropertiesOnDynamic = true,
+                Debug = true,
+                Language = RazorEngine.Language.CSharp,
+                EncodedStringFactory = new RazorEngine.Text.RawStringFactory(),
             };
+
         }
 
         public bool TemplateIsConfigured => _template != null;
@@ -64,20 +71,11 @@ namespace Bb.Generators
         protected override IEnumerable<GeneratedDocument> Generate<TModel>(IEnumerable<TModel> models, ContextGenerator ctx)
         {
 
-            _config.AllowMissingPropertiesOnDynamic = true;
-            _config.Debug = true;
-            _config.Language = RazorEngine.Language.CSharp;
-            _config.EncodedStringFactory = new RazorEngine.Text.RawStringFactory();
-            //_config.ConfigureCompilerBuilder = builder =>
-            //{
-
-            //    //builder.SetCompilerServiceFactory(new Bb.RazorEngine.Compilers.CSharp.CSharpCompilerServiceFactory());
-            //};
-
             var service = RazorEngineService.Create(_config);
 
             bool first = true;
             ITemplateKey key = null;
+            Type modelType = null;
 
             foreach (var model in models)
             {
@@ -87,6 +85,7 @@ namespace Bb.Generators
 
                     if (first)
                     {
+                        modelType = model.GetType();
                         key = service.GetKey(_template.TemplateFile);
                         service.AddTemplate(key, new LoadedTemplateSource(_template.Template));
                     }
@@ -97,7 +96,7 @@ namespace Bb.Generators
                         using (TextWriter streamWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true))
                         {
                             if (first)
-                                service.RunCompile(key, streamWriter, model: model);
+                                service.RunCompile(key, streamWriter, modelType, model: model);
                             else
                                 service.Run(key, streamWriter, model: model);
 
@@ -108,16 +107,16 @@ namespace Bb.Generators
 
                     }
                 }
-                catch (Exception ew)
+                catch (Exception ex)
                 {
-
+                    ctx.Diagnostics.AddError(ex.ToString(), "generating", new TargetSource(model));
                 }
 
                 if (body != null)
                 {
                     var result = new GeneratedDocument(this, ctx)
                     {
-                        Filename = _functionName?.Invoke(model) ?? model.GetType().Name,                        
+                        Filename = _functionName?.Invoke(model) ?? model.GetType().Name,
                         RelativePath = _functionRelativPath?.Invoke(model) ?? string.Empty,
                         Content = body
                     };
@@ -142,5 +141,6 @@ namespace Bb.Generators
         private readonly TemplateServiceConfiguration _config;
         private LoadedTemplateSource _template;
     }
+
 
 }

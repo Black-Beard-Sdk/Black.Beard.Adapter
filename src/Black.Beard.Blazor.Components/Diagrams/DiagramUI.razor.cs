@@ -18,8 +18,12 @@ namespace Bb.Diagrams
 
 
 
-        public Diagnostics Diagnostics { get; set; }
+        public DiagramUI()
+        {
+           
+        }
 
+        public Diagnostics Diagnostics { get; set; }
 
         [Inject]
         public ITranslateService TranslationService { get; set; }
@@ -30,6 +34,8 @@ namespace Bb.Diagrams
         [Parameter]
         public Diagram DiagramModel { get; set; }
 
+        [Inject]
+        public IBusyService BusyService { get; set; }
 
         [Parameter]
         public MudExpansionPanel ExpansionDiagnostic { get; set; }
@@ -38,23 +44,6 @@ namespace Bb.Diagrams
 
 
         private BlazorDiagram Diagram { get; set; } = null!;
-
-
-        protected override void OnAfterRender(bool firstRender)
-        {
-            base.OnAfterRender(firstRender);
-            if (firstRender)
-            {
-                //PropertyGrid.PropertyFilter = (p) =>
-                //{
-                //    if (p.Browsable)
-                //        return true;
-                //    return false;
-                //};
-
-            }
-
-        }
 
         protected override void OnInitialized()
         {
@@ -139,20 +128,29 @@ namespace Bb.Diagrams
         private async ValueTask SaveToMyServer(Blazor.Diagrams.Core.Diagram diagram)
         {
 
-            var diagnostic = new Diagnostics() { Translator = TranslationService };
+            if (_session == null || _session.BusyStatus == BusyEnum.Completed)
+                _session = BusyService.IsBusyFor(this, "Save", (a) =>
+                {
 
-            diagnostic.EvaluateModel(Diagram);
 
-            Diagnostics = diagnostic;
-            if (Diagnostics.Where(c => c.Level == DiagnosticLevel.Error).Any())
-                ExpansionDiagnostic.Expand();
+                    // a.Update("Saving...");
 
-            foreach (var node in Diagram.Nodes)
-                if (node is CustomizedNodeModel model)
-                    model.SynchronizeSource();
+                    var diagnostic = new Diagnostics() { Translator = TranslationService };
 
-            DiagramModel.LastDiagnostics = diagnostic;
-            DiagramModel?.Save(DiagramModel);
+                    diagnostic.EvaluateModel(Diagram);
+
+                    Diagnostics = diagnostic;
+                    if (Diagnostics.Where(c => c.Level == DiagnosticLevel.Error).Any())
+                        ExpansionDiagnostic.Expand();
+
+                    foreach (var node in Diagram.Nodes)
+                        if (node is CustomizedNodeModel model)
+                            model.SynchronizeSource();
+
+                    DiagramModel.LastDiagnostics = diagnostic;
+                    DiagramModel?.Save(DiagramModel);
+
+                });
 
         }
 
@@ -198,11 +196,8 @@ namespace Bb.Diagrams
                 if (disposing)
                 {
                     FocusedService.FocusChanged -= FocusedService_FocusChanged;
-                    // TODO: supprimer l'état managé (objets managés)
                 }
 
-                // TODO: libérer les ressources non managées (objets non managés) et substituer le finaliseur
-                // TODO: affecter aux grands champs une valeur null
                 disposedValue = true;
             }
         }
@@ -220,6 +215,24 @@ namespace Bb.Diagrams
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+  
+        protected override void OnAfterRender(bool firstRender)
+        {
+            base.OnAfterRender(firstRender);
+            if (firstRender)
+            {
+
+            }
+
+        }
+
+        protected override Task OnAfterRenderAsync(bool firstRender)
+        {
+            return base.OnAfterRenderAsync(firstRender);
+        }
+
+        private BusySession _session;
+
     }
 
 

@@ -1,11 +1,7 @@
 ﻿using Blazor.Diagrams.Core.Models;
-using Bb.ComponentModel.Accessors;
-using Bb.Expressions;
 using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Models.Base;
-using System.Text.Json.Serialization;
 using Bb.TypeDescriptors;
-using System.Text.Json;
 using Bb.CustomComponents;
 
 namespace Bb.Diagrams

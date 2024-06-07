@@ -1,5 +1,6 @@
 ﻿namespace Bb
 {
+
     public interface IFocusedService
     {
 

@@ -256,8 +256,48 @@
 
             namespaceImports = namespaceImports ?? new HashSet<string>();
 
+            ResolveTypes(context);
+
             // Gets the generator result.
             return GetGeneratorResult(GetNamespaces(templateType, namespaceImports), context);
+        }
+
+
+        private void ResolveTypes(TypeContext context)
+        {
+
+            ISet<string> namespaceImports = context.Namespaces;
+            namespaceImports = namespaceImports ?? new HashSet<string>();
+
+            var namespaces = GetNamespaces(context.TemplateType, namespaceImports);
+
+            foreach (var item in context.TemplateContent.Template.Split('\r', '\n'))
+            {
+                var e = item.Trim().ToLower();
+                if (e.StartsWith("@inherits"))
+                {
+                    var typeName = item.Substring(item.IndexOf(" ")).Trim();
+                    if (!string.IsNullOrEmpty(typeName))
+                    {
+                        var type = ResolveType(namespaces, typeName);
+                        if (type != null)
+                            context.TemplateType = type;
+                    }
+                }
+
+                if (e.StartsWith("@model"))
+                {
+                    var typeName = item.Substring(item.IndexOf(" "));
+                    if (!string.IsNullOrEmpty(typeName))
+                    {
+                        var type = ResolveType(namespaces, typeName);
+                        if (type != null)
+                            context.ModelType = type;
+                    }
+                }
+
+            }
+
         }
 
         /// <summary>
@@ -269,13 +309,19 @@
         [SecurityCritical]
         private string GetGeneratorResult(IEnumerable<string> namespaces, TypeContext context)
         {
+
+            var templateType = context.TemplateType;
+            string typename = BuildTypeName(context.TemplateType, context.ModelType);
+
 #pragma warning disable 612, 618
             var razorEngine = RazorEngine.Create(builder =>
             {
                 builder
                     .SetNamespace(DynamicTemplateNamespace)
                     //.SetBaseType("Microsoft.Extensions.RazorViews.BaseView")
-                    .SetBaseType(BuildTypeName(context.TemplateType, context.ModelType))
+                    .SetBaseType(typename)
+                    .AddDirective(DirectiveDescriptor.CreateDirective("inherits", DirectiveKind.SingleLine, d => d.AddOptionalTypeToken("inherits", "")))
+                    .AddDirective(DirectiveDescriptor.CreateDirective("model", DirectiveKind.SingleLine, d => d.AddOptionalTypeToken("model", "")))
                     .ConfigureClass((document, @class) =>
                     {
                         @class.ClassName = context.ClassName;
@@ -307,7 +353,7 @@
                     path = Path.GetDirectoryName(context.TemplateContent.TemplateFile);
                 }
 
-                var razorProject = RazorProjectFileSystem.Create(path);              
+                var razorProject = RazorProjectFileSystem.Create(path);
                 var templateEngine = new RazorTemplateEngineInternal(razorEngine, razorProject);
                 templateEngine.Options.DefaultImports = RazorSourceDocument.Create(importString, fileName: null);
                 RazorPageGeneratorResult result;
@@ -328,6 +374,22 @@
             }
         }
 
+        private static Type ResolveType(IEnumerable<string> namespaces, string typename)
+        {
+
+            var result = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .Where(c => !c.IsDynamic)
+                .SelectMany(c => c.ExportedTypes
+                    .Where(d => d.Name == typename))
+                .ToList();
+
+            if (result.Count > 1)
+                result = result.Where(d => namespaces.Contains(d.Namespace)).ToList();
+
+            return result.FirstOrDefault();
+
+        }
 
         private static RazorPageGeneratorResult GenerateCodeFile(RazorTemplateEngineInternal templateEngine, RazorProjectItem projectItem)
         {

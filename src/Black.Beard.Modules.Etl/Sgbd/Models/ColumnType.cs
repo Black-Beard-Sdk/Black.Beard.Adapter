@@ -1,5 +1,9 @@
-﻿namespace Bb.Modules.Sgbd.Models
+﻿using System.Diagnostics;
+
+namespace Bb.Modules.Sgbd.Models
 {
+
+    [DebuggerDisplay("{Label}")]
     public class ColumnType
     {
 

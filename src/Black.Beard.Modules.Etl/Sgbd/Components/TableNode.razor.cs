@@ -50,7 +50,7 @@ namespace Bb.Modules.Sgbd.Components
             var diagram = this.Node.Source.Diagram as SgbdDiagram;
             var t = diagram.GetTechnology();
             if (t != null)
-                column.Type = t.DefaultColumnType.Label;
+                column.Type = t.DefaultColumnType.Code;
 
             Node.AddColumn(column);
 

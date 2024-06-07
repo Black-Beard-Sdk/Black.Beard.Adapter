@@ -1,6 +1,12 @@
 ﻿using Bb.ComponentModel.Attributes;
+using Bb.Diagrams;
+using Bb.Generators;
+using Bb.Modules.Sgbd.DiagramTools;
 using Bb.TypeDescriptors;
+using MudBlazor;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Modules.Sgbd.Models
 {
@@ -160,6 +166,37 @@ namespace Bb.Modules.Sgbd.Models
         }
 
 
+        protected override Generator ConfigureGenerator(Generator generator)
+        {
+
+            generator.AddRazorTemplate<SgbdDiagram>(".sql", c =>
+            {
+
+                c.Configure(d =>
+                {
+                    d.BaseTemplateType = typeof(RazorTemplateSqlserver);
+                    d.Namespaces.Add("Bb.Modules.Sgbd.Models");
+                });
+
+                c.GetModels(
+                    c =>
+                    {
+                        return c.Models.OfType<DiagramNode>()
+                            .Where(c => c.Type == new Guid(TableTool.Key))
+                            .Select(c => new Table(c));
+                    },
+                    c => c.Name,
+                    c => "Tables"
+                    );
+
+                c.WithTemplateFromResource("Bb.Modules.Templates.SqlServer.Table.cshtml");
+
+            });
+
+            return generator;
+
+        }
+
         private void AddTypes()
         {
             AddColumnType("Binary", "binary", ColumbTypeCategory.Binary);
@@ -199,5 +236,62 @@ namespace Bb.Modules.Sgbd.Models
 
 
     }
+
+    public class RazorTemplateSqlserver : RazorTemplateModule<Table>
+    {
+
+        public string WriteParameters(params string[] properties)
+        {
+
+            string separator = ", ";
+
+            StringBuilder sb = new StringBuilder();
+            var first = true;
+
+            sb.Append("(");
+
+
+            foreach (var item in properties)
+            {
+                if (!first)
+                  sb.Append(separator);
+                else
+                    first = false;
+
+                sb.Append(item);
+            }
+
+            sb.Append(")");
+
+            return sb.ToString();
+
+        }
+
+        //public string WriteIndex(Index index)
+        //{
+        //    Write("CREATE ");
+        //    if (index.Unique)
+        //        Write("UNIQUE ");
+        //    Write("INDEX [", index.Name, "] ON [", index.Table.Name, "] (");
+        //    var first = true;
+        //    foreach (var item in index.Columns)
+        //    {
+        //        if (!first)
+        //        {
+        //            Write(",");
+        //            Write(Environment.NewLine);
+        //        }
+        //        else
+        //            first = false;
+
+        //        Write(Tab, "[", item.Column.Name, "]");
+        //    }
+        //    Write(")");
+
+        //    return string.Empty;
+        //}
+
+    }
+
 
 }

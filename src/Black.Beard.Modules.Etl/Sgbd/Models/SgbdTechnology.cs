@@ -2,14 +2,8 @@
 using Bb.Generators;
 using Bb.Modules.Sgbd.DiagramTools;
 using Bb.TypeDescriptors;
-using Bb.UIComponents;
-using System.Reflection;
-using System.Security.Permissions;
-using System.Security.Policy;
-using System.Security;
-using System.ComponentModel;
 using Blazor.Diagrams;
-using Bb.CustomComponents;
+using System.Linq;
 
 namespace Bb.Modules.Sgbd.Models
 {
@@ -88,7 +82,7 @@ namespace Bb.Modules.Sgbd.Models
                     i.DisableBrowsable();
                 });
 
-                c.Property(u=> u.Relationships, i =>
+                c.Property(u => u.Relationships, i =>
                 {
                     i.DisableBrowsable();
                 });
@@ -98,13 +92,13 @@ namespace Bb.Modules.Sgbd.Models
 
             config.Add<BlazorDiagram>(c =>
             {
-              
+
                 c.Property(u => u.SuspendRefresh, i =>
                 {
                     i.DisableValidation();
                 });
 
-                c.Property(u=> u.SuspendSorting, i =>
+                c.Property(u => u.SuspendSorting, i =>
                 {
                     i.DisableValidation();
                 });
@@ -140,8 +134,8 @@ namespace Bb.Modules.Sgbd.Models
                 });
 
 
-            }); 
-            
+            });
+
         }
 
 
@@ -150,33 +144,20 @@ namespace Bb.Modules.Sgbd.Models
 
             if (_generator == null)
             {
-
-                _generator = new Generator()
+                _generator = ConfigureGenerator( new Generator()
                 {
                     Context = context,
-                }
-
-                .AddRazorTemplate<SgbdDiagram>(".sql", c =>
-                {
-
-                    c.Configure(d =>
-                    {
-
-                    });
-
-                    c.GetModels(
-                        c => c.Models.OfType<DiagramNode>().Where(c => c.Type == new Guid(TableTool.Key)),
-                        c => c.Name,
-                        c => "Tables"
-                        );
-
-                    c.WithTemplateFromResource("Bb.Modules.Sgbd.Templates.Table.cshtml");
-
                 });
-
             }
 
             return _generator;
+
+        }
+
+        protected virtual Generator ConfigureGenerator(Generator generator)
+        {
+            
+            return generator;
 
         }
 

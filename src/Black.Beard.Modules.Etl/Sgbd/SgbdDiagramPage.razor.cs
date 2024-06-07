@@ -20,6 +20,7 @@ namespace Bb.Modules.Sgbd
         [Parameter]
         public Guid Uuid { get; set; }
 
+
         [Inject]
         public FeatureInstances FeatureInstances { get; set; }
 
@@ -48,6 +49,7 @@ namespace Bb.Modules.Sgbd
                 var ctx = new ContextGenerator()
                 {
                     RootPath = "c:\\temp",
+                    Diagnostics = e.LastDiagnostics,
                 };
 
                 var gen = DiagramModel.GetTechnology().GetGenerator(ctx);
@@ -71,6 +73,7 @@ namespace Bb.Modules.Sgbd
             {
                 if (disposing)
                 {
+                 
                     if (DiagramModel != null)
                         DiagramModel.OnModelSaved -= ModelSaved;
                 }
@@ -91,6 +94,10 @@ namespace Bb.Modules.Sgbd
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+
+    
+
 
     }
 }

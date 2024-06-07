@@ -21,8 +21,8 @@ namespace Bb
 
 
         public static TranslatedKeyLabel Tools => new TranslatedKeyLabel("Tools");
-        public static TranslatedKeyLabel Relationships => new TranslatedKeyLabel("Links");
 
+        public static TranslatedKeyLabel Relationships => new TranslatedKeyLabel("Links");
 
     }
 

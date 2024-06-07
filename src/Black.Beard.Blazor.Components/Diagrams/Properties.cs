@@ -4,8 +4,11 @@ using System.Text.Json;
 
 namespace Bb.Diagrams
 {
+
+
     public class Properties : List<Property>
     {
+
 
         public void SetProperty(string name, string value)
         {
