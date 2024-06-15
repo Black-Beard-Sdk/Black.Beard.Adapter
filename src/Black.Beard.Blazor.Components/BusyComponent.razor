@@ -7,21 +7,37 @@
         <MudText Typo="Typo.h6">@Session.Title</MudText>
     </TitleContent>
 
-
     <DialogContent>
-        <MudContainer Fixed="true">
-            <MudPaper Height="300px">
+
+        <div Class="d-flex" Elevation="0">
+            <div Class="flex-1" />
+            <div Class="flex-1" />
+            <div Class="flex-1" />
+
+            <div Class="flex-1">
                 <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-                <MudText Typo="Typo.h6">@Session.Message</MudText>
-            </MudPaper>
-        </MudContainer>
+            </div>
+
+            <div Class="flex-1" />
+            <div Class="flex-1" />
+            <div Class="flex-1" />
+        </div>
+
+        <div style="display:inline">
+            <MudText Style="text-align:center">@Session.Title</MudText>
+        </div>
+
     </DialogContent>
 
-
     <DialogActions>
-        <MudContainer Fixed="true">
-            <MudButton Variant="Variant.Text" Color="Color.Primary" Class="px-10" OnClick=Closing>@ComponentConstants.Cancel.Translate(this)</MudButton>
-        </MudContainer>
+
+        <div Elevation="0" style="display:inline">
+            <MudButton Style="align-content:center"
+                       Variant="Variant.Text"
+                       Color="Color.Primary"
+                       OnClick=Closing>@ComponentConstants.Cancel.Translate(this)</MudButton>
+        </div>
+
     </DialogActions>
 
 

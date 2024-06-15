@@ -35,15 +35,23 @@ namespace Bb.Diagrams
         public Diagram DiagramModel { get; set; }
 
         [Inject]
-        public IBusyService BusyService { get; set; }
+        public IBusyService BusyService 
+        {
+            get => _busyService;
+            set
+            {
+                if (_busyService != null)
+                    _busyService.BusyChanged -= _busyService_BusyChanged;
+                _busyService = value;
+                _busyService.BusyChanged += _busyService_BusyChanged;
+
+            }
+        }
 
         [Parameter]
         public MudExpansionPanel ExpansionDiagnostic { get; set; }
 
         public ToolboxList Toolbox { get => _toolboxList ?? (_toolboxList = new ToolboxList(DiagramModel.Specifications)); }
-
-
-        private BlazorDiagram Diagram { get; set; } = null!;
 
         protected override void OnInitialized()
         {
@@ -128,7 +136,7 @@ namespace Bb.Diagrams
         private async ValueTask SaveToMyServer(Blazor.Diagrams.Core.Diagram diagram)
         {
 
-            if (_session == null || _session.BusyStatus == BusyEnum.Completed)
+            if (_session == null)
                 _session = BusyService.IsBusyFor(this, "Save", (a) =>
                 {
 
@@ -180,6 +188,20 @@ namespace Bb.Diagrams
 
         }
 
+        private void _busyService_BusyChanged(object? sender, BusyEventArgs e)
+        {
+            if (e.Source == _session)
+            {
+                if (e.Source.BusyStatus == BusyEnum.Completed)
+                    _session = null;
+                // StateHasChanged();
+            }
+        }
+
+
+        private BlazorDiagram Diagram { get; set; } = null!;
+
+        private IBusyService _busyService;
         private string dropClass = "";
         private Toolbox _toolbox;
         private ToolboxList _toolboxList;
@@ -195,7 +217,17 @@ namespace Bb.Diagrams
             {
                 if (disposing)
                 {
-                    FocusedService.FocusChanged -= FocusedService_FocusChanged;
+                    if (Diagram != null)
+                    {
+                        Diagram.PointerClick -= PointerClick;
+                        Diagram.SelectionChanged -= SelectionChanged;
+                    }
+
+                    if (FocusedService != null)
+                        FocusedService.FocusChanged -= FocusedService_FocusChanged;
+    
+                    if (_busyService != null)
+                        _busyService.BusyChanged -= _busyService_BusyChanged;
                 }
 
                 disposedValue = true;
