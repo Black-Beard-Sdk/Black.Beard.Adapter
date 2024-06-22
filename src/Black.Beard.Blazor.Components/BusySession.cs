@@ -116,9 +116,9 @@ namespace Bb
 
         public void Dispose()
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                Close();
+                await Close();
             });
         }
 

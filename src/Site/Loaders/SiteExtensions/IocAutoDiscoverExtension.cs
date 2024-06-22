@@ -45,7 +45,6 @@ namespace Site.Loaders.SiteExtensions
 
         }
 
-
         private static void BindConfiguration<TOptions>(this IServiceCollection self, IConfiguration configuration)
             where TOptions : class
         {

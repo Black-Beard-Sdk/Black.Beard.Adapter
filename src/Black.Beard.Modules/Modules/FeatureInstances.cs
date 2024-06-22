@@ -2,10 +2,11 @@
 using Bb.Modules.Storage;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Modules
 {
-    [ExposeClass(UIConstants.Service, ExposedType = typeof(FeatureInstances), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(UIConstants.Service, ExposedType = typeof(FeatureInstances), LifeCycle = IocScopeEnum.Scoped)]
     public class FeatureInstances
     {
 
@@ -27,9 +28,11 @@ namespace Bb.Modules
         /// <returns></returns>
         public FeatureInstance GetFeature(Guid uuid)
         {
-            FeatureInstance module = _store.Load(uuid);
-            module.Parent = this;
-            return module;
+            FeatureInstance feature = _store.Load(uuid);
+            feature.Parent = this;
+            var s = _referentiel.GetFeature(feature.Specification);
+            feature.FeatureSpecification = s;
+            return feature;
         }
 
 
@@ -40,11 +43,21 @@ namespace Bb.Modules
         /// <returns></returns>
         public ObservableCollection<FeatureInstance> GetFeatures()
         {
+
             Initialize();
-            var result = new ObservableCollection<FeatureInstance>(_store.Values());
-            foreach (var item in result)
+
+            List<FeatureInstance> list = new List<FeatureInstance>();
+            foreach (var item in _store.Values())
+            {
                 item.Parent = this;
+                var s = _referentiel.GetFeature(item.Specification);
+                item.FeatureSpecification = s;
+                list.Add(item);
+            }
+
+            var result = new ObservableCollection<FeatureInstance>(list);
             return result;
+
         }
 
 
@@ -66,7 +79,7 @@ namespace Bb.Modules
             Initialize();
 
             if (_store.Exists(uuid))
-                throw new Exception("Module already exists");
+                throw new Exception("Feature already exists");
 
             var result = new FeatureInstance()
             {

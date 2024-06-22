@@ -4,7 +4,7 @@ namespace Bb.Modules
 {
 
 
-    [ExposeClass(UIConstants.Service, ExposedType = typeof(ModuleSpecifications), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(UIConstants.Service, ExposedType = typeof(ModuleSpecifications), LifeCycle = IocScopeEnum.Scoped)]
     public class ModuleSpecifications
     {
 

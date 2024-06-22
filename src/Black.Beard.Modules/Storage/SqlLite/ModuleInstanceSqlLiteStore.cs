@@ -9,7 +9,7 @@ namespace Bb.Storage.SqlLite
 {
 
 
-    [ExposeClass("Service", ExposedType = typeof(IStore<Guid, ModuleInstance>), LifeCycle = IocScopeEnum.Singleton)]
+    //[ExposeClass("Service", ExposedType = typeof(IStore<Guid, ModuleInstance>), LifeCycle = IocScopeEnum.Scoped)]
     public class ModuleInstanceSqlLiteStore : SqlLiteStoreBase<Guid, ModuleInstance>
     {
 
@@ -23,13 +23,13 @@ namespace Bb.Storage.SqlLite
         }
 
 
-        protected override ModuleInstance MapInstance(IDataReader reader)
-        {
-            var result = base.MapInstance(reader);
-            result.ModuleSpecification = _moduleSpecifications.GetModule(result.Specification);
-            result.FeatureInstances = _featureInstances;
-            return result;
-        }
+        //protected override ModuleInstance MapInstance(IDataReader reader)
+        //{
+        //    var result = base.MapInstance(reader);
+        //    result.ModuleSpecification = _moduleSpecifications.GetModule(result.Specification);
+        //    result.FeatureInstances = _featureInstances;
+        //    return result;
+        //}
 
         private readonly ModuleSpecifications _moduleSpecifications;
         private readonly FeatureInstances _featureInstances;

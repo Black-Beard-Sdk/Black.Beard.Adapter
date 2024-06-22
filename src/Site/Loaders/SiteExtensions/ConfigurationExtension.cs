@@ -49,6 +49,7 @@ namespace Site.Loaders.SiteExtensions
 
         }
 
+
         public static IConfigurationBuilder LoadConfigurationFile(this IConfigurationBuilder config,
             WebHostBuilderContext hostingContext,
             string[] paths,

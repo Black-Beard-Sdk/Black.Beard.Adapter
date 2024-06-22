@@ -1,24 +1,26 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.Modules.Storage;
+using Microsoft.AspNetCore.Razor.Hosting;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Modules
 {
 
 
-    [ExposeClass(UIConstants.Service, ExposedType = typeof(ModuleInstances), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(UIConstants.Service, ExposedType = typeof(ModuleInstances), LifeCycle = IocScopeEnum.Scoped)]
     public class ModuleInstances
     {
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ModuleModuleReferential"></param>
-        public ModuleInstances(ModuleSpecifications ModuleModuleReferential, 
+        /// <param name="ModuleReferential"></param>
+        public ModuleInstances(ModuleSpecifications ModuleReferential,
             IStore<Guid, ModuleInstance> store)
         {
-            this._referentiel = ModuleModuleReferential;
+            this._referentiel = ModuleReferential;
             this._store = store;
         }
 
@@ -30,6 +32,8 @@ namespace Bb.Modules
         public ModuleInstance GetModule(Guid uuid)
         {
             ModuleInstance module = _store.Load(uuid);
+            var s = _referentiel.GetModule(module.Specification);
+            module.ModuleSpecification = s;
             return module;
         }
 
@@ -42,7 +46,16 @@ namespace Bb.Modules
         public ObservableCollection<ModuleInstance> GetModules()
         {
             Initialize();
-            var result = new ObservableCollection<ModuleInstance>(_store.Values());
+
+            List<ModuleInstance> list = new List<ModuleInstance>();
+            foreach (var item in _store.Values())
+            {
+                var s = _referentiel.GetModule(item.Specification);
+                item.ModuleSpecification = s;
+                list.Add(item);
+            }
+
+            var result = new ObservableCollection<ModuleInstance>(list);
             return result;
         }
 
@@ -57,7 +70,7 @@ namespace Bb.Modules
 
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
-            
+
             if (string.IsNullOrEmpty(description))
                 throw new ArgumentNullException(nameof(description));
 

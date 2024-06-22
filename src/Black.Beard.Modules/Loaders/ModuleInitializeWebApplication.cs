@@ -13,12 +13,17 @@ namespace Bb.Loaders
         public override void Execute(WebApplication builder)
         {
 
-            var uiService = builder.Services.GetService<MenuService>();
-            if (uiService != null)
+            using (var scope = builder.Services.CreateScope())
             {
-                var loader = new InjectionLoader<MenuService>(UIConstants.LeftMenu, builder.Services)
-                    .LoadModules()
-                    .Execute(uiService);
+
+                var uiService = scope.ServiceProvider.GetService<MenuService>();
+                if (uiService != null)
+                {
+                    var loader = new InjectionLoader<MenuService>(UIConstants.LeftMenu, scope.ServiceProvider)
+                        .LoadModules()
+                        .Execute(uiService);
+                }
+
             }
         }
 

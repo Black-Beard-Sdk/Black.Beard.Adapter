@@ -8,18 +8,17 @@ ObjectCreatorByIoc.SetInjectionAttribute<InjectAttribute>();
 var Logger = Loggers.InitializeLogger();
 Assemblies.Load(); // Ensure all required assemblies are loaded
 
-var builder = WebApplication
-    .CreateBuilder(args)
-    .Initialize(null, c =>
-    {
-        //c.Map(Logger);
-    })
-    ;
+var builder = WebApplication.CreateBuilder(args)
+                            .Initialize(null, c =>
+                            {
+                                //c.Map(Logger);
+                            })
+                            ;
 
 
-var app = builder
-    .Build()
-    .Initialize()
-    ;
+var app = builder.Build()
+                 .Initialize()
+                 ;
+
 
 app.Run();

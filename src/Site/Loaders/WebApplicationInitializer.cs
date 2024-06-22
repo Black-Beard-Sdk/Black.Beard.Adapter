@@ -5,13 +5,13 @@ using Bb;
 
 namespace Site.Loaders
 {
+
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IApplicationBuilderInitializer<WebApplication>), LifeCycle = IocScopeEnum.Transiant)]
     public class WebApplicationInitializer : ApplicationInitializerBase<WebApplication>
     {
 
         public override void Execute(WebApplication app)
         {
-
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

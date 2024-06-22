@@ -28,7 +28,7 @@ namespace Bb.Modules.Storage
         /// Save the model
         /// </summary>
         /// <param name="value"></param>
-        void Save(TValue key);
+        void Save(TValue value);
 
         /// <summary>
         /// Remove the model
@@ -44,7 +44,7 @@ namespace Bb.Modules.Storage
         /// Return the list of values
         /// </summary>
         /// <returns></returns>
-        List<TValue> Values();
+        IEnumerable<TValue> Values();
 
     }
 

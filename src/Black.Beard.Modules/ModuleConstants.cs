@@ -33,6 +33,9 @@ namespace Bb
 
         public static TranslatedKeyLabel DoYouWantToDeleteItem => new TranslatedKeyLabel("Do you want to delete the {0} '{1}' ?");
 
+        public const string Extension = ".json";
+
+
     }
 
 }

@@ -105,6 +105,7 @@ namespace Bb.Modules.Storage
                 }
 
             }
+        
         }
 
         public virtual bool Exists(TKey key)
@@ -127,7 +128,7 @@ namespace Bb.Modules.Storage
 
         }
 
-        public List<TValue> Values()
+        public IEnumerable<TValue> Values()
         {
             var sql = _table.CreateReadAll();
             var results = Read(sql);

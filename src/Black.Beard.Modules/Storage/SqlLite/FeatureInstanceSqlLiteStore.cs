@@ -6,7 +6,9 @@ using System.Data;
 
 namespace Bb.Storage.SqlLite
 {
-    [ExposeClass("Service", ExposedType = typeof(IStore<Guid, FeatureInstance>), LifeCycle = IocScopeEnum.Singleton)]
+
+
+    //[ExposeClass("Service", ExposedType = typeof(IStore<Guid, FeatureInstance>), LifeCycle = IocScopeEnum.Scoped)]
     public class FeatureInstanceSqlLiteStore : SqlLiteStoreBase<Guid, FeatureInstance>
     {
 
@@ -20,16 +22,16 @@ namespace Bb.Storage.SqlLite
         }
 
 
-        protected override FeatureInstance MapInstance(IDataReader reader)
-        {
-            var result = base.MapInstance(reader);
-            result.FeatureSpecification = _featureSpecifications.GetFeature(result.Specification);
-            if (result.FeatureSpecification == null)
-            {
+        //protected override FeatureInstance MapInstance(IDataReader reader)
+        //{
+        //    var result = base.MapInstance(reader);
+        //    result.FeatureSpecification = _featureSpecifications.GetFeature(result.Specification);
+        //    if (result.FeatureSpecification == null)
+        //    {
 
-            }
-            return result;
-        }
+        //    }
+        //    return result;
+        //}
 
 
         private readonly FeatureSpecifications _featureSpecifications;
