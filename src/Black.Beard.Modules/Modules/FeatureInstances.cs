@@ -1,8 +1,7 @@
 ﻿using Bb.ComponentModel.Attributes;
-using Bb.Modules.Storage;
+using Bb.Storage;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using static MudBlazor.CategoryTypes;
 
 namespace Bb.Modules
 {
@@ -47,7 +46,7 @@ namespace Bb.Modules
             Initialize();
 
             List<FeatureInstance> list = new List<FeatureInstance>();
-            foreach (var item in _store.Values())
+            foreach (var item in _store.Index())
             {
                 item.Parent = this;
                 var s = _referentiel.GetFeature(item.Specification);
@@ -101,12 +100,17 @@ namespace Bb.Modules
 
         public void RemoveAllFeatureOf(ModuleInstance module)
         {
-            _store.Remove(("ModuleUuid", module.Uuid));
+
+            _store.Index()
+                .Where(c => c.ModuleUuid == module.Uuid)
+                .ToList()
+                .ForEach(c => _store.RemoveKey(c.Uuid));
+
         }
 
         public void Remove(FeatureInstance module)
         {
-            _store.Remove(module.Uuid);
+            _store.RemoveKey(module.Uuid);
         }
 
 

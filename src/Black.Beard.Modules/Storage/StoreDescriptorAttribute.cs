@@ -1,9 +1,8 @@
 ﻿
-using Bb.Modules.Storage;
-
-
 namespace Bb.Storage
 {
+
+
     [AttributeUsage(AttributeTargets.Property)]
     public class StoreDescriptorAttribute : Attribute
     {

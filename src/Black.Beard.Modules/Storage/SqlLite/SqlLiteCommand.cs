@@ -5,16 +5,19 @@ using System.Text;
 namespace Bb.Storage.SqlLite
 {
 
-    public class SqlLite
+    public class SqlLiteCommand
     {
 
-        public SqlLite(string path, string databaseName)
+        public SqlLiteCommand(string connectionString )
         {
+            
+            _connectionString = connectionString;
 
-            _path = path.Combine(databaseName + ".db").AsFile();
-            if (!_path.Directory.Exists)
-                _path.Directory.Create();
-            _connectionString = $"Data Source={_path.FullName}";
+            var cnx = new SqliteConnection(_connectionString);
+            cnx.DataSource
+                .AsFile()
+                .Directory
+                .CreateFolderIfNotExists();
 
         }
 

@@ -1,8 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.Modules;
-using Bb.Modules.Storage;
-using System.Data;
-
+using System.Reflection;
 
 namespace Bb.Storage.SqlLite
 {
@@ -13,9 +11,15 @@ namespace Bb.Storage.SqlLite
     {
 
 
-        public FeatureInstanceSqlLiteStore(FeatureSpecifications featureSpecifications)
-            : base("Features")
+        public FeatureInstanceSqlLiteStore(IConfiguration configuration, FeatureSpecifications featureSpecifications)
+            : base(configuration, "Modules", "Features")
         {
+
+            //var baseName = Assembly.GetEntryAssembly().GetName().Name.Replace(".", "_");
+            //var _path = Path.GetTempPath().Combine(baseName + ".db").AsFile();
+            //if (!_path.Directory.Exists)
+            //    _path.Directory.Create();
+            //var _connectionString = $"Data Source={_path.FullName}";
 
             _featureSpecifications = featureSpecifications;
 

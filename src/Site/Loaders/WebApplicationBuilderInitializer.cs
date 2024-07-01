@@ -22,15 +22,11 @@ namespace Site.Loaders
         }
 
         public override void Execute(WebApplicationBuilder builder)
-        {
-
-            builder.WebHost.SetConfiguration();
-            builder.WebHost.SetLogging(new NLogAspNetCoreOptions() { IncludeScopes = true, IncludeActivityIdsWithBeginScope = true });
+        {            
 
             builder.SetIoc();
 
             var services = builder.Services;
-
             // Add services to the container.
             services.AddRazorPages();
             services.AddServerSideBlazor();
@@ -47,5 +43,6 @@ namespace Site.Loaders
 
 
     }
+
 
 }

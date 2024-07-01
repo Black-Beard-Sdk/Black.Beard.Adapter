@@ -235,6 +235,25 @@ namespace Bb.Storage.SqlLite
             return sb;
         }
 
+        public StringBuilder CreateReadKey()
+        {
+
+            var sb = new StringBuilder();
+            sb.Append("SELECT ");
+
+            string comma = string.Empty;
+            for (int i = 0; i < _columns.Count; i++)
+                if (_columns[i].IsPrimary)
+                {
+                    sb.Append($"{comma}{_columns[i].Name}");
+                    comma = ", ";
+                }
+
+            sb.Append($" FROM {_table}");
+
+            return sb;
+        }
+
         internal StringBuilder AlterTable()
         {
             var sql = new StringBuilder($"ALTER TABLE {_table}");

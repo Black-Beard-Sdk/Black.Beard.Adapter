@@ -1,23 +1,33 @@
-﻿using Bb;
+﻿using Bb.Expressions;
 using Bb.Modules;
-using Bb.Modules.Storage;
+
 
 namespace Bb.Storage.Files
 {
 
-    public class FileStoreBase<TKey, TValue> : IStore<TKey, TValue>
-                where TKey : struct
+
+    public class FileStoreBase<TKey, TValue> 
+        : IStore<TKey, TValue>
+        where TKey : struct
         where TValue : ModelBase<TKey>, new()
     {
 
-        public FileStoreBase(StoreFolder folder, string name, string extension)
+        public FileStoreBase(IConfiguration configuration, string connectionStringName, string name, string extension)
         {
-            this._storeRoot = folder;
+
+            var connectionString = configuration.GetConnectionString(connectionStringName);
+
+            this._TypeKey = typeof(TKey);
+            this._TypeValue = typeof(TValue);
+            this._storeRoot = connectionString;
             this._name = name;
             this._extension = extension;
             _pattern = "*" + _extension;
             _datas = new Dictionary<string, TValue>();
         }
+
+
+        public string IndexName => _name;
 
 
         public bool Exists(TKey uuid)
@@ -32,6 +42,7 @@ namespace Bb.Storage.Files
         {
             GetRoot();
         }
+
 
         public TValue Load(TKey key)
         {
@@ -50,7 +61,8 @@ namespace Bb.Storage.Files
 
         }
 
-        public bool Remove(TKey key)
+
+        public bool RemoveKey(TKey key)
         {
 
             var file = GetFilename(key);
@@ -66,10 +78,6 @@ namespace Bb.Storage.Files
 
         }
 
-        public int Remove((string, object) parameter)
-        {
-            throw new NotImplementedException();
-        }
 
         public void Save(TValue value)
         {
@@ -77,7 +85,7 @@ namespace Bb.Storage.Files
             file.FullName.Save(value.Serialize(true));
         }
 
-        public IEnumerable<TValue> Values()
+        public IEnumerable<TValue> Index()
         {
 
             var root = GetRoot().AsDirectory();
@@ -87,6 +95,13 @@ namespace Bb.Storage.Files
 
             return _datas.Values;
 
+        }
+
+        public IEnumerable<TKey> Keys()
+        {
+            var root = GetRoot().AsDirectory();
+            foreach (var item in root.GetFiles(_pattern))
+                yield return GetKey(item);
         }
 
         private void EnsureUpdated(FileInfo file)
@@ -133,24 +148,35 @@ namespace Bb.Storage.Files
             return root.Combine(uuid.ToString() + _extension).AsFile();
         }
 
+        private TKey GetKey(FileInfo file)
+        {
+            return (TKey)ConverterHelper.ToObject(Path.GetFileNameWithoutExtension(file.Name), _TypeKey);
+        }
 
         private string GetRoot()
         {
 
             if (_root == null)
-                _root = this._storeRoot.GetRoot(this._name);
+                _root = this._storeRoot.Combine(this._name);
 
             return _root;
 
         }
 
+        //    public string GetRoot(params string[] path)
+        //    {
+        //        var r =  Path.Combine(path);
+        //        r.CreateFolderIfNotExists();
+        //        return r;
+        //    }
 
-
-        private readonly StoreFolder _storeRoot;
+        private readonly string _storeRoot;
         private readonly string _name;
         private readonly string _extension;
         private readonly string _pattern;
         private readonly Dictionary<string, TValue> _datas;
+        private readonly Type _TypeKey;
+        private readonly Type _TypeValue;
         private string _root;
     }
 

@@ -8,6 +8,7 @@ namespace Site.Loaders.SiteExtensions
     public static class Loggers
     {
 
+
         static Loggers()
         {
             DirectoryToTrace = Directory.GetCurrentDirectory().Combine("Logs");
@@ -17,10 +18,10 @@ namespace Site.Loaders.SiteExtensions
         public static Logger InitializeLogger()
         {
 
-            DirectoryToTrace.CreateFolderIfNotExists();
-
-            // target folder where write
+            // target folder where store logs
+            DirectoryToTrace.CreateFolderIfNotExists();            
             GlobalDiagnosticsContext.Set("web_log_directory", DirectoryToTrace);
+
 
             // push environment variables in the log
             foreach (DictionaryEntry item in Environment.GetEnvironmentVariables())
@@ -45,7 +46,6 @@ namespace Site.Loaders.SiteExtensions
 
             return logger;
         }
-
 
         public static string DirectoryToTrace { get; set; }
 

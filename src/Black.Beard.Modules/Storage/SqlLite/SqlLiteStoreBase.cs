@@ -1,35 +1,29 @@
 ﻿using Bb.ComponentModel.Accessors;
 using Bb.Expressions;
-using Bb.Storage;
+using Bb.Modules;
 using Bb.Storage.SqlLite;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using SQLitePCL;
-using System.ComponentModel;
 using System.Data;
-using System.Reflection;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using static MudBlazor.Colors;
 
 
-namespace Bb.Modules.Storage
+namespace Bb.Storage
 {
 
 
-    public abstract class SqlLiteStoreBase<TKey, TValue> : IStore<TKey, TValue>
+    public abstract class SqlLiteStoreBase<TKey, TValue> 
+        : IStore<TKey, TValue>
         where TKey : struct
         where TValue : ModelBase<TKey>, new()
     {
 
 
-        public SqlLiteStoreBase(string tableName, params TableField[] columns)
+        public SqlLiteStoreBase(IConfiguration configuration, string connectionStringName, string tableName, params TableField[] columns)
         {
 
-            var baseName = Assembly.GetEntryAssembly().GetName().Name.Replace(".", "_");
+            var  connectionString = configuration.GetConnectionString(connectionStringName);
 
-            _db = new SqlLite(Path.GetTempPath(), baseName);
+            _db = new SqlLiteCommand(connectionString);
             _table = new StoreTable(tableName);
 
             if (columns.Length == 0)
@@ -41,6 +35,8 @@ namespace Bb.Modules.Storage
             _columns = columns;
 
         }
+
+        public string IndexName => _table.TableName;
 
 
         public void Initialize()
@@ -80,7 +76,7 @@ namespace Bb.Modules.Storage
             if (_added.Count > 0)
             {
 
-                var values = Values();
+                var values = Index();
                 foreach (var item in values)
                 {
 
@@ -105,7 +101,7 @@ namespace Bb.Modules.Storage
                 }
 
             }
-        
+
         }
 
         public virtual bool Exists(TKey key)
@@ -128,15 +124,21 @@ namespace Bb.Modules.Storage
 
         }
 
-        public IEnumerable<TValue> Values()
+        public IEnumerable<TValue> Index()
         {
             var sql = _table.CreateReadAll();
             var results = Read(sql);
             return results;
         }
 
+        public IEnumerable<TKey> Keys()
+        {
+            var sql = _table.CreateReadKey();
+            var results = ReadKey(sql);
+            return results;
+        }
 
-        public virtual bool Remove(TKey key)
+        public virtual bool RemoveKey(TKey key)
         {
 
             var sql = _table.CreateDelete(true);
@@ -163,7 +165,7 @@ namespace Bb.Modules.Storage
 
             if (Exists(value.Uuid) && value.LastUpdate.HasValue)
             {
-                
+
                 count = UpdateItem(value);
                 if (count > 0)
                 {
@@ -253,68 +255,15 @@ namespace Bb.Modules.Storage
             var payload = reader.GetString(reader.GetOrdinal(_data));
             var instance = payload.Deserialize<TValue>();
 
-            var b = typeof(bool?);
-
-
             foreach (var item in _columns.Where(c => !c.IsPayload && !c.IsPrimary))
             {
 
                 object value;
 
                 var index = reader.GetOrdinal(item.Name);
-
                 var type = item.Accessor.Type;
-                var nameType = type.IsGenericType
-                    ? type.GetGenericArguments()[0].Name
-                    : type.Name;
 
-                switch (nameType)
-                {
-                    case "DateTimeOffset":
-                        value = new DateTimeOffset(reader.GetDateTime(index));
-                        break;
-                    case "DateTime":
-                        value = reader.GetDateTime(index);
-                        break;
-                    case "Int16":
-                        value = reader.GetInt16(index);
-                        break;
-                    case "Int32":
-                        value = reader.GetInt32(index);
-                        break;
-                    case "Int64":
-                        value = reader.GetInt64(index);
-                        break;
-                    case "Byte":
-                        value = reader.GetByte(index);
-                        break;
-                    case "Char":
-                        value = reader.GetChar(index);
-                        break;
-                    case "Double":
-                        value = reader.GetDouble(index);
-                        break;
-                    case "Float":
-                        value = reader.GetFloat(index);
-                        break;
-                    case "Decimal":
-                        value = reader.GetDecimal(index);
-                        break;
-                    case "String":
-                        value = reader.GetString(index);
-                        break;
-                    case "Guid":
-                        value = reader.GetGuid(index);
-                        break;
-                    case "Boolean":
-                        value = reader.GetBoolean(index);
-                        break;
-                    default:
-                        value = reader.GetValue(index);
-                        break;
-                }
-
-                value = ConverterHelper.ToObject(value, item.Accessor.Type);
+                value = ConverterHelper.ToObject(ReadValue(reader, index, type), type);
                 item.Accessor.SetValue(instance, value);
 
             }
@@ -323,6 +272,79 @@ namespace Bb.Modules.Storage
 
         }
 
+        protected virtual IEnumerable<TKey> MapKeys(IDataReader reader)
+        {
+
+            List<TKey> keys = new List<TKey>();
+            foreach (var item in _columns.Where(c => !c.IsPayload && !c.IsPrimary))
+            {              
+                var index = reader.GetOrdinal(item.Name);
+                var type = item.Accessor.Type;
+                keys.Add((TKey)ConverterHelper.ToObject(ReadValue(reader, index, typeof(TKey)), typeof(TKey)));
+            }
+
+            return keys;
+
+        }
+
+        private object ReadValue(IDataReader reader, int index, Type type)
+        {
+
+            object value;
+
+            var nameType = type.IsGenericType
+                    ? type.GetGenericArguments()[0].Name
+                    : type.Name;
+
+            switch (nameType)
+            {
+                case "DateTimeOffset":
+                    value = new DateTimeOffset(reader.GetDateTime(index));
+                    break;
+                case "DateTime":
+                    value = reader.GetDateTime(index);
+                    break;
+                case "Int16":
+                    value = reader.GetInt16(index);
+                    break;
+                case "Int32":
+                    value = reader.GetInt32(index);
+                    break;
+                case "Int64":
+                    value = reader.GetInt64(index);
+                    break;
+                case "Byte":
+                    value = reader.GetByte(index);
+                    break;
+                case "Char":
+                    value = reader.GetChar(index);
+                    break;
+                case "Double":
+                    value = reader.GetDouble(index);
+                    break;
+                case "Float":
+                    value = reader.GetFloat(index);
+                    break;
+                case "Decimal":
+                    value = reader.GetDecimal(index);
+                    break;
+                case "String":
+                    value = reader.GetString(index);
+                    break;
+                case "Guid":
+                    value = reader.GetGuid(index);
+                    break;
+                case "Boolean":
+                    value = reader.GetBoolean(index);
+                    break;
+                default:
+                    value = reader.GetValue(index);
+                    break;
+            }
+
+            return value;
+
+        }
 
         private int UpdateItem(TValue value)
         {
@@ -353,6 +375,24 @@ namespace Bb.Modules.Storage
                 var result = MapInstance(reader);
                 results.Add(result);
 
+                return true;
+            };
+
+            _db.ExecuteReader(sql, action, arguments);
+
+            return results;
+
+        }
+
+        private List<TKey> ReadKey(StringBuilder sql, params (string, object)[] arguments)
+        {
+
+            List<TKey> results = new List<TKey>();
+
+            Func<IDataReader, bool> action = reader =>
+            {
+                var result = MapKeys(reader);
+                results.Add(result.FirstOrDefault());
                 return true;
             };
 
@@ -420,7 +460,7 @@ namespace Bb.Modules.Storage
 
         protected const string _data = "Data";
         protected readonly IServiceProvider _provider;
-        protected readonly SqlLite _db;
+        protected readonly SqlLiteCommand _db;
         protected readonly StoreTable _table;
         private readonly TableField[] _columns;
         protected const string _Uuid = "Uuid";

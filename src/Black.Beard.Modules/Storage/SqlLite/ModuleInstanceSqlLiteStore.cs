@@ -1,9 +1,4 @@
-﻿using Bb.ComponentModel.Accessors;
-using Bb.ComponentModel.Attributes;
-using Bb.Modules;
-using Bb.Modules.Storage;
-using System.Data;
-
+﻿using Bb.Modules;
 
 namespace Bb.Storage.SqlLite
 {
@@ -14,10 +9,9 @@ namespace Bb.Storage.SqlLite
     {
 
 
-        public ModuleInstanceSqlLiteStore(ModuleSpecifications moduleSpecifications, FeatureInstances featureInstances)
-            : base("Modules")
+        public ModuleInstanceSqlLiteStore(IConfiguration configuration, ModuleSpecifications moduleSpecifications, FeatureInstances featureInstances)
+            : base(configuration, "Modules", "Modules")
         {
-
             _moduleSpecifications = moduleSpecifications;
             _featureInstances = featureInstances;
         }

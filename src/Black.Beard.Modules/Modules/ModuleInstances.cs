@@ -1,9 +1,7 @@
 ﻿using Bb.ComponentModel.Attributes;
-using Bb.Modules.Storage;
-using Microsoft.AspNetCore.Razor.Hosting;
+using Bb.Storage;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using static MudBlazor.CategoryTypes;
 
 namespace Bb.Modules
 {
@@ -48,7 +46,7 @@ namespace Bb.Modules
             Initialize();
 
             List<ModuleInstance> list = new List<ModuleInstance>();
-            foreach (var item in _store.Values())
+            foreach (var item in _store.Index())
             {
                 var s = _referentiel.GetModule(item.Specification);
                 item.ModuleSpecification = s;
@@ -96,9 +94,9 @@ namespace Bb.Modules
 
 
         public void Remove(ModuleInstance module)
-        {
+        {          
             module.FeatureInstances.RemoveAllFeatureOf(module);
-            _store.Remove(module.Uuid);
+            _store.RemoveKey(module.Uuid);
         }
 
 

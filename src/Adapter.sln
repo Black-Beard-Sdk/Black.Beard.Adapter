@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Site", "Site\Site.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bb.RazorEngine", "Bb.RazorEngine.NetCore\Bb.RazorEngine.csproj", "{71A4FF1C-BE89-4AA2-AD1A-4A73F0FAD090}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Configuration.Git", "Black.Beard.Configuration.Git\Black.Beard.Configuration.Git.csproj", "{1CD0213B-01CD-455F-9C3B-141810046F8D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Configuration.Vault.Azure", "Black.Beard.Configuration.Vault.Azure\Black.Beard.Configuration.Vault.Azure.csproj", "{3BFADDFC-9D61-4EC3-9779-FA453467F6F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{71A4FF1C-BE89-4AA2-AD1A-4A73F0FAD090}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71A4FF1C-BE89-4AA2-AD1A-4A73F0FAD090}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71A4FF1C-BE89-4AA2-AD1A-4A73F0FAD090}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD0213B-01CD-455F-9C3B-141810046F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD0213B-01CD-455F-9C3B-141810046F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD0213B-01CD-455F-9C3B-141810046F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD0213B-01CD-455F-9C3B-141810046F8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BFADDFC-9D61-4EC3-9779-FA453467F6F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BFADDFC-9D61-4EC3-9779-FA453467F6F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BFADDFC-9D61-4EC3-9779-FA453467F6F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BFADDFC-9D61-4EC3-9779-FA453467F6F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

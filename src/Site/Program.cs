@@ -4,12 +4,30 @@ using Microsoft.AspNetCore.Components;
 using Site.Loaders;
 using Site.Loaders.SiteExtensions;
 
+
+/*
+
+With the git configuration you can store your configuration in spearated store branch. the configuration will be downloaded and loaded. 
+For configure git add the following configuration in the appsettings.json file or in environment variables or in the command line
+    - GitRemoteUrl : the url of the git repository
+    - GitUserName : the user name
+    - GitEmail : the user email
+    - GitPassword : the user password
+    - GitBranch : the branch to use. by default the main branch is used.
+
+
+
+ */
+
+
 ObjectCreatorByIoc.SetInjectionAttribute<InjectAttribute>();
-var Logger = Loggers.InitializeLogger();
 Assemblies.Load(); // Ensure all required assemblies are loaded
 
+
 var builder = WebApplication.CreateBuilder(args)
-                            .Initialize(null, c =>
+                            .LoadConfiguration()
+                            .ConfigureTrace()
+                            .Initialize(null, c => // Appends services in ioc
                             {
                                 //c.Map(Logger);
                             })

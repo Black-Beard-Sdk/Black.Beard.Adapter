@@ -1,6 +1,5 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.Modules;
-using Bb.Modules.Storage;
 
 namespace Bb.Storage.Files
 {
@@ -9,8 +8,8 @@ namespace Bb.Storage.Files
     public class ModuleInstanceFileStore : FileStoreBase<Guid, ModuleInstance>
     {
 
-        public ModuleInstanceFileStore(StoreFolder folder, FeatureInstances featureInstances)
-            : base(folder, "ModuleInstances", ModuleConstants.Extension)
+        public ModuleInstanceFileStore(IConfiguration configuration, FeatureInstances featureInstances)
+            : base(configuration, "Modules", "ModuleInstances", ModuleConstants.Extension)
         {
             _featureInstances = featureInstances;
         }

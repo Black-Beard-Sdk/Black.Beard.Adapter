@@ -32,6 +32,10 @@ namespace Site.Loaders
                 .AddLocalhostUrlWithDynamicPort("localhost", ref port)
                 .AddLocalhostSecureUrlWithDynamicPort("localhost", ref port);
 
+
+            var srv = app.Services.GetService<OptionsServices>();
+            var i = srv.Items(app.Services, OptionsEnum.Configuration).ToList();
+
         }
 
     }
