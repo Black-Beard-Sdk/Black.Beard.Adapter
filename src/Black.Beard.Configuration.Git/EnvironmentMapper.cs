@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Black.Beard.Configuration.Git
+namespace Bb.Configuration.Git
 {
 
 

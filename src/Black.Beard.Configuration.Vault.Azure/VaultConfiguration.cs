@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 
-namespace Site.Loaders
+namespace Bb.Configuration.Vault.Azure
 {
     public class VaultConfiguration
     {

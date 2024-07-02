@@ -10,7 +10,8 @@
     { "AssemblyName": "Black.Beard.Blazor.Components" },
     { "AssemblyName": "Black.Beard.Modules" },
     { "AssemblyName": "Black.Beard.Modules.Datas" },
-    { "AssemblyName": "Black.Beard.Configuration.Git" }
+    { "AssemblyName": "Black.Beard.Configuration.Git" },
+    { "AssemblyName": "Black.Beard.Logging.NLog" }
 
   ]
 

@@ -1,10 +1,8 @@
-﻿using LibGit2Sharp;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 
-namespace Black.Beard.Configuration.Git
+namespace Bb.Configuration.Git
 {
 
     internal static class ConfigurationMapper

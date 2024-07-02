@@ -1,8 +1,9 @@
 ﻿using Bb;
 using NLog;
+using NLog.Config;
 using System.Collections;
 
-namespace Site.Loaders.SiteExtensions
+namespace Bb.Logging.NLog
 {
 
     public static class Loggers
@@ -33,7 +34,7 @@ namespace Site.Loaders.SiteExtensions
             // load the configuration file
             var configLogPath = Directory.GetCurrentDirectory().Combine("nlog.config");
             if (File.Exists(configLogPath))
-                LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(configLogPath);
+                LogManager.Configuration = new XmlLoggingConfiguration(configLogPath);
 
             // Initialize log
             var logger = LogManager

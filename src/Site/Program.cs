@@ -26,13 +26,11 @@ Assemblies.Load(); // Ensure all required assemblies are loaded
 
 var builder = WebApplication.CreateBuilder(args)
                             .LoadConfiguration()
-                            .ConfigureTrace()
-                            .Initialize(null, c => // Appends services in ioc
-                            {
-                                //c.Map(Logger);
-                            })
-                            ;
+                            .ConfigureTrace();
 
+var provider = new LocalServiceProvider(builder.Services.BuildServiceProvider());
+
+builder.Initialize(null);
 
 var app = builder.Build()
                  .Initialize()

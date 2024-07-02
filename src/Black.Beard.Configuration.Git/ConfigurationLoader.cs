@@ -4,7 +4,7 @@ using System;
 using LibGit2Sharp.Handlers;
 
 
-namespace Black.Beard.Configuration.Git
+namespace Bb.Configuration.Git
 {
 
 

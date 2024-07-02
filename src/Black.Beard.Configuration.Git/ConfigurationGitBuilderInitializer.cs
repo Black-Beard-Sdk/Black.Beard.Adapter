@@ -1,13 +1,11 @@
-﻿using Bb;
-using Bb.ComponentModel;
+﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using System;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
-using System.Xml.Linq;
 
-namespace Black.Beard.Configuration.Git
+namespace Bb.Configuration.Git
 {
 
 

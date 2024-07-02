@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Black.Beard.Configuration.Git
+namespace Bb.Configuration.Git
 {
     [System.AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     sealed class EnvironmentMapAttribute : Attribute

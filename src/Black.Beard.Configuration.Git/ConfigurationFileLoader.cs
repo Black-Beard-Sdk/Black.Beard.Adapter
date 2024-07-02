@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Black.Beard.Configuration.Git
+namespace Bb.Configuration.Git
 {
     internal static class ConfigurationFileLoader
     {

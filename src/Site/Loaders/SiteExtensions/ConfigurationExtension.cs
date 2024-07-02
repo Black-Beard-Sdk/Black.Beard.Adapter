@@ -4,7 +4,6 @@ using Bb.ComponentModel.Loaders;
 using Bb.ComponentModel;
 using System.Reflection;
 using NLog;
-using Black.Beard.Configuration.Git;
 
 namespace Site.Loaders.SiteExtensions
 {
@@ -15,7 +14,7 @@ namespace Site.Loaders.SiteExtensions
 
         static ConfigurationExtension()
         {
-            _logger = LogManager.GetLogger(nameof(ConfigurationExtension));
+
         }
 
 
@@ -77,35 +76,33 @@ namespace Site.Loaders.SiteExtensions
         /// <returns></returns>
         public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder)
         {
-            builder.WebHost.LoadConfiguration();
-            return builder;
-        }
-
-        public static void LoadConfiguration(this ConfigureWebHostBuilder builder)
-        {
 
             var paths = new List<string>
             {
                 "Configs"
             };
 
-            builder.ConfigureAppConfiguration((hostingContext, config) =>
+            builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
             {
 
-                config.LoadConfigurationFile(paths.ToArray(), null, null)
-                      .ConfigureApplication(hostingContext);
+                config.LoadConfigurationFile(paths.ToArray(), null, null)   // Load all files in the paths.
+                      .AddUserSecrets(Assembly.GetEntryAssembly())
+                      .AddCommandLine(Environment.GetCommandLineArgs())
+                      .AddEnvironmentVariables();
 
+                config.ConfigureApplication(hostingContext, builder);       // Resolve all injection class for loading configuration
+                
             });
 
+            return builder;
         }
 
 
-        public static IConfigurationBuilder ConfigureApplication(this IConfigurationBuilder config, WebHostBuilderContext hostingContext)
+        public static IConfigurationBuilder ConfigureApplication(this IConfigurationBuilder config, WebHostBuilderContext hostingContext, WebApplicationBuilder builder)
         {
 
-            var provider = new LocalServiceProvider()
+            var provider = new LocalServiceProvider(builder.Services.BuildServiceProvider())
                 .Add(typeof(WebHostBuilderContext), hostingContext)
-                .Add(typeof(Logger), _logger)
                 ;
 
             var loader = new InjectionLoader<IConfigurationBuilder>(ConstantsCore.Initialization, provider)
@@ -165,15 +162,9 @@ namespace Site.Loaders.SiteExtensions
                     if (filter == null || filter(file))
                     {
                         config.AddJsonFile(file.FullName, optional: false, reloadOnChange: false);
-                        _logger.Debug($"configuration file {file.FullName} is loaded.");
+                        Console.WriteLine($"configuration file {file.FullName} is loaded.");
                     }
             }
-
-
-            config.AddUserSecrets(Assembly.GetEntryAssembly())
-                  .AddEnvironmentVariables()
-            //.AddCommandLine(_args)
-            ;
 
             return config;
 
@@ -206,8 +197,6 @@ namespace Site.Loaders.SiteExtensions
             return false;
 
         }
-
-        private static readonly Logger _logger;
 
     }
 }

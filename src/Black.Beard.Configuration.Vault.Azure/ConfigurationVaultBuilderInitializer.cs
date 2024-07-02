@@ -4,7 +4,7 @@ using Bb.ComponentModel.Attributes;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
-namespace Site.Loaders
+namespace Bb.Configuration.Vault.Azure
 {
 
 

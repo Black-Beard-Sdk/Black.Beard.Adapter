@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Site.Loaders
+namespace Bb.Configuration.Vault.Azure
 {
     internal static class ConfigurationMapper
     {

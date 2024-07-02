@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Black.Beard.Blazor.Components\Black.Beard.Blazor.Components.csproj" />
     <ProjectReference Include="..\Black.Beard.Configuration.Git\Black.Beard.Configuration.Git.csproj" />
+    <ProjectReference Include="..\Black.Beard.Logging.NLog\Black.Beard.Logging.NLog.csproj" />
     <ProjectReference Include="..\Black.Beard.Modules.Etl\Black.Beard.Modules.Datas.csproj" />
     <ProjectReference Include="..\Black.Beard.Modules\Black.Beard.Modules.csproj" />
   </ItemGroup>
