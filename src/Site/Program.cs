@@ -30,7 +30,7 @@ var builder = WebApplication.CreateBuilder(args)
 
 var provider = new LocalServiceProvider(builder.Services.BuildServiceProvider());
 
-builder.Initialize(null);
+builder.Initialize(provider);
 
 var app = builder.Build()
                  .Initialize()
