@@ -38,12 +38,6 @@ namespace Bb.Configuration.Git
             GitPassword = password;
         }
 
-        /// <summary>
-        /// Return configuration mapped from environment
-        /// </summary>
-        /// <returns></returns>
-        public static GitConfiguration GetFromEnvironment() => new GitConfiguration().MapFromEnvironment();
-
         public static GitConfiguration GetFromConfiguration(IConfigurationRoot configuration) => new GitConfiguration().MapFromConfiguration(configuration);
 
 

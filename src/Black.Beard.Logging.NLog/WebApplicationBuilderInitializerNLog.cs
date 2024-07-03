@@ -6,23 +6,38 @@ using Bb.ComponentModel.Loaders;
 
 namespace Bb.Logging.NLog
 {
-    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IApplicationBuilderInitializer<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
-    public class WebApplicationBuilderInitializerNLog : ApplicationInitializerBase<WebApplicationBuilder>
+    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
+    public class WebApplicationBuilderInitializerNLog : IInjectBuilder<WebApplicationBuilder>
     {
 
         public WebApplicationBuilderInitializerNLog()
         {
         }
 
-        public override bool CanExecute(WebApplicationBuilder builder, InitializationLoader<WebApplicationBuilder> initializer)
+        public string FriendlyName => typeof(WebApplicationBuilderInitializerNLog).Name;
+
+        public Type Type => typeof(WebApplicationBuilder);
+
+        public bool CanExecute(WebApplicationBuilder builder)
         {
-            return base.CanExecute(builder, initializer);
+            return true;
         }
 
-        public override void Execute(WebApplicationBuilder builder)
+        public bool CanExecute(object context)
+        {
+            return CanExecute((WebApplicationBuilder)context);
+        }
+
+        public object Execute(WebApplicationBuilder builder)
         {
             var options = new NLogAspNetCoreOptions() { IncludeScopes = true, IncludeActivityIdsWithBeginScope = true };
             builder.WebHost.UseNLog(options);
+            return null;    
+        }
+
+        public object Execute(object context)
+        {
+            return Execute((WebApplicationBuilder)context);
         }
 
     }

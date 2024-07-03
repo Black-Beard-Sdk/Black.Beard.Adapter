@@ -6,7 +6,7 @@ namespace Bb.Storage.Files
 {
 
 
-    public class FileStoreBase<TKey, TValue> 
+    public class FileStoreBase<TKey, TValue>
         : IStore<TKey, TValue>
         where TKey : struct
         where TValue : ModelBase<TKey>, new()
@@ -17,6 +17,9 @@ namespace Bb.Storage.Files
 
             var connectionString = configuration.GetConnectionString(connectionStringName);
 
+            if (string.IsNullOrEmpty(connectionString))
+                throw new ArgumentException($"The connection string '{connectionStringName}' is not defined");
+
             this._TypeKey = typeof(TKey);
             this._TypeValue = typeof(TValue);
             this._storeRoot = connectionString;
@@ -24,6 +27,7 @@ namespace Bb.Storage.Files
             this._extension = extension;
             _pattern = "*" + _extension;
             _datas = new Dictionary<string, TValue>();
+
         }
 
 
@@ -90,8 +94,9 @@ namespace Bb.Storage.Files
 
             var root = GetRoot().AsDirectory();
 
-            foreach (var item in root.GetFiles(_pattern))
-                EnsureUpdated(item);
+            if (root.Exists)
+                foreach (var item in root.GetFiles(_pattern))
+                    EnsureUpdated(item);
 
             return _datas.Values;
 
@@ -100,8 +105,9 @@ namespace Bb.Storage.Files
         public IEnumerable<TKey> Keys()
         {
             var root = GetRoot().AsDirectory();
-            foreach (var item in root.GetFiles(_pattern))
-                yield return GetKey(item);
+            if (root.Exists)
+                foreach (var item in root.GetFiles(_pattern))
+                    yield return GetKey(item);
         }
 
         private void EnsureUpdated(FileInfo file)

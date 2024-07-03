@@ -9,12 +9,10 @@ namespace Bb
     public partial class BusyComponent : ComponentBase, ITranslateHost, IDisposable
     {
 
-
         public BusyComponent()
         {
 
         }
-
 
         protected override void OnAfterRender(bool firstRender)
         {
@@ -25,7 +23,6 @@ namespace Bb
                 Session.Run();
 
         }
-
 
         [CascadingParameter]
         MudDialogInstance MudDialog { get; set; }

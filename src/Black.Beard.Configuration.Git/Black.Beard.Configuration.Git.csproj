@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.96" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.96" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.100" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.100" />
     <PackageReference Include="Black.Beard.Helpers" Version="2.0.38" />
     <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />

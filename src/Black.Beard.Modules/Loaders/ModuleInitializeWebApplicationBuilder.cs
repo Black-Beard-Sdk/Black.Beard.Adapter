@@ -7,11 +7,24 @@ namespace Bb.Loaders
 
 
 
-    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IApplicationBuilderInitializer<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
-    public class ModuleInitializeWebApplicationBuilder : ApplicationInitializerBase<WebApplicationBuilder>
+    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
+    public class ModuleInitializeWebApplicationBuilder : IInjectBuilder<WebApplicationBuilder>
     {
-               
-        public override void Execute(WebApplicationBuilder builder)
+        public string FriendlyName => typeof(ModuleInitializeWebApplicationBuilder).Name;
+
+        public Type Type => typeof(WebApplicationBuilder);
+
+        public bool CanExecute(WebApplicationBuilder context)
+        {
+            return true;
+        }
+
+        public bool CanExecute(object context)
+        {
+            return CanExecute((WebApplicationBuilder)context);
+        }
+
+        public object Execute(WebApplicationBuilder builder)
         {
 
             var services = builder.Services;
@@ -30,9 +43,14 @@ namespace Bb.Loaders
 
             });
 
+            return null;
 
         }
 
+        public object Execute(object context)
+        {
+            return Execute((WebApplicationBuilder)context);
+        }
     }
 
 }

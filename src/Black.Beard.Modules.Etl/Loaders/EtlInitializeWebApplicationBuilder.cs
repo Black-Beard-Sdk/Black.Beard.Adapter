@@ -1,40 +1,46 @@
-﻿using Bb.ComponentModel;
-using Bb.ComponentModel.Attributes;
-using Bb.ComponentModel.Loaders;
+﻿//using Bb.ComponentModel;
+//using Bb.ComponentModel.Attributes;
+//using Bb.ComponentModel.Loaders;
 
-namespace Bb.Loaders
-{
-
-
-    [ExposeClass(ConstantsCore.Initialization, LifeCycle = IocScopeEnum.Transiant)]
-    public class EtlInitializeWebApplicationBuilder : IApplicationBuilderInitializer<WebApplicationBuilder>
-    {
-
-        public EtlInitializeWebApplicationBuilder()
-        {
+//namespace Bb.Loaders
+//{
 
 
-        }
+//    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
+//    public class EtlInitializeWebApplicationBuilder : IInjectBuilder<WebApplicationBuilder>
+//    {
 
-        public string FriendlyName => GetType().Name;
+//        public EtlInitializeWebApplicationBuilder()
+//        {
 
-        public int OrderPriority => 1;
 
-        public bool Executed { get; set; }
+//        }
 
-        public Type Type => typeof(WebApplicationBuilder);
+//        public Type Type => typeof(WebApplicationBuilder);
 
-        public bool CanExecute(WebApplicationBuilder builder, InitializationLoader<WebApplicationBuilder> initializer)
-        {
-            return true;
-        }
-                
-        public void Execute(WebApplicationBuilder builder)
-        {
-         
-        }
+//        public string FriendlyName => typeof(EtlInitializeWebApplicationBuilder).Name;
 
-    }
+//        public bool CanExecute(WebApplicationBuilder builder)
+//        {
+//            return true;
+//        }
+
+//        public bool CanExecute(object context)
+//        {
+//            return CanExecute((WebApplicationBuilder)context);
+//        }
+
+//        public object Execute(WebApplicationBuilder context)
+//        {
+//            return null;
+//        }
+
+//        public object Execute(object context)
+//        {
+//            return Execute((WebApplicationBuilder)context);
+//        }
+
+//    }
 
   
-}
+//}

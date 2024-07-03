@@ -6,11 +6,25 @@ using Bb;
 namespace Site.Loaders
 {
 
-    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IApplicationBuilderInitializer<WebApplication>), LifeCycle = IocScopeEnum.Transiant)]
-    public class WebApplicationInitializer : ApplicationInitializerBase<WebApplication>
+    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplication>), LifeCycle = IocScopeEnum.Transiant)]
+    public class WebApplicationInitializer : IInjectBuilder<WebApplication>
     {
 
-        public override void Execute(WebApplication app)
+        public string FriendlyName => typeof(WebApplicationInitializer).Name;
+
+        public Type Type => typeof(WebApplication);
+
+        public bool CanExecute(WebApplication context)
+        {
+            return true;
+        }
+
+        public bool CanExecute(object context)
+        {
+            return CanExecute((WebApplication)context);
+        }
+
+        public object Execute(WebApplication app)
         {
 
             // Configure the HTTP request pipeline.
@@ -33,10 +47,23 @@ namespace Site.Loaders
                 .AddLocalhostSecureUrlWithDynamicPort("localhost", ref port);
 
 
-            var srv = app.Services.GetService<OptionsServices>();
-            var i = srv.Items(app.Services, OptionsEnum.Configuration).ToList();
+            //var srv = app.Services.GetService<OptionsServices>();
+            //var i = srv.Items(app.Services, OptionsEnum.Configuration).ToList();
+            //foreach (var item in i)
+            //{
+            //    var s1 = app.Services.GetService(item);
+            //}
+            
+            
+            return null;
 
         }
+
+        public object Execute(object context)
+        {
+            return Execute((WebApplication)context);
+        }
+
 
     }
 

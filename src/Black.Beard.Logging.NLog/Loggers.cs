@@ -9,7 +9,6 @@ namespace Bb.Logging.NLog
     public static class Loggers
     {
 
-
         static Loggers()
         {
             DirectoryToTrace = Directory.GetCurrentDirectory().Combine("Logs");

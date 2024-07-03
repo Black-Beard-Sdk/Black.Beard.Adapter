@@ -6,8 +6,6 @@ namespace Bb.Logging.NLog
 {
 
 
-
-
     /// <summary>
     /// Load configuration from git
     /// </summary>
@@ -49,15 +47,9 @@ namespace Bb.Logging.NLog
 
         public object Execute(ILoggingBuilder context)
         {
-
             context.ClearProviders();
             context.SetMinimumLevel(LogLevel.Trace);
-
-            var Logger = Loggers.InitializeLogger();
-
-
             return context;
-
         }
 
     }

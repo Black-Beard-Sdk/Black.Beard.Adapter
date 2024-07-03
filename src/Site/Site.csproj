@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.96" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.96" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.100" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.100" />
     <PackageReference Include="Black.Beard.Helpers" Version="2.0.38" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.7.8" />
     <PackageReference Include="MudBlazor" Version="6.20.0" />
