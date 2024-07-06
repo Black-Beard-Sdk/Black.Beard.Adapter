@@ -47,14 +47,14 @@ namespace Site.Loaders
                 .AddLocalhostSecureUrlWithDynamicPort("localhost", ref port);
 
 
-            //var srv = app.Services.GetService<OptionsServices>();
-            //var i = srv.Items(app.Services, OptionsEnum.Configuration).ToList();
-            //foreach (var item in i)
-            //{
-            //    var s1 = app.Services.GetService(item);
-            //}
-            
-            
+            var srv = app.Services.GetService<OptionsServices>();
+            var i = srv.Items(app.Services, OptionsEnum.Configuration).ToList();
+            foreach (var item in i)
+            {
+                var s1 = app.Services.GetService(item);
+            }
+
+
             return null;
 
         }

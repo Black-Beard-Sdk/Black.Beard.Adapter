@@ -11,7 +11,6 @@ namespace Bb
     public class BusyService : IBusyService
     {
 
-
         public BusySession IsBusyFor(object instance, string title, Action<BusySession> action)
         {
             var session = new BusySession(this, title, instance, action);
@@ -30,14 +29,5 @@ namespace Bb
         public event EventHandler<BusyEventArgs> BusyChanged;
 
     }
-
-    public enum BusyEnum
-    {
-        New,
-        Started,
-        Running,
-        Completed,
-    }
-
 
 }

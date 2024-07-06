@@ -1,5 +1,6 @@
-﻿using Bb.ComponentModel.Translations;
-using Bb.CustomComponents;
+﻿using Bb.ComponentDescriptors;
+using Bb.ComponentModel.Attributes;
+using Bb.ComponentModel.Translations;
 using Bb.TypeDescriptors;
 using System.Collections;
 using System.ComponentModel;

@@ -18,7 +18,7 @@ namespace Bb.Storage.Files
             var connectionString = configuration.GetConnectionString(connectionStringName);
 
             if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentException($"The connection string '{connectionStringName}' is not defined");
+                throw new ArgumentException($"The connection string name '{connectionStringName}' is not defined");
 
             this._TypeKey = typeof(TKey);
             this._TypeValue = typeof(TValue);
@@ -41,12 +41,10 @@ namespace Bb.Storage.Files
             return file.Exists;
         }
 
-
         public void Initialize()
         {
             GetRoot();
         }
-
 
         public TValue Load(TKey key)
         {
@@ -65,7 +63,6 @@ namespace Bb.Storage.Files
 
         }
 
-
         public bool RemoveKey(TKey key)
         {
 
@@ -81,7 +78,6 @@ namespace Bb.Storage.Files
             return false;
 
         }
-
 
         public void Save(TValue value)
         {
@@ -109,6 +105,15 @@ namespace Bb.Storage.Files
                 foreach (var item in root.GetFiles(_pattern))
                     yield return GetKey(item);
         }
+
+
+        protected virtual void MapInstance(TValue instance)
+        {
+
+        }
+
+
+        #region private
 
         private void EnsureUpdated(FileInfo file)
         {
@@ -142,12 +147,6 @@ namespace Bb.Storage.Files
 
         }
 
-        protected virtual void MapInstance(TValue instance)
-        {
-
-        }
-
-
         private FileInfo GetFilename(TKey uuid)
         {
             var root = GetRoot();
@@ -169,13 +168,6 @@ namespace Bb.Storage.Files
 
         }
 
-        //    public string GetRoot(params string[] path)
-        //    {
-        //        var r =  Path.Combine(path);
-        //        r.CreateFolderIfNotExists();
-        //        return r;
-        //    }
-
         private readonly string _storeRoot;
         private readonly string _name;
         private readonly string _extension;
@@ -184,6 +176,9 @@ namespace Bb.Storage.Files
         private readonly Type _TypeKey;
         private readonly Type _TypeValue;
         private string _root;
+
+        #endregion private
+
     }
 
 }

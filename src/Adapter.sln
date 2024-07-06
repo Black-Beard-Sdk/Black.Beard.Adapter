@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Configuration.G
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Configuration.Vault.Azure", "Black.Beard.Configuration.Vault.Azure\Black.Beard.Configuration.Vault.Azure.csproj", "{3BFADDFC-9D61-4EC3-9779-FA453467F6F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Logging.NLog", "Black.Beard.Logging.NLog\Black.Beard.Logging.NLog.csproj", "{139757FF-39BA-4DA1-8C07-C2235FB735DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Logging.NLog", "Black.Beard.Logging.NLog\Black.Beard.Logging.NLog.csproj", "{139757FF-39BA-4DA1-8C07-C2235FB735DB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ToPackage", "ToPackage", "{4E7EA3FE-DAFA-4F80-B4CB-A3C7627936A5}"
 EndProject

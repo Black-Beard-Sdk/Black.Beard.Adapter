@@ -1,11 +1,12 @@
-﻿using Bb.CustomComponents;
+﻿using Bb.ComponentDescriptors;
+using Microsoft.AspNetCore.Components;
 using System.Globalization;
 
 namespace Bb.PropertyGrid
 {
 
 
-    public partial class ComponentFieldBase<T> : ComponentFieldBase
+    public partial class ComponentFieldBase<T> : ComponentFieldBase, IComponentFieldBase<T>
     {
 
         public ComponentFieldBase()

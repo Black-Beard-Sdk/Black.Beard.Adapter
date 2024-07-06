@@ -1,5 +1,5 @@
-﻿using Bb.ComponentModel.Attributes;
-using Bb.CustomComponents;
+﻿using Bb.ComponentDescriptors;
+using Bb.ComponentModel.Attributes;
 using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;

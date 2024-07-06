@@ -1,8 +1,5 @@
 ﻿using Bb.ComponentModel.Factories;
 using Bb.ComponentModel.Loaders;
-using Bb.ComponentModel;
-using NLog.Web;
-using Site.Pages.Pages.Authentication;
 
 namespace Site.Loaders.SiteExtensions
 {
@@ -17,13 +14,7 @@ namespace Site.Loaders.SiteExtensions
 
             builder.WebHost.ConfigureLogging(logging =>
             {
-
-                var provider = new LocalServiceProvider(builder.Services.BuildServiceProvider());
-
-                var loader = new InjectionLoader<ILoggingBuilder>(ConstantsCore.Initialization, provider)
-                    .LoadModules()
-                    .Execute(logging);
-
+                logging.Initialize(new LocalServiceProvider(builder.Services.BuildServiceProvider()));
             });
 
             return builder;

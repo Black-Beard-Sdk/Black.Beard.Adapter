@@ -3,7 +3,6 @@ using Bb.ComponentModel.Factories;
 using Bb.ComponentModel.Loaders;
 using Bb.ComponentModel;
 using System.Reflection;
-using NLog;
 
 namespace Site.Loaders.SiteExtensions
 {
@@ -16,7 +15,6 @@ namespace Site.Loaders.SiteExtensions
         {
 
         }
-
 
         /// <summary>
         /// Load configuration and discover all methods for loading configuration
@@ -98,23 +96,17 @@ namespace Site.Loaders.SiteExtensions
         }
 
 
-        public static IConfigurationBuilder ConfigureApplication(this IConfigurationBuilder config, WebHostBuilderContext hostingContext, WebApplicationBuilder builder)
+        private static IConfigurationBuilder ConfigureApplication(this IConfigurationBuilder config, WebHostBuilderContext hostingContext, WebApplicationBuilder builder)
         {
 
-            var provider = new LocalServiceProvider(builder.Services.BuildServiceProvider())
-                .Add(typeof(WebHostBuilderContext), hostingContext)
-                ;
-
-            var loader = new InjectionLoader<IConfigurationBuilder>(ConstantsCore.Initialization, provider)
-                .LoadModules()
-                .Execute(config);
+            config.Initialize(new LocalServiceProvider(builder.Services.BuildServiceProvider())
+                .Add(typeof(WebHostBuilderContext), hostingContext));
 
             return config;
 
         }
 
-
-        public static IConfigurationBuilder LoadConfigurationFile(this IConfigurationBuilder config,
+        private static IConfigurationBuilder LoadConfigurationFile(this IConfigurationBuilder config,
             string[] paths,
             string pattern = null,
             Func<FileInfo, bool> filter = null)
@@ -170,7 +162,7 @@ namespace Site.Loaders.SiteExtensions
 
         }
 
-        public static bool FilePathIsAbsolute(this string path)
+        private static bool FilePathIsAbsolute(this string path)
         {
 
             if (!string.IsNullOrEmpty(path))
@@ -184,7 +176,7 @@ namespace Site.Loaders.SiteExtensions
 
         }
 
-        public static bool DirectoryPathIsAbsolute(this string path)
+        private static bool DirectoryPathIsAbsolute(this string path)
         {
 
             if (!string.IsNullOrEmpty(path))

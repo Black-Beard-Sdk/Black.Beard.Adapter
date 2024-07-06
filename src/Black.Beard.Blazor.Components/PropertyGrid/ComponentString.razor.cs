@@ -1,5 +1,4 @@
-﻿using Bb.CustomComponents;
-using Microsoft.AspNetCore.Components;
+﻿using Bb.ComponentDescriptors;
 using MudBlazor;
 
 namespace Bb.PropertyGrid

@@ -1,6 +1,7 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Factories;
 using NLog;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Site.Loaders.SiteExtensions
@@ -12,7 +13,6 @@ namespace Site.Loaders.SiteExtensions
 
         static IocAutoDiscoverExtension()
         {
-            _logger = LogManager.GetLogger(nameof(IocAutoDiscoverExtension));
             _methodRegister = typeof(IocAutoDiscoverExtension).GetMethod(nameof(AddType), BindingFlags.NonPublic | BindingFlags.Static);
             _methodOptionConfiguration = typeof(IocAutoDiscoverExtension).GetMethod(nameof(BindConfiguration), BindingFlags.NonPublic | BindingFlags.Static);
         }
@@ -48,7 +48,10 @@ namespace Site.Loaders.SiteExtensions
         private static void BindConfiguration<TOptions>(this IServiceCollection self, IConfiguration configuration)
             where TOptions : class
         {
-            var attribute = typeof(TOptions).GetCustomAttribute<ExposeClassAttribute>();
+
+            var type = typeof(TOptions);
+
+            var attribute = type.GetCustomAttribute<ExposeClassAttribute>();
             var sectionName = !string.IsNullOrEmpty(attribute?.Name) ? attribute.Name : typeof(TOptions).Name;
 
             var section = configuration.GetSection(sectionName);
@@ -57,8 +60,9 @@ namespace Site.Loaders.SiteExtensions
                 self.AddOptions<TOptions>()
                     .Bind(section)
                     .ValidateDataAnnotations();
+
             else
-                _logger.Warn("section {sectionName} not found", sectionName);
+                Trace.TraceWarning("section {sectionName} not found", sectionName);
 
         }
 
@@ -103,7 +107,7 @@ namespace Site.Loaders.SiteExtensions
                     break;
             }
 
-            _logger.Debug("registered {contextModel} {type} exposed by {exposed} with lifecycle {lifeCycle}", attribute.Context, typeof(T).Name, exposed.Name, attribute.LifeCycle.ToString());
+            Trace.TraceInformation("registered {contextModel} {type} exposed by {exposed} with lifecycle {lifeCycle}", attribute.Context, typeof(T).Name, exposed.Name, attribute.LifeCycle.ToString());
 
         }
 
@@ -134,7 +138,7 @@ namespace Site.Loaders.SiteExtensions
 
             }
 
-            _logger.Debug("registered {contextModel} {type} exposed by {exposed} with lifecycle {lifeCycle}", attribute.Context, typeof(T).Name, exposed.Name, attribute.LifeCycle.ToString());
+            Trace.TraceInformation("registered {contextModel} {type} exposed by {exposed} with lifecycle {lifeCycle}", attribute.Context, typeof(T).Name, exposed.Name, attribute.LifeCycle.ToString());
 
         }
 
@@ -159,8 +163,6 @@ namespace Site.Loaders.SiteExtensions
             return items;
         }
 
-
-        private static readonly Logger _logger;
         private static readonly MethodInfo? _methodRegister;
         private static readonly MethodInfo? _methodOptionConfiguration;
         private static readonly MethodInfo? _methodConfiguration;

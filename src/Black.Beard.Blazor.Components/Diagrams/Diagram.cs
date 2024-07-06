@@ -1,8 +1,5 @@
-﻿using Bb.CustomComponents;
-using Blazor.Diagrams.Core.Models;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Text.Json.Serialization;
-using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {

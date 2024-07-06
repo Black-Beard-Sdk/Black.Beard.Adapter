@@ -1,10 +1,7 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.ComponentDescriptors;
 using Bb.ComponentModel.Translations;
-using Bb.CustomComponents;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace Bb.PropertyGrid
 {

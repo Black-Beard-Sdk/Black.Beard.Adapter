@@ -1,5 +1,4 @@
 ﻿using Bb.ComponentModel.Attributes;
-using Bb.CustomComponents;
 using Bb.Diagrams;
 using Bb.TypeDescriptors;
 using System.ComponentModel;

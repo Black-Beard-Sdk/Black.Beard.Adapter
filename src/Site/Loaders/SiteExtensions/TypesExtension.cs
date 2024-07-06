@@ -9,6 +9,8 @@ namespace Site.Loaders.SiteExtensions
         {
 
             var services = builder.Services;
+
+            services.AddOptions();
             services.AddSingleton(typeof(OptionsServices), new OptionsServices(services));
 
             // Auto discover all types with attribute [ExposeClass] and register in ioc.

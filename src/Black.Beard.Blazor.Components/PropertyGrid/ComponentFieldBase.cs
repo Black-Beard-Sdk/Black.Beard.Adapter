@@ -1,5 +1,5 @@
-﻿using Bb.ComponentModel.Translations;
-using Bb.CustomComponents;
+﻿using Bb.ComponentDescriptors;
+using Bb.ComponentModel.Translations;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -9,7 +9,7 @@ namespace Bb.PropertyGrid
 {
 
 
-    public partial class ComponentFieldBase : ComponentBase
+    public partial class ComponentFieldBase : ComponentBase, IComponentFieldBase
     {
 
 

@@ -1,15 +1,8 @@
 ﻿using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Geometry;
-using Bb.ComponentModel.Accessors;
-using Bb.Expressions;
 using Blazor.Diagrams.Core.Models.Base;
-using ICSharpCode.Decompiler.Metadata;
-using System.ComponentModel;
-using System.Text.Json.Serialization;
 using Bb.TypeDescriptors;
-using static MudBlazor.CategoryTypes;
-using System.Text.Json;
-using Bb.CustomComponents;
+using Bb.ComponentModel.Attributes;
 
 namespace Bb.Diagrams
 {

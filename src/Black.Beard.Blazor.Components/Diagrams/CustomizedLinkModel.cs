@@ -2,7 +2,7 @@
 using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Models.Base;
 using Bb.TypeDescriptors;
-using Bb.CustomComponents;
+using Bb.ComponentModel.Attributes;
 
 namespace Bb.Diagrams
 {
