@@ -1,0 +1,31 @@
+﻿@using MudBlazor
+@using Bb.PropertyGrid;
+
+<MudDialog>
+
+    <TitleContent>
+        <MudText Typo="Typo.h6">@Title</MudText>
+    </TitleContent>
+
+    <DialogContent>
+
+        <PropertyGridView @ref="CurrentPropertyGridView" SelectedObject="@ViewObject" />
+
+    </DialogContent>
+
+    <DialogActions>
+
+        <MudButton Style="align-content:center"
+                   Variant="Variant.Text"
+                   Color="Color.Primary"
+                   OnClick=Cancel>@ComponentConstants.Cancel.Translate(this)</MudButton>
+
+        <MudButton Style="align-content:center"
+                   Variant="Variant.Text"
+                   Color="Color.Primary"
+                   OnClick=Validate>@ComponentConstants.Submit.Translate(this)</MudButton>
+
+    </DialogActions>
+
+
+</MudDialog>

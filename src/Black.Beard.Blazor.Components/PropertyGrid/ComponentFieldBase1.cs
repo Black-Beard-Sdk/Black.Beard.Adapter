@@ -1,5 +1,8 @@
 ﻿using Bb.ComponentDescriptors;
+using Bb.Expressions;
+using ICSharpCode.Decompiler.Solution;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using System.Globalization;
 
 namespace Bb.PropertyGrid
@@ -19,6 +22,105 @@ namespace Bb.PropertyGrid
             return base.OnInitializedAsync();
         }
 
+
+        public override string? ValueString
+        {
+            get
+            {
+
+                if (LastWritingInError)
+                    return LastTextInError;
+
+                var v = this.Value;
+
+                if (ConvertToString(v, out var result))
+                    return result;
+
+                return null;
+
+            }
+            set
+            {
+
+                if (value == null)
+                    this.Value = default(T);
+
+                else
+                {
+                    if (ConvertFromString(value, out var result))
+                    {
+                        LastTextInError = string.Empty;
+                        LastWritingInError = false;
+
+                        if (!object.Equals(this.Value, result))
+                            this.Value = result;
+                    }
+                    else
+                    {
+                        LastTextInError = value;
+                        LastWritingInError = true;
+                    }
+                }
+            }
+        }
+
+        protected virtual bool ConvertToString(T? value, out string? valueResult)
+        {
+
+            valueResult = null;
+
+            if (value == null)
+            {
+                valueResult = null;
+                return true;
+            }
+
+            if (value is string vv)
+            {
+                valueResult = vv;
+                return true;
+            }
+
+            try
+            {
+                valueResult = value.ToObject<string>();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+
+        protected virtual bool ConvertFromString(string value, out T valueResult)
+        {
+
+            valueResult = default(T);
+
+            if (string.IsNullOrEmpty(value))
+                return true;
+
+            if (value is T vv)
+            {
+                valueResult = vv;
+                return true;
+            }
+
+            try
+            {
+                valueResult = value.ToObject<T>();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+
         public T? Value
         {
             get
@@ -36,7 +138,7 @@ namespace Bb.PropertyGrid
             }
             set
             {
-                
+
                 if (Property != null)
                     if (!object.Equals(Property.Value, value))
                     {
@@ -157,34 +259,14 @@ namespace Bb.PropertyGrid
                     if (v == null)
                         return null;
 
-                    var c = object.Equals(v, _value);
+                    _value = v.GetType() != this.Property.Type
+                        ? v.ToObject(this.Property.Type)
+                        : _value = v;
 
-                    if (this.Property.KindView == PropertyKingView.Date.ToString() || this.Property.KindView == PropertyKingView.DateOffset.ToString())
-                    {
-                        if (Property.IsNullable)
-                        {
-                            var o = Convert.ChangeType(v, Property.SubType, CultureInfo.CurrentCulture);
-                            _value = (T)Activator.CreateInstance(this.Property.Type, new object[] { o });
-                        }
-                        else
-                        {
-                            _value = (T)Convert.ChangeType(v, this.Property.Type, CultureInfo.CurrentCulture);
-                        }
-                    }
-                    else
-                    {
-                        if (Property.IsNullable)
-                        {
-                            var o = Convert.ChangeType(v, Property.SubType);
-                            _value = (T)Activator.CreateInstance(this.Property.Type, new object[] { o });
-                        }
-                        else
-                        {
-                            _value = (T)Convert.ChangeType(v, this.Property.Type);
-                        }
-                    }
-                    if (c)
+                    var c = object.Equals(v, _value);
+                    if (!c)
                         PropertyChange();
+
                 }
                 catch (Exception ex)
                 {

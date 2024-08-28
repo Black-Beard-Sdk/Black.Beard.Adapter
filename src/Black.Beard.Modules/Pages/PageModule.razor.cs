@@ -1,9 +1,14 @@
-﻿using Bb.ComponentModel.Translations;
+﻿using Bb.ComponentDescriptors;
+using Bb.ComponentModel.Translations;
+using Bb.Configuration.Git;
+using Bb.Editors;
 using Bb.Modules;
 using Bb.UIComponents;
 using Bb.Wizards;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Dynamic;
+using System.Reflection;
 
 
 namespace Bb.Pages
@@ -39,7 +44,7 @@ namespace Bb.Pages
         }
 
         public ModuleInstance Module => _module ?? (_module = Instances.GetModule(Uuid));
-        
+
 
 
         private void OpenDialogCreateNewFeature()
@@ -71,6 +76,73 @@ namespace Bb.Pages
             ;
 
             wizardModel.Show();
+
+        }
+
+
+        private async void OpenEdit()
+        {
+
+            var act = new EditorResultComponent()
+            {
+                Cancel = ctx =>
+                {
+                    return true;
+                },
+                Validate = ctx =>
+                {
+
+                    var diagnosticResult = ctx.ViewObject.Validate(this.TranslationService);
+                    if (diagnosticResult.IsValid)
+                    {
+                        ctx.Mapper.MapTo(ctx.ViewObject, ctx.SelectedObject.GetType(), ctx.SelectedObject);
+                        return true;
+                    }
+
+                    return false;
+
+                },
+                ToClose = c =>
+                {
+                    if (!c.Result.Canceled)
+                    {
+                        Instances.Save(Module);
+                        StateHasChanged();
+                    }
+                }
+                
+            };
+
+            var b = new DialogParameters
+            {
+                { "SelectedObject",  Module.Sources },
+                { "Actions", act
+                }
+            };
+
+            var options = new DialogOptions()
+            {
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true,
+                CloseOnEscapeKey = false,
+                NoHeader = false,
+                Position = DialogPosition.Center,
+            };
+
+            try
+            {
+
+                await InvokeAsync(() =>
+                {                    
+                    var r = DialogService.ShowAsync<EditorComponent>(ComponentConstants.Edit.Translate(this), b, options);
+                });
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
 
         }
 

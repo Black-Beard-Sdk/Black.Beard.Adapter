@@ -85,7 +85,6 @@ namespace Bb.Diagrams
                 FocusedService.FocusChange(model);
         }
 
-
         private BlazorDiagram CreateDiagram()
         {
             var options = new BlazorDiagramOptions
@@ -126,7 +125,6 @@ namespace Bb.Diagrams
 
         }
 
-
         public void Save()
         {
             SaveToMyServer(Diagram);
@@ -139,7 +137,6 @@ namespace Bb.Diagrams
             if (_session == null)
                 _session = BusyService.IsBusyFor(this, "Save", (a) =>
                 {
-
 
                     // a.Update("Saving...");
 

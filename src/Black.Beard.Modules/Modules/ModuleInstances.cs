@@ -82,7 +82,7 @@ namespace Bb.Modules
                 Uuid = Guid.NewGuid(),
                 Specification = uuid,
                 Label = name,
-                Description = description,
+                Description = description,                
             };
 
 
@@ -90,6 +90,12 @@ namespace Bb.Modules
 
             return result;
 
+        }
+
+
+        public void Save(ModuleInstance module)
+        {
+            _store.Save(module);
         }
 
 

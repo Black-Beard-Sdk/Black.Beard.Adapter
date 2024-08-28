@@ -15,6 +15,7 @@
 
     <ToolBarContent>
         <MudButton OnClick="OpenDialogCreateNewFeature" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.AddANewFeature.Translate(this)</MudButton>
+        <MudButton OnClick="OpenEdit" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.ManageGit.Translate(this)</MudButton>
         <MudSpacer />
         <MudText Typo="Typo.h6">@ModuleConstants.Filter.Translate(this)&nbsp;&nbsp;&nbsp;</MudText>
         <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"

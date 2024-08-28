@@ -10,6 +10,7 @@ namespace Bb
 
 
         public static TranslatedKeyLabel Cancel => new TranslatedKeyLabel("Cancel");
+        public static TranslatedKeyLabel Edit => new TranslatedKeyLabel("Edit");
 
         public static TranslatedKeyLabel Previous => new TranslatedKeyLabel("Previous");
 

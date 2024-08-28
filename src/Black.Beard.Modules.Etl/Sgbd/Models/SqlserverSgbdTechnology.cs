@@ -31,10 +31,8 @@ namespace Bb.Modules.Sgbd.Models
         {
 
             AddTypes();
-
-            var config = DynamicTypeDescriptionProvider.Configuration;
-
-            config.Add<SgbdDiagram>(c =>
+                        
+            DynamicTypeDescriptionProvider.Configure<SgbdDiagram>(c =>
             {
 
                 c.AddProperty("Schema", typeof(string), i =>
@@ -44,7 +42,7 @@ namespace Bb.Modules.Sgbd.Models
                 });
             });
 
-            config.Add<Table>(c =>
+            DynamicTypeDescriptionProvider.Configure<Table>(c =>
             {
 
                 c.AddProperty("Schema", typeof(string), i =>
@@ -54,7 +52,7 @@ namespace Bb.Modules.Sgbd.Models
                 });
             });
 
-            config.Add<Column>(c =>
+            DynamicTypeDescriptionProvider.Configure<Column>(c =>
             {
 
                 c.AddProperty("AutoIncrement", typeof(bool), i =>
@@ -87,7 +85,7 @@ namespace Bb.Modules.Sgbd.Models
 
             });
 
-            config.Add<Column>(c =>
+            DynamicTypeDescriptionProvider.Configure<Column>(c =>
             {
 
                 c.AddProperty("Scale", typeof(int), i =>
@@ -105,7 +103,7 @@ namespace Bb.Modules.Sgbd.Models
                 return false;
             });
 
-            config.Add<Column>(c =>
+            DynamicTypeDescriptionProvider.Configure<Column>(c =>
             {
 
                 c.AddProperty("Precision", typeof(int), i =>
@@ -124,7 +122,7 @@ namespace Bb.Modules.Sgbd.Models
                 return false;
             });
 
-            config.Add<Column>(c =>
+            DynamicTypeDescriptionProvider.Configure<Column>(c =>
             {
                 c.AddProperty("Lenght", typeof(int), i =>
                 {
@@ -144,7 +142,7 @@ namespace Bb.Modules.Sgbd.Models
             });
 
 
-            config.Add<Index>(c =>
+            DynamicTypeDescriptionProvider.Configure<Index>(c =>
             {
                 // c.AddProperty("Year", typeof(int), i =>
                 // {
@@ -154,7 +152,7 @@ namespace Bb.Modules.Sgbd.Models
                 // });
             });
 
-            config.Add<ColumnIndex>(c =>
+            DynamicTypeDescriptionProvider.Configure<ColumnIndex>(c =>
             {
                 // c.AddProperty("Year", typeof(int), i =>
                 // {
@@ -175,7 +173,7 @@ namespace Bb.Modules.Sgbd.Models
                 c.Configure(d =>
                 {
                     d.BaseTemplateType = typeof(RazorTemplateSqlserver);
-                    d.Namespaces.Add("Bb.Modules.Sgbd.Models");
+                    d.Namespaces.Add(typeof(RazorTemplateSqlserver).Namespace);
                 });
 
                 c.GetModels(

@@ -78,7 +78,7 @@ namespace Bb.Diagrams
             
         }
 
-        private readonly DynamicDescriptorInstanceContainer _container;
+        private readonly DynamicDescriptorInstanceContainer? _container;
 
         [EvaluateValidation(false)]
         public DiagramNode Source { get; }
@@ -88,3 +88,4 @@ namespace Bb.Diagrams
     }
 
 }
+

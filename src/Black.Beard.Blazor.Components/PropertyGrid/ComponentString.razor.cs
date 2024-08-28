@@ -51,7 +51,7 @@ namespace Bb.PropertyGrid
                 case StringType.Week:
                     inputType = InputType.Week;
                     break;
-                
+
                 case StringType.Undefined:
                 default:
                     break;

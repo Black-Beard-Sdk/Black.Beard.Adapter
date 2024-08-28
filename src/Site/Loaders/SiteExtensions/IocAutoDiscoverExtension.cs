@@ -62,7 +62,7 @@ namespace Site.Loaders.SiteExtensions
                     .ValidateDataAnnotations();
 
             else
-                Trace.TraceWarning("section {sectionName} not found", sectionName);
+                Trace.TraceWarning("section {0} not found", sectionName);
 
         }
 
@@ -138,7 +138,11 @@ namespace Site.Loaders.SiteExtensions
 
             }
 
-            Trace.TraceInformation("registered {contextModel} {type} exposed by {exposed} with lifecycle {lifeCycle}", attribute.Context, typeof(T).Name, exposed.Name, attribute.LifeCycle.ToString());
+            Trace.TraceInformation("registered {0} {1} exposed by {2} with lifecycle {3}"
+                , attribute.Context
+                , typeof(T).Name
+                , exposed.Name
+                , attribute.LifeCycle.ToString());
 
         }
 

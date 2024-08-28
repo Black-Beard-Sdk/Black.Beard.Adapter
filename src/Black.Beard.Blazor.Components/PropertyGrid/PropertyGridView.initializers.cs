@@ -16,33 +16,27 @@ namespace Bb.PropertyGrid
 			InitializeMapping(strategy);
 
 			strategy
-				.ToTarget(c => c.IsEnum, (t, mapper, descriptor) =>
+				.ConfigureWhere(c => c.IsEnum, (t, mapper, descriptor) =>
 				{
 					descriptor.EditorType = typeof(ComponentEnumeration);
-					descriptor.KindView = PropertyKingView.Enumeration.ToString();
+					descriptor.KindView = PropertyKindView.Enumeration;
 					descriptor.ListProvider = typeof(EnumListProvider);
 				})
 
-				.ToTarget(c => typeof(IEnumerable).IsAssignableFrom(c), (t, mapper, descriptor) =>
+				.ConfigureWhere(c => typeof(IEnumerable).IsAssignableFrom(c), (t, mapper, descriptor) =>
 				{
 					foreach (var item in descriptor.Type.GetInterfaces())
 						if (item.IsGenericType && item.GetGenericTypeDefinition() is Type type && type == typeof(ICollection<>))
 						{
 							descriptor.SubType = item.GetGenericArguments()[0];
-							descriptor.KindView = PropertyKingView.List.ToString();
+							descriptor.KindView = PropertyKindView.List;
 							descriptor.EditorType = typeof(ComponentList);
 						}
 				})
 			;
 
 			strategy
-
-				.ToTarget<StringMaskAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.Mask = attribute.Mask;
-				})
-
-				.ToTarget<DataTypeAttribute>((attribute, mapper, descriptor) =>
+				.ConfigureOnAttribute<DataTypeAttribute>((attribute, mapper, descriptor) =>
 				{
 					StrategyEditor str = null;
 					switch (attribute.DataType)
@@ -52,7 +46,7 @@ namespace Bb.PropertyGrid
 							if (!mapper.TryGetValueByType(typeof(DateTime), out str))
 							{
 								descriptor.EditorType = str.ComponentView;
-								descriptor.KindView = str.PropertyKingView;
+								descriptor.KindView = str.PropertyKindView;
 							}
 							break;
 
@@ -60,7 +54,7 @@ namespace Bb.PropertyGrid
 							if (!mapper.TryGetValueByType(typeof(DateTime), out str))
 							{
 								descriptor.EditorType = str.ComponentView;
-								descriptor.KindView = str.PropertyKingView;
+								descriptor.KindView = str.PropertyKindView;
 							}
 							break;
 
@@ -110,102 +104,36 @@ namespace Bb.PropertyGrid
 
 				})
 
-				.ToTarget<ListProviderAttribute>((attribute, mapper, descriptor) =>
+				.ConfigureOnAttribute<ListProviderAttribute>((attribute, mapper, descriptor) =>
 				{
 					descriptor.ListProvider = attribute.ProviderListType;
 					descriptor.EditorType = typeof(ComponentEnumeration);
-					descriptor.KindView = PropertyKingView.Enumeration.ToString();
+					descriptor.KindView = PropertyKindView.Enumeration;
 				})
 
-				.ToTarget<EditorAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.EditorType = Type.GetType(attribute.EditorTypeName);
-				})
-
-				.ToTarget<PasswordPropertyTextAttribute>((attribute, mapper, descriptor) =>
+				.ConfigureOnAttribute<PasswordPropertyTextAttribute>((attribute, mapper, descriptor) =>
 				{
 					descriptor.IsPassword = attribute.Password;
 					descriptor.EditorType = typeof(ComponentPassword);
-				})
+                    //descriptor.KindView = PropertyKindView.Password;
 
-				.ToTarget<StepNumericAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.Step = attribute.Step;
-				})
-
-				.ToTarget<StringLengthAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.Maximum = attribute.MaximumLength;
-					descriptor.Minimum = attribute.MinimumLength;
-				})
-
-				.ToTarget<MaxLengthAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.Maximum = attribute.Length;
-				})
-
-				.ToTarget<MinLengthAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.Maximum = attribute.Length;
-				})
-
-				.ToTarget<RangeAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.Minimum = (int)attribute.Minimum;
-					descriptor.Maximum = (int)attribute.Maximum;
-				})
-
-				.ToTarget<DisplayFormatAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.DataFormatString = attribute.DataFormatString;
-					descriptor.HtmlEncode = attribute.HtmlEncode;
-				})
-
-				.ToTarget<EditableAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.Browsable = attribute.AllowEdit;
-				})
-
-				.ToTarget<BrowsableAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.Browsable = attribute.Browsable;
-				})
-
-				.ToTarget<ReadOnlyAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.ReadOnly = attribute.IsReadOnly;
-				})
-
-				.ToTarget<DefaultValueAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.DefaultValue = attribute.Value;
-				})
-
-				.ToTarget<PropertyTabAttribute>((attribute, mapper, descriptor) =>
-				{
-					if (System.Diagnostics.Debugger.IsAttached)
-						System.Diagnostics.Debugger.Break();
-				})
-
-				.ToTarget<TypeConverterAttribute>((attribute, mapper, descriptor) =>
-				{
-					if (System.Diagnostics.Debugger.IsAttached)
-						System.Diagnostics.Debugger.Break();
-				})
-
-				.ToTarget<TypeDescriptionProviderAttribute>((attribute, mapper, descriptor) =>
-				{
-				})
-
-				.ToTarget<RequiredAttribute>((attribute, mapper, descriptor) =>
-				{
-					descriptor.Required = true;
-				})
-
-                .ToTarget<DesignerAttribute>((attribute, mapper, descriptor) =>
-                {
-                    descriptor.EditorType = Type.GetType(attribute.DesignerTypeName);
                 })
+
+				.ConfigureOnAttribute<PropertyTabAttribute>((attribute, mapper, descriptor) =>
+				{
+					if (System.Diagnostics.Debugger.IsAttached)
+						System.Diagnostics.Debugger.Break();
+				})
+
+				.ConfigureOnAttribute<TypeConverterAttribute>((attribute, mapper, descriptor) =>
+				{
+					if (System.Diagnostics.Debugger.IsAttached)
+						System.Diagnostics.Debugger.Break();
+				})
+
+				.ConfigureOnAttribute<TypeDescriptionProviderAttribute>((attribute, mapper, descriptor) =>
+				{
+				})
 
             ;
 
@@ -215,22 +143,30 @@ namespace Bb.PropertyGrid
 		{
 
 			strategy
-				.ToTarget<ComponentBool>(PropertyKingView.Bool)
-                .ToTarget<ComponentChar>(PropertyKingView.Char)
-				.ToTarget<ComponentDate>(PropertyKingView.Date)
-                .ToTarget<ComponentDateOffset>(PropertyKingView.DateOffset)
-				.ToTarget<ComponentDecimal>(PropertyKingView.Decimal)
-				.ToTarget<ComponentDouble>(PropertyKingView.Double)
-				.ToTarget<ComponentFloat>(PropertyKingView.Float)
-                .ToTarget<ComponentInt16>(PropertyKingView.Int16)
-                .ToTarget<ComponentInt32>(PropertyKingView.Int32)
-                .ToTarget<ComponentInt64>(PropertyKingView.Int64)
-				.ToTarget<ComponentString>(PropertyKingView.String)
-				.ToTarget<ComponentTime>(PropertyKingView.Time, (c, d) => { d.Mask = StringType.Time; })
-				.ToTarget<ComponentUInt16>(PropertyKingView.UInt16)
-				.ToTarget<ComponentUInt32>(PropertyKingView.UInt32)
-				.ToTarget<ComponentUInt64>(PropertyKingView.UInt64)
-			;
+				.ToTarget<ComponentBool>(PropertyKindView.Bool)
+                .ToTarget<ComponentChar>(PropertyKindView.Char)
+				.ToTarget<ComponentDate>(PropertyKindView.Date)
+                .ToTarget<ComponentDateOffset>(PropertyKindView.DateOffset)
+				.ToTarget<ComponentDecimal>(PropertyKindView.Decimal)
+				.ToTarget<ComponentDouble>(PropertyKindView.Double)
+				.ToTarget<ComponentFloat>(PropertyKindView.Float)
+                .ToTarget<ComponentInt16>(PropertyKindView.Int16)
+                .ToTarget<ComponentInt32>(PropertyKindView.Int32)
+                .ToTarget<ComponentInt64>(PropertyKindView.Int64)
+				.ToTarget<ComponentString>(PropertyKindView.String)
+				.ToTarget<ComponentTime>(PropertyKindView.Time, (c, d) => { d.Mask = StringType.Time; })
+				.ToTarget<ComponentUInt16>(PropertyKindView.UInt16)
+				.ToTarget<ComponentUInt32>(PropertyKindView.UInt32)
+				.ToTarget<ComponentUInt64>(PropertyKindView.UInt64)
+				.ToTarget<ComponentGuid>(PropertyKindView.Guid, (c, d) =>
+				{
+                    //d.DataFormatString = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX";
+                    //= ;
+                    d.FormatString = "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$";
+
+                    d.CreateMask = () => GuidMask.Guid();
+                })
+            ;
 
 		}
 

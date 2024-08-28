@@ -15,8 +15,7 @@ namespace Bb.Modules.Sgbd.Models
         static SgbdTechnology()
         {
 
-            var config = DynamicTypeDescriptionProvider.Configuration;
-            config.Add<Table>(c =>
+            DynamicTypeDescriptionProvider.Configure<Table>(c =>
             {
 
                 c.RemoveProperties("ControlledSize", "Title", "Selected", "Id", "Locked", "Visible");
@@ -59,7 +58,7 @@ namespace Bb.Modules.Sgbd.Models
 
             });
 
-            config.Add<Column>(c =>
+            DynamicTypeDescriptionProvider.Configure<Column>(c =>
             {
 
                 c.Property(c => c.Name, i =>
@@ -75,7 +74,7 @@ namespace Bb.Modules.Sgbd.Models
             });
 
 
-            config.Add<SgbdDiagram>(c =>
+            DynamicTypeDescriptionProvider.Configure<SgbdDiagram>(c =>
             {
                 c.Property(u => u.Models, i =>
                 {
@@ -90,7 +89,7 @@ namespace Bb.Modules.Sgbd.Models
             });
 
 
-            config.Add<BlazorDiagram>(c =>
+            DynamicTypeDescriptionProvider.Configure<BlazorDiagram>(c =>
             {
 
                 c.Property(u => u.SuspendRefresh, i =>

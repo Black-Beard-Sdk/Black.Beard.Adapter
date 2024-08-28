@@ -10,11 +10,11 @@ namespace Bb.Diagrams
 
         public DiagnosticLevel Level { get; set; }
 
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
-        public string Source { get; set; }
+        public string? Source { get; set; }
 
-        public TargetSource Target { get; set; }
+        public TargetSource? Target { get; set; }
 
     }
 
@@ -36,7 +36,7 @@ namespace Bb.Diagrams
 
         public Guid Feature { get; set; }
 
-        public List<Guid> Target { get; set; }
+        public List<Guid>? Target { get; set; }
 
         public object Model => model;
 

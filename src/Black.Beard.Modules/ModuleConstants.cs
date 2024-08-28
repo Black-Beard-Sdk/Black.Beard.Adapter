@@ -24,6 +24,7 @@ namespace Bb
 
         public static TranslatedKeyLabel AddANewModule => new TranslatedKeyLabel("Add a new module");
         public static TranslatedKeyLabel AddANewFeature => new TranslatedKeyLabel("Add a new feature");
+        public static TranslatedKeyLabel ManageGit => new TranslatedKeyLabel("Manage git");
 
         public static TranslatedKeyLabel Cancel => new TranslatedKeyLabel("Cancel");
 
