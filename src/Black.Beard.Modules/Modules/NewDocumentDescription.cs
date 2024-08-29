@@ -1,22 +1,18 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.Addons;
+using Bb.ComponentModel.Attributes;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bb.Modules
 {
 
-    public interface IModuleInstanceHost
-    {
-        ModuleInstance Module { get; set; }
-    }
 
-
-    public class NewFeatureDescription : IModuleInstanceHost
+    public class NewDocumentDescription : ISolutionInstanceHost
     {
 
 
 
-        public ModuleInstance Module { get; set; }
+        public Solution Solution { get; set; }
 
 
         [Description("Name of the feature")]
@@ -28,7 +24,7 @@ namespace Bb.Modules
         public string? Description { get; set; }
 
         [Description("Type based Feature")]
-        [ListProvider(typeof(ListProviderFeature))]
+        [ListProvider(typeof(ListProviderFeatures))]
         [Required]
         public Guid? Type { get; set; }
 

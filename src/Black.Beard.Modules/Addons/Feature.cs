@@ -1,17 +1,21 @@
-﻿
+﻿using Bb.Modules;
 using Microsoft.AspNetCore.Components;
 using System.Reflection;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
-namespace Bb.Modules
+namespace Bb.Addons
 {
 
-    public class FeatureSpecification
+
+    /// <summary>
+    /// Base model for a new feature in a module
+    /// </summary>
+    public class Feature
     {
 
 
-        protected FeatureSpecification(Guid uuid, string name, string description, Guid owner, Type model)
+        protected Feature(Guid uuid, string name, string description, Guid owner, Type model)
         {
 
             if (uuid == Guid.Empty)
@@ -23,11 +27,11 @@ namespace Bb.Modules
             if (string.IsNullOrEmpty(description))
                 throw new ArgumentException("description is empty");
 
-            this.Uuid = uuid;
-            this.Name = name;
-            this.Description = description;
-            this.Owner = owner;
-            this.Model = model;
+            Uuid = uuid;
+            Name = name;
+            Description = description;
+            Owner = owner;
+            Model = model;
 
         }
 
@@ -62,7 +66,7 @@ namespace Bb.Modules
                 {
                     _page = value;
                     var attribute = _page.GetCustomAttribute<RouteAttribute>(true);
-                    this.Route = attribute.Template;
+                    Route = attribute.Template;
                 }
                 else
                     throw new ArgumentException("value is not a page");
@@ -75,7 +79,7 @@ namespace Bb.Modules
         /// </summary>
         public string Description { get; }
 
-        public FeatureSpecifications Parent { get; internal set; }
+        public AddonFeatures Parent { get; internal set; }
 
         public string GetRoute(Guid uuid)
         {
@@ -91,8 +95,8 @@ namespace Bb.Modules
             return result;
         }
 
-        public virtual object GetModel(FeatureInstance featureInstance)
-        {            
+        public virtual object Load(Document featureInstance)
+        {
             if (featureInstance.Model == null)
                 return Activator.CreateInstance(Model);
             var payload = featureInstance.Model.ToJsonString();
@@ -100,7 +104,7 @@ namespace Bb.Modules
             return result;
         }
 
-        public virtual void SetModel(FeatureInstance featureInstance, object model)
+        public virtual void Save(Document featureInstance, object model)
         {
             if (model == null)
                 featureInstance.Model = null;
@@ -109,7 +113,7 @@ namespace Bb.Modules
                 try
                 {
                     var modelText = model.Serialize(true);
-                    featureInstance.Model = JsonObject.Parse(modelText);
+                    featureInstance.Model = JsonNode.Parse(modelText);
                 }
                 catch (Exception ex)
                 {

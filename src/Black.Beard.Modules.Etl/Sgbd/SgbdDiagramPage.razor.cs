@@ -22,13 +22,13 @@ namespace Bb.Modules.Sgbd
 
 
         [Inject]
-        public FeatureInstances FeatureInstances { get; set; }
+        public Documents FeatureInstances { get; set; }
 
         [Inject]
         public SgbdTechnologies SgbdTechnologies { get; set; }
 
 
-        public SgbdDiagram DiagramModel { get => _diagramModel ?? (_diagramModel = Initialize((SgbdDiagram)FeatureInstance.GetModel())); }
+        public SgbdDiagram DiagramModel { get => _diagramModel ?? (_diagramModel = Initialize((SgbdDiagram)Document.Load())); }
 
         private SgbdDiagram? Initialize(SgbdDiagram sgbdDiagram)
         {
@@ -60,10 +60,10 @@ namespace Bb.Modules.Sgbd
             }
         }
 
-        public FeatureInstance FeatureInstance => _featureInstance ?? (_featureInstance = FeatureInstances.GetFeature(Uuid));
+        public Document Document => _featureInstance ?? (_featureInstance = FeatureInstances.GeDocument(Uuid));
 
 
-        private FeatureInstance _featureInstance;
+        private Document _featureInstance;
         private SgbdDiagram _diagramModel;
         private bool disposedValue;
 

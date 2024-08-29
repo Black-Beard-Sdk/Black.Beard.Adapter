@@ -59,12 +59,24 @@ namespace Bb.Diagrams
         {
             return Ports.FirstOrDefault(c => c.Uuid == id);
         }
-
-
+                
         [JsonIgnore]
         public Diagram Diagram { get; internal set; }
 
+
+
+        // public ExternalDiagramReference ExternalReference { get; set; }
+
+
     }
 
+    //public class ExternalDiagramReference
+    //{
+        
+    //    public string Document { get; set; }    
+
+    //    public Guid Uuid { get; set; }
+
+    //}
 
 }

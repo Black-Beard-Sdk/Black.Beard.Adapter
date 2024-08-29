@@ -13,7 +13,9 @@
 
         public Action<EditorResultComponent> ToClose { get; set; }
 
+
         public ContextEditor Result { get; internal set; }
+
 
     }
 

@@ -1,11 +1,11 @@
-﻿
-namespace Bb.Modules
+﻿namespace Bb.Addons
 {
 
-    public class ModuleSpecification
+
+    public class AddOnLibrary
     {
 
-        protected ModuleSpecification(Guid uuid, string name, string description)
+        protected AddOnLibrary(Guid uuid, string name, string description)
         {
 
             if (uuid == Guid.Empty)
@@ -17,9 +17,9 @@ namespace Bb.Modules
             if (string.IsNullOrEmpty(description))
                 throw new ArgumentException("description is empty");
 
-            this.Uuid = uuid;
-            this.Name = name;
-            this.Description = description;
+            Uuid = uuid;
+            Name = name;
+            Description = description;
 
         }
 
@@ -27,9 +27,9 @@ namespace Bb.Modules
         /// Return all features
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<FeatureSpecification> GetFeatures()
+        public IEnumerable<Feature> GetFeatures()
         {
-            return Parent.FeatureSpecifications.GetFeatures().Where(c => c.Owner == this.Uuid);
+            return Parent.FeatureSpecifications.GetFeatures().Where(c => c.Owner == Uuid);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Bb.Modules
         /// </summary>
         public string Description { get; }
 
-        public ModuleSpecifications Parent { get; internal set; }
+        public AddOnLibraries Parent { get; internal set; }
 
 
     }

@@ -1,4 +1,5 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.Addons;
+using Bb.ComponentModel.Attributes;
 using Bb.Modules;
 using System.Reflection;
 
@@ -7,11 +8,11 @@ namespace Bb.Storage.SqlLite
 
 
     //[ExposeClass("Service", ExposedType = typeof(IStore<Guid, FeatureInstance>), LifeCycle = IocScopeEnum.Scoped)]
-    public class FeatureInstanceSqlLiteStore : SqlLiteStoreBase<Guid, FeatureInstance>
+    public class FeatureInstanceSqlLiteStore : SqlLiteStoreBase<Guid, Document>
     {
 
 
-        public FeatureInstanceSqlLiteStore(IConfiguration configuration, FeatureSpecifications featureSpecifications)
+        public FeatureInstanceSqlLiteStore(IConfiguration configuration, AddonFeatures featureSpecifications)
             : base(configuration, "Modules", "Features")
         {
 
@@ -38,7 +39,7 @@ namespace Bb.Storage.SqlLite
         //}
 
 
-        private readonly FeatureSpecifications _featureSpecifications;
+        private readonly AddonFeatures _featureSpecifications;
 
 
     }

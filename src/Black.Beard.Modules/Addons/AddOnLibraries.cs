@@ -1,17 +1,20 @@
 ﻿using Bb.ComponentModel.Attributes;
 
-namespace Bb.Modules
+namespace Bb.Addons
 {
 
+    /// <summary>
+    /// Service for discover all modules
+    /// </summary>
 
-    [ExposeClass(UIConstants.Service, ExposedType = typeof(ModuleSpecifications), LifeCycle = IocScopeEnum.Scoped)]
-    public class ModuleSpecifications
+    [ExposeClass(UIConstants.Service, ExposedType = typeof(AddOnLibraries), LifeCycle = IocScopeEnum.Scoped)]
+    public class AddOnLibraries
     {
 
-        public ModuleSpecifications(FeatureSpecifications featureSpecifications)
+        public AddOnLibraries(AddonFeatures featureSpecifications)
         {
 
-            this.FeatureSpecifications = featureSpecifications;
+            FeatureSpecifications = featureSpecifications;
         }
 
 
@@ -19,7 +22,7 @@ namespace Bb.Modules
         /// Return all modules
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ModuleSpecification> GetModules()
+        public IEnumerable<AddOnLibrary> GetModules()
         {
 
             if (_items == null)
@@ -27,16 +30,16 @@ namespace Bb.Modules
                     if (_items == null)
                     {
 
-                        var filter = Bb.ComponentModel.ConstantsCore.Plugin;
-                        var items = new Dictionary<Guid, ModuleSpecification>();
+                        var filter = ComponentModel.ConstantsCore.Plugin;
+                        var items = new Dictionary<Guid, AddOnLibrary>();
 
                         var types = ComponentModel.TypeDiscovery.Instance
                             .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object),
-                            c => c.ExposedType == typeof(ModuleSpecification) && c.Context == filter).ToList();
+                            c => c.ExposedType == typeof(AddOnLibrary) && c.Context == filter).ToList();
 
                         foreach (var item in types)
                         {
-                            var module = (ModuleSpecification)Activator.CreateInstance(item);
+                            var module = (AddOnLibrary)Activator.CreateInstance(item);
                             module.Parent = this;
                             items.Add(module.Uuid, module);
                         }
@@ -48,14 +51,14 @@ namespace Bb.Modules
 
         }
 
-        public ModuleSpecification GetModule(Guid guid)
+        public AddOnLibrary GetModule(Guid guid)
         {
             if (_items == null)
                 lock (_lock)
                     if (_items == null)
                         GetModules();
 
-            if (_items.TryGetValue(guid, out ModuleSpecification module))
+            if (_items.TryGetValue(guid, out AddOnLibrary module))
                 return module;
 
             return null;
@@ -64,9 +67,9 @@ namespace Bb.Modules
 
         private volatile object _lock = new object();
 
-        private Dictionary<Guid, ModuleSpecification> _items;
+        private Dictionary<Guid, AddOnLibrary> _items;
 
-        public FeatureSpecifications FeatureSpecifications { get; }
+        public AddonFeatures FeatureSpecifications { get; }
     }
 
 

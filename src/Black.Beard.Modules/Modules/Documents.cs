@@ -1,24 +1,23 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.Addons;
+using Bb.ComponentModel.Attributes;
 using Bb.Storage;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 
 namespace Bb.Modules
 {
-
-
-    [ExposeClass(UIConstants.Service, ExposedType = typeof(ModuleInstances), LifeCycle = IocScopeEnum.Scoped)]
-    public class ModuleInstances
+    [ExposeClass(UIConstants.Service, ExposedType = typeof(Documents), LifeCycle = IocScopeEnum.Scoped)]
+    public class Documents
     {
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ModuleReferential"></param>
-        public ModuleInstances(ModuleSpecifications ModuleReferential,
-            IStore<Guid, ModuleInstance> store)
+        /// <param name="ModuleModuleReferential"></param>
+        public Documents(AddonFeatures ModuleModuleReferential,
+            IStore<Guid, Document> store)
         {
-            this._referentiel = ModuleReferential;
+            this._referentiel = ModuleModuleReferential;
             this._store = store;
         }
 
@@ -27,12 +26,13 @@ namespace Bb.Modules
         /// </summary>
         /// <param name="uuid"></param>
         /// <returns></returns>
-        public ModuleInstance GetModule(Guid uuid)
+        public Document GeDocument(Guid uuid)
         {
-            ModuleInstance module = _store.Load(uuid);
-            var s = _referentiel.GetModule(module.Specification);
-            module.ModuleSpecification = s;
-            return module;
+            Document feature = _store.Load(uuid);
+            feature.Parent = this;
+            var s = _referentiel.GetFeature(feature.Specification);
+            feature.Feature = s;
+            return feature;
         }
 
 
@@ -41,21 +41,25 @@ namespace Bb.Modules
         /// </summary>
         /// <param name="uuid"></param>
         /// <returns></returns>
-        public ObservableCollection<ModuleInstance> GetModules()
+        public ObservableCollection<Document> GetDocuments()
         {
+
             Initialize();
 
-            List<ModuleInstance> list = new List<ModuleInstance>();
+            List<Document> list = new List<Document>();
             foreach (var item in _store.Index())
             {
-                var s = _referentiel.GetModule(item.Specification);
-                item.ModuleSpecification = s;
+                item.Parent = this;
+                var s = _referentiel.GetFeature(item.Specification);
+                item.Feature = s;
                 list.Add(item);
             }
 
-            var result = new ObservableCollection<ModuleInstance>(list);
+            var result = new ObservableCollection<Document>(list);
             return result;
+
         }
+
 
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace Bb.Modules
         /// </summary>
         /// <param name="uuid"></param>
         /// <returns></returns>
-        public ModuleInstance Create(Guid uuid, string name, string description)
+        public Document Create(Guid moduleUuid, Guid uuid, string name, string description)
         {
 
             if (string.IsNullOrEmpty(name))
@@ -75,16 +79,18 @@ namespace Bb.Modules
             Initialize();
 
             if (_store.Exists(uuid))
-                throw new Exception("Module already exists");
+                throw new Exception("Feature already exists");
 
-            var result = new ModuleInstance()
+            var result = new Document()
             {
                 Uuid = Guid.NewGuid(),
                 Specification = uuid,
+                ModuleUuid = moduleUuid,
                 Label = name,
-                Description = description,                
+                Description = description,
+                Parent = this,
+                Model = null,
             };
-
 
             _store.Save(result);
 
@@ -93,17 +99,27 @@ namespace Bb.Modules
         }
 
 
-        public void Save(ModuleInstance module)
+        public void RemoveAllFeatureOf(Solution module)
         {
-            _store.Save(module);
+
+            _store.Index()
+                .Where(c => c.ModuleUuid == module.Uuid)
+                .ToList()
+                .ForEach(c => _store.RemoveKey(c.Uuid));
+
         }
 
-
-        public void Remove(ModuleInstance module)
-        {          
-            module.FeatureInstances.RemoveAllFeatureOf(module);
+        public void Remove(Document module)
+        {
             _store.RemoveKey(module.Uuid);
         }
+
+
+        public void Save(Document instance)
+        {
+            _store.Save(instance);
+        }
+
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -119,8 +135,8 @@ namespace Bb.Modules
         }
 
 
-        private ModuleSpecifications _referentiel;
-        private readonly IStore<Guid, ModuleInstance> _store;
+        private AddonFeatures _referentiel;
+        private readonly IStore<Guid, Document> _store;
         private volatile object _lock = new object();
         private bool _initialized;
 

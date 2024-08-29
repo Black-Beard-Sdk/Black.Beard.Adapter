@@ -1,12 +1,13 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.Addons;
+using Bb.ComponentModel.Attributes;
 using Bb.Diagrams;
 using Bb.Modules.Sgbd.Models;
 
 namespace Bb.Modules.Sgbd
 {
 
-    [ExposeClass(ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(FeatureSpecification), LifeCycle = IocScopeEnum.Transiant)]
-    public class SgbdDiagramFeature : FeatureSpecification
+    [ExposeClass(ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(Feature), LifeCycle = IocScopeEnum.Transiant)]
+    public class SgbdDiagramFeature : Feature
     {
 
         public SgbdDiagramFeature()
@@ -21,14 +22,14 @@ namespace Bb.Modules.Sgbd
         }
 
 
-        public override object GetModel(FeatureInstance featureInstance)
+        public override object Load(Document featureInstance)
         {
 
-            var result = (SgbdDiagram)base.GetModel(featureInstance);
+            var result = (SgbdDiagram)base.Load(featureInstance);
 
             result.SetSave( d =>
             {
-                SetModel(featureInstance, d);
+                Save(featureInstance, d);
                 featureInstance.Parent.Save(featureInstance);
             });
 
@@ -37,9 +38,9 @@ namespace Bb.Modules.Sgbd
 
         }
 
-        public override void SetModel(FeatureInstance featureInstance, object model)
+        public override void Save(Document featureInstance, object model)
         {
-            base.SetModel(featureInstance, model);
+            base.Save(featureInstance, model);
         }
 
         /// <summary>

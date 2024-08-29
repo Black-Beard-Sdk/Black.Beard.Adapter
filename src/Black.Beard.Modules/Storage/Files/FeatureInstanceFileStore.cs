@@ -4,8 +4,8 @@ using Bb.Modules;
 namespace Bb.Storage.Files
 {
 
-    [ExposeClass("Service", ExposedType = typeof(IStore<Guid, FeatureInstance>), LifeCycle = IocScopeEnum.Scoped)]
-    public class FeatureInstanceFileStore : FileStoreBase<Guid, FeatureInstance>
+    [ExposeClass("Service", ExposedType = typeof(IStore<Guid, Document>), LifeCycle = IocScopeEnum.Scoped)]
+    public class FeatureInstanceFileStore : FileStoreBase<Guid, Document>
     {
 
         public FeatureInstanceFileStore(IConfiguration configuration)
@@ -14,7 +14,7 @@ namespace Bb.Storage.Files
 
         }
 
-        protected override void MapInstance(FeatureInstance instance)
+        protected override void MapInstance(Document instance)
         {
             base.MapInstance(instance);
         }

@@ -1,10 +1,11 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.Addons;
+using Bb.ComponentModel.Attributes;
 
 namespace Bb.Modules
 {
 
-    [ExposeClass(ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(ModuleSpecification), LifeCycle = IocScopeEnum.Singleton)]
-    public class ModuleDatas : ModuleSpecification
+    [ExposeClass(ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(AddOnLibrary), LifeCycle = IocScopeEnum.Singleton)]
+    public class ModuleDatas : AddOnLibrary
     {
 
         public ModuleDatas() :

@@ -1,11 +1,12 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.Addons;
+using Bb.ComponentModel.Attributes;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bb.Modules
 {
 
-    public class NewModuleDescription
+    public class NewSolutionDescription
     {
 
         [Description("Name of the module")]
@@ -17,7 +18,7 @@ namespace Bb.Modules
         public string? Description { get; set; }
 
         [Description("Type based module")]
-        [ListProvider(typeof(ListProviderModule))]
+        [ListProvider(typeof(ListProviderAddons))]
         [Required]
         public Guid? Type { get; set; }
 

@@ -11,10 +11,10 @@
     </MudToolBar>
 </MudPaper>
 
-<FluentSplitter Orientation="@Microsoft.Fast.Components.FluentUI.Orientation.Horizontal"
+<FluentSplitter Class="full-size" Orientation="@Microsoft.Fast.Components.FluentUI.Orientation.Horizontal"
                 BarSize="6"
-                Panel1Size="20%"
-                Panel1MinSize="15%"
+                Panel1Size="8%"
+                Panel1MinSize="8%"
                 Panel2MinSize="50px">
     <Panel1>
 
@@ -29,57 +29,56 @@
 
     <Panel2>
 
-        <MudExpansionPanels>
-            <MudExpansionPanel @ref=ExpansionDiagnostic Dense="true">
-                <MudSimpleTable>
-                    <thead>
-                        <tr>
-                            <th>Level</th>
-                            <th>Description</th>
-                            <th>Source</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Diagnostics != null)
-                            @foreach (var row in Diagnostics)
-                            {
-                                <DiagnosticRow Row="@row" PropertyGridView="PropertyGrid" />
-                            }
-                    </tbody>
+            <MudExpansionPanels>
+                <MudExpansionPanel @ref=ExpansionDiagnostic Dense="true">
+                    <MudSimpleTable>
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Description</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Diagnostics != null)
+                                @foreach (var row in Diagnostics)
+                                {
+                                    <DiagnosticRow Row="@row" PropertyGridView="PropertyGrid" />
+                                }
+                        </tbody>
 
-                </MudSimpleTable>
-            </MudExpansionPanel>
-        </MudExpansionPanels>
+                    </MudSimpleTable>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
 
-        <div class="diagram-container dropzone @dropClass"
-             ondrop="@((DragEventArgs args)=>{HandleDrop(args);})"
-             ondragover="event.preventDefault();"
-             ondragenter="@HandleDragEnter"
-             ondragleave="@HandleDragLeave">
+        <div class="full-size diagram-container dropzone @dropClass"
+                 ondrop="@((DragEventArgs args)=>{HandleDrop(args);})"
+                 ondragover="event.preventDefault();"
+                 ondragenter="@HandleDragEnter"
+                 ondragleave="@HandleDragLeave">
 
-            <CascadingValue Value="Diagram" IsFixed="true">
-                <DiagramCanvas>
+                <CascadingValue Value="Diagram" IsFixed="true">
+                <DiagramCanvas Class="flex-grow">
 
-                    <Widgets>
+                        <Widgets>
 
-                        <NavigatorWidget Width="200"
-                                         Height="120"
-                                         UseNodeShape="false"
-                                         Class="border border-black bg-white absolute"
-                                         Style="bottom: 15px; right: 15px;">
+                            <NavigatorWidget Width="200"
+                                             Height="120"
+                                             UseNodeShape="false"
+                                             Class="border border-black bg-white absolute"
+                                             Style="bottom: 15px; right: 15px;">
 
-                        </NavigatorWidget>
+                            </NavigatorWidget>
 
-                        <GridWidget Size="20" Mode="GridMode.Point" BackgroundColor="white" />
+                            <GridWidget Size="20" Mode="GridMode.Point" BackgroundColor="white" />
 
-                        <SelectionBoxWidget />
+                            <SelectionBoxWidget />
 
-                    </Widgets>
+                        </Widgets>
 
-                </DiagramCanvas>
-            </CascadingValue>
-        </div>
+                    </DiagramCanvas>
+                </CascadingValue>
+            </div>
 
     </Panel2>
 </FluentSplitter>
-

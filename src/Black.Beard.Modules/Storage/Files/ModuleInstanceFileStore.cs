@@ -4,22 +4,22 @@ using Bb.Modules;
 namespace Bb.Storage.Files
 {
 
-    [ExposeClass("Service", ExposedType = typeof(IStore<Guid, ModuleInstance>), LifeCycle = IocScopeEnum.Scoped)]
-    public class ModuleInstanceFileStore : FileStoreBase<Guid, ModuleInstance>
+    [ExposeClass("Service", ExposedType = typeof(IStore<Guid, Solution>), LifeCycle = IocScopeEnum.Scoped)]
+    public class ModuleInstanceFileStore : FileStoreBase<Guid, Solution>
     {
 
-        public ModuleInstanceFileStore(IConfiguration configuration, FeatureInstances featureInstances)
+        public ModuleInstanceFileStore(IConfiguration configuration, Documents featureInstances)
             : base(configuration, "Modules", "ModuleInstances", ModuleConstants.Extension)
         {
             _featureInstances = featureInstances;
         }
 
-        protected override void MapInstance(ModuleInstance instance)
+        protected override void MapInstance(Solution instance)
         {
-            instance.FeatureInstances = _featureInstances;
+            instance.Documents = _featureInstances;
         }
 
-        private readonly FeatureInstances _featureInstances;
+        private readonly Documents _featureInstances;
 
     }
 

@@ -16,7 +16,7 @@ namespace Bb.Loaders
     {
 
 
-        public MenuServiceBuilder(ModuleInstances modules)
+        public MenuServiceBuilder(Modules.Solutions modules)
         {
             _modules = modules;
         }
@@ -27,7 +27,7 @@ namespace Bb.Loaders
             service.Initialize(UIKeys.Menus.LeftMenu, UIKeys.Menus.Modules, menu =>
             {
 
-                menu.WithDisplay(ModuleConstants.Modules)
+                menu.WithDisplay(ModuleConstants.Solutions)
                     //.DoActionMatchAll()
                     .WithDividerAfter()
                     //.WithIcon(Glyph.Empty)
@@ -75,7 +75,7 @@ namespace Bb.Loaders
         }
 
         static readonly Guid NewModule = new("{C8063B0B-B057-4BCB-8629-19D149FE9181}");
-        private readonly ModuleInstances _modules;
+        private readonly Modules.Solutions _modules;
 
     }
 

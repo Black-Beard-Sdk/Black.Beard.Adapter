@@ -25,35 +25,35 @@ namespace Bb.Pages
         public ITranslateService TranslationService { get; set; }
 
         [Inject]
-        public ModuleInstances Instances { get; set; }
+        public Modules.Solutions Instances { get; set; }
 
         [Inject]
         public IDialogService DialogService { get; set; }
 
-        public MudDataGrid<ModuleInstance> Grid { get; set; }
+        public MudDataGrid<Solution> Grid { get; set; }
 
         private void OpenDialogCreateNewModule()
         {
 
             var wizardModel = new WizardModel(DialogService)
-                  .SetTitle(ModuleConstants.AddANewModule)
-                  .SetModel(new NewModuleDescription())
+                  .SetTitle(ModuleConstants.AddANewSolution)
+                  .SetModel(new NewSolutionDescription())
                   .AddPage(ModuleConstants.Description, c =>
                   {
-                      c.SetDescription(ModuleConstants.AddNewModuleSetName)
+                      c.SetDescription(ModuleConstants.AddNewSolutionSetName)
                        .SetFilterOnPropertyModel("Name", "Description");
                   })
-                  .AddPage(ModuleConstants.Type, c =>
-                  {
-                      c.SetDescription(ModuleConstants.AddNewModuleSetType)
-                       .SetFilterOnPropertyModel("Type");
-                  })
+                  //.AddPage(ModuleConstants.Type, c =>
+                  //{
+                  //    c.SetDescription(ModuleConstants.AddNewSolutionSetType)
+                  //     .SetFilterOnPropertyModel("Type");
+                  //})
                   .ExecuteOnClose(async (wizard, result) =>
                   {
                       if (result == WizardResult.Ok)
                       {
-                          var m = wizard.GetModel<NewModuleDescription>();
-                          var module = Instances.Create(m.Type.Value, m.Name, m.Description);
+                          var m = wizard.GetModel<NewSolutionDescription>();
+                          var module = Instances.Create(m.Name, m.Description);
                       }
                       StateHasChanged();
                       RefreshService.CallRequestRefresh(this, UIKeys.Menus.Modules);
@@ -64,10 +64,10 @@ namespace Bb.Pages
 
         }
 
-        private async Task OpenDialogDeleteModule(CellContext<ModuleInstance> arg)
+        private async Task OpenDialogDeleteModule(CellContext<Solution> arg)
         {
 
-            ModuleInstance module = arg.Item;
+            Solution module = arg.Item;
 
             var options = new DialogOptions()
             {
@@ -94,7 +94,7 @@ namespace Bb.Pages
         }
 
 
-        private Func<ModuleInstance, bool> _quickFilter => x =>
+        private Func<Solution, bool> _quickFilter => x =>
         {
             
             if (string.IsNullOrWhiteSpace(_searchString))
@@ -104,9 +104,6 @@ namespace Bb.Pages
                 return true;
 
             if (x.Label.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            if (x.ModuleSpecification.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;

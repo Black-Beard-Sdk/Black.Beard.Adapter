@@ -13,8 +13,24 @@ namespace Bb.Modules
 
         }
 
+        /// <summary>
+        /// Unique key of the document
+        /// </summary>
         [StoreDescriptor(isPrimary: true, order: 0)]
         public TKey Uuid { get; set; }
+
+
+        /// <summary>
+        /// Name of the module
+        /// </summary>
+        [StoreDescriptor(externalize: true, order: 4)]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Description of the module
+        /// </summary>
+        public string Description { get; set; }
+
 
         [StoreDescriptor(checkIntegrity: true, order: 1)]
         public int Version { get; set; }

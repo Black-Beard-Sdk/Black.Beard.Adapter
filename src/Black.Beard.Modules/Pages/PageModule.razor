@@ -4,7 +4,7 @@
 
 <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">@Module?.Label</MudText>
 
-<MudDataGrid @ref=Grid T="FeatureInstance"
+<MudDataGrid @ref=Grid T="Document"
              SortMode="SortMode.Multiple"
              Filterable="true" QuickFilter="@_quickFilter"
              Hideable="true"
@@ -14,7 +14,7 @@
              Items="@Module.GetFeatures()">
 
     <ToolBarContent>
-        <MudButton OnClick="OpenDialogCreateNewFeature" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.AddANewFeature.Translate(this)</MudButton>
+        <MudButton OnClick="OpenDialogCreateNewFeature" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.AddANewDocument.Translate(this)</MudButton>
         <MudButton OnClick="OpenEdit" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.ManageGit.Translate(this)</MudButton>
         <MudSpacer />
         <MudText Typo="Typo.h6">@ModuleConstants.Filter.Translate(this)&nbsp;&nbsp;&nbsp;</MudText>
@@ -25,7 +25,7 @@
     <Columns>
 
         <PropertyColumn Property="x => x.Label" Title="Label" />
-        <PropertyColumn Property="x => x.FeatureSpecification.Name" Title="Specification" />
+        <PropertyColumn Property="x => x.Feature.Name" Title="Specification" />
 
         <PropertyColumn Property="x => x.Description" Title="Description"></PropertyColumn>
 
@@ -43,7 +43,7 @@
     </Columns>
 
     <PagerContent>
-        <MudDataGridPager T="FeatureInstance" PageSizeOptions=@(new int[] {10, 25, 50, 100}) />
+        <MudDataGridPager T="Document" PageSizeOptions=@(new int[] {10, 25, 50, 100}) />
     </PagerContent>
 
 </MudDataGrid>

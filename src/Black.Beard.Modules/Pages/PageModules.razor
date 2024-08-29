@@ -5,7 +5,7 @@
 
 <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">@ModuleConstants.Manage.Translate(this)</MudText>
 
-<MudDataGrid @ref=Grid T="ModuleInstance"
+<MudDataGrid @ref=Grid T="Solution"
              SortMode="SortMode.Multiple"
              Filterable="true" QuickFilter="@_quickFilter"
              Hideable="true"
@@ -15,7 +15,7 @@
              Items="@Instances.GetModules()">
 
     <ToolBarContent>
-        <MudButton OnClick="OpenDialogCreateNewModule" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.AddANewModule.Translate(this)</MudButton>
+        <MudButton OnClick="OpenDialogCreateNewModule" Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">@ModuleConstants.AddANewSolution.Translate(this)</MudButton>
         <MudSpacer />
         <MudText Typo="Typo.h6">@ModuleConstants.Filter.Translate(this)&nbsp;&nbsp;&nbsp;</MudText>
         <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
@@ -25,7 +25,6 @@
     <Columns>
 
         <PropertyColumn Property="x => x.Label" Title="Label" />
-        <PropertyColumn Property="x => x.ModuleSpecification.Name" Title="Specification" />
 
         <PropertyColumn Property="x => x.Description" Title="Description"></PropertyColumn>
 
@@ -43,7 +42,7 @@
     </Columns>
 
     <PagerContent>
-        <MudDataGridPager T="ModuleInstance" PageSizeOptions=@(new int[] {10, 25, 50, 100}) />
+        <MudDataGridPager T="Solution" PageSizeOptions=@(new int[] {10, 25, 50, 100}) />
     </PagerContent>
 
 </MudDataGrid>

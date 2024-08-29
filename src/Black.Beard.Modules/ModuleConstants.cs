@@ -8,22 +8,25 @@ namespace Bb
 
         public static TranslatedKeyLabel Description => new TranslatedKeyLabel("Description");
 
-        public static TranslatedKeyLabel AddNewModuleSetName => new TranslatedKeyLabel("Specify the name and the description for the new module");
-        public static TranslatedKeyLabel AddNewFeatureSetName => new TranslatedKeyLabel("Specify the name and the description for the new feature");
 
-        public static TranslatedKeyLabel AddNewModuleSetType => new TranslatedKeyLabel("Specify the type of the new module");
-        public static TranslatedKeyLabel AddNewFeatureSetType => new TranslatedKeyLabel("Specify the type of the new feature");
+        public static TranslatedKeyLabel AddNewSolutionSetName => new TranslatedKeyLabel("Specify the name and the description for the new solution");
+        public static TranslatedKeyLabel AddNewDocumentSetName => new TranslatedKeyLabel("Specify the name and the description for the new document");
+
+
+        public static TranslatedKeyLabel AddNewSolutionSetType => new TranslatedKeyLabel("Specify the type of the new module");
+        public static TranslatedKeyLabel AddNewDocumentSetType => new TranslatedKeyLabel("Specify the type of the new feature");
+
 
         public static TranslatedKeyLabel Type => new TranslatedKeyLabel("Type");
 
         public static TranslatedKeyLabel Filter => new TranslatedKeyLabel("Filter");
 
-        public static TranslatedKeyLabel Modules => new TranslatedKeyLabel("Modules");
+        public static TranslatedKeyLabel Solutions => new TranslatedKeyLabel("Solutions");
 
         public static TranslatedKeyLabel Manage => new TranslatedKeyLabel("Manage");
 
-        public static TranslatedKeyLabel AddANewModule => new TranslatedKeyLabel("Add a new module");
-        public static TranslatedKeyLabel AddANewFeature => new TranslatedKeyLabel("Add a new feature");
+        public static TranslatedKeyLabel AddANewSolution => new TranslatedKeyLabel("Add a new solution");
+        public static TranslatedKeyLabel AddANewDocument => new TranslatedKeyLabel("Add a new Document");
         public static TranslatedKeyLabel ManageGit => new TranslatedKeyLabel("Manage git");
 
         public static TranslatedKeyLabel Cancel => new TranslatedKeyLabel("Cancel");

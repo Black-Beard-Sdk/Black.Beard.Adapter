@@ -50,15 +50,14 @@ namespace Bb.Editors
                     {
                         var mapper = MapperProvider.GetMapper(type, typeView);
                         _viewObject = mapper?.MapTo(_selectedObject, typeView, null);
-
                         _mapperReturn = MapperProvider.GetMapper(typeView, type);
-
                     }
+
                 }
             }
         }
 
-        public object ViewObject => _viewObject;
+        public object? ViewObject => _viewObject ?? _selectedObject;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -82,7 +81,8 @@ namespace Bb.Editors
             GC.SuppressFinalize(this);
         }
 
-        private async void Cancel()
+
+        private void Cancel()
         {
 
             Actions.Result = new ContextEditor()
@@ -100,11 +100,10 @@ namespace Bb.Editors
                 Actions.ToClose(Actions);
             }
 
-            
-
         }
 
-        private async void Validate()
+
+        private void Validate()
         {
             Actions.Result = new ContextEditor()
             {
@@ -127,7 +126,7 @@ namespace Bb.Editors
         private bool disposedValue;
         private PropertyGridView CurrentPropertyGridView;
         private object _selectedObject;
-        private object _viewObject;
+        private object? _viewObject;
         private IMapper? _mapperReturn;
     }
 }

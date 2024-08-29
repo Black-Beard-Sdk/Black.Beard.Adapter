@@ -1,4 +1,5 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.Addons;
+using Bb.ComponentModel.Attributes;
 using Bb.Diagrams;
 using Bb.Modules.Etl.Models;
 
@@ -6,14 +7,15 @@ namespace Bb.Modules.Etl
 {
 
 
-    [ExposeClass(Bb.ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(FeatureSpecification), LifeCycle = IocScopeEnum.Transiant)]
-    public class EtlDiagramFeature : FeatureSpecification
+    [ExposeClass(Bb.ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(Feature), LifeCycle = IocScopeEnum.Transiant)]
+    public class EtlDiagramFeature : Feature
     {
+        private const string Description = "Design data flow for your solution";
 
         public EtlDiagramFeature()
             : base(new Guid(Filter),
                 "data flow diagram",
-                "Design data flow for your module",
+                Description,
                 new Guid(ModuleDatas.Filter),
                 typeof(EtlDiagram)
             )
@@ -22,13 +24,13 @@ namespace Bb.Modules.Etl
         }
 
 
-        public override object GetModel(FeatureInstance featureInstance)
+        public override object Load(Document featureInstance)
         {
-            var result =  (Diagram)base.GetModel(featureInstance);
+            var result =  (Diagram)base.Load(featureInstance);
 
             result.SetSave(d =>
             {
-                SetModel(featureInstance, d);
+                Save(featureInstance, d);
                 featureInstance.Parent.Save(featureInstance); 
             });
 
@@ -37,9 +39,9 @@ namespace Bb.Modules.Etl
 
         }
 
-        public override void SetModel(FeatureInstance featureInstance, object model)
+        public override void Save(Document featureInstance, object model)
         {
-            base.SetModel(featureInstance, model);
+            base.Save(featureInstance, model);
         }
 
         /// <summary>

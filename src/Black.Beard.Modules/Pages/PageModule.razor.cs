@@ -28,10 +28,10 @@ namespace Bb.Pages
         public ITranslateService TranslationService { get; set; }
 
         [Inject]
-        public ModuleInstances Instances { get; set; }
+        public Modules.Solutions Instances { get; set; }
 
         [Inject]
-        public FeatureInstances FeatureInstances { get; set; }
+        public Documents FeatureInstances { get; set; }
 
         [Inject]
         public IDialogService DialogService { get; set; }
@@ -43,7 +43,7 @@ namespace Bb.Pages
             StateHasChanged();
         }
 
-        public ModuleInstance Module => _module ?? (_module = Instances.GetModule(Uuid));
+        public Modules.Solution Module => _module ?? (_module = Instances.GetModule(Uuid));
 
 
 
@@ -51,23 +51,23 @@ namespace Bb.Pages
         {
 
             var wizardModel = new WizardModel(DialogService)
-                  .SetTitle(ModuleConstants.AddANewFeature)
-                  .SetModel(new NewFeatureDescription() { Module = Module })
+                  .SetTitle(ModuleConstants.AddANewDocument)
+                  .SetModel(new NewDocumentDescription() { Solution = Module })
                   .AddPage(ModuleConstants.Description, c =>
                   {
-                      c.SetDescription(ModuleConstants.AddNewFeatureSetName)
+                      c.SetDescription(ModuleConstants.AddNewDocumentSetName)
                        .SetFilterOnPropertyModel("Name", "Description");
                   })
                   .AddPage(ModuleConstants.Type, c =>
                   {
-                      c.SetDescription(ModuleConstants.AddNewFeatureSetType)
+                      c.SetDescription(ModuleConstants.AddNewDocumentSetType)
                        .SetFilterOnPropertyModel("Type");
                   })
                   .ExecuteOnClose(async (wizard, result) =>
                   {
                       if (result == WizardResult.Ok)
                       {
-                          var m = wizard.GetModel<NewFeatureDescription>();
+                          var m = wizard.GetModel<NewDocumentDescription>();
                           var module = FeatureInstances.Create(Uuid, m.Type.Value, m.Name, m.Description);
                       }
                       StateHasChanged();
@@ -146,10 +146,10 @@ namespace Bb.Pages
 
         }
 
-        private async Task OpenDialogDeleteFeature(CellContext<FeatureInstance> arg)
+        private async Task OpenDialogDeleteFeature(CellContext<Document> arg)
         {
 
-            FeatureInstance feature = arg.Item;
+            Document feature = arg.Item;
 
             var options = new DialogOptions()
             {
@@ -176,10 +176,10 @@ namespace Bb.Pages
         }
 
 
-        public MudDataGrid<FeatureInstance> Grid { get; set; }
+        public MudDataGrid<Document> Grid { get; set; }
 
 
-        private Func<FeatureInstance, bool> _quickFilter => x =>
+        private Func<Document, bool> _quickFilter => x =>
         {
 
             if (string.IsNullOrWhiteSpace(_searchString))
@@ -191,7 +191,7 @@ namespace Bb.Pages
             if (x.Label.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
-            if (x.FeatureSpecification.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            if (x.Feature.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;
@@ -201,7 +201,7 @@ namespace Bb.Pages
         private string _searchString;
 
 
-        private ModuleInstance _module;
+        private Modules.Solution _module;
 
     }
 

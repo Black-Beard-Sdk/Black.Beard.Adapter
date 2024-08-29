@@ -118,8 +118,6 @@ namespace Site.Shared
             GC.SuppressFinalize(this);
         }
 
-
-
         private MudBlazorAdminDashboard _theme = new();
 
         public bool _drawerOpen = true;
