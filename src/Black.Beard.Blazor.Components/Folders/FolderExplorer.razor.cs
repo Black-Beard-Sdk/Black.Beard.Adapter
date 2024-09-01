@@ -5,6 +5,10 @@ using System.Linq;
 
 namespace Bb.Folders
 {
+
+    /// <summary>
+    /// Folder explorer
+    /// </summary>
     public partial class FolderExplorer : ComponentBase
     {
 
@@ -19,7 +23,6 @@ namespace Bb.Folders
                 TreeItems.Add(new FileItemData(p));
 
         }
-
 
         private HashSet<FileItemData> TreeItems { get; set; } = new HashSet<FileItemData>();
 
