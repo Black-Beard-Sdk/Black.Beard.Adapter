@@ -1,0 +1,20 @@
+﻿@using MudBlazor
+
+<MudPaper Width="400px" Elevation="2">
+
+    <MudTreeView T="@FileItemData" Items="TreeItems" ExpandOnClick="true">
+        <ItemTemplate>
+            <MudTreeViewItem Value="@context"                             
+                             LoadingIconColor="Color.Info"
+                             CanExpand="@context.HasChild"
+                             @bind-Expanded="@context.IsExpanded"
+                             Text="@context.Text"
+                             EndTextTypo="@Typo.caption"
+                             Icon="@context.Icon"
+                             ExpandedIcon="@context.ExpandedIcon"
+                             Items="@context.TreeItems" />
+        </ItemTemplate>
+    </MudTreeView>
+
+</MudPaper>
+
