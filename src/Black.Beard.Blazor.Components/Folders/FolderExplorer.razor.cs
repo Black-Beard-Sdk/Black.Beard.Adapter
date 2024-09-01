@@ -12,6 +12,9 @@ namespace Bb.Folders
     public partial class FolderExplorer : ComponentBase
     {
 
+        /// <summary>
+        /// Gets or sets the path to explore.
+        /// </summary>
         [Parameter]
         public string Path { get; set; }
 
@@ -19,9 +22,12 @@ namespace Bb.Folders
         {
 
             var p = new DirectoryInfo(Path);
-            if (p .Exists)
-                TreeItems.Add(new FileItemData(p));
 
+            if (p.Exists)
+            {
+                p.Refresh();
+                TreeItems.Add(new FileItemData(p));
+            }
         }
 
         private HashSet<FileItemData> TreeItems { get; set; } = new HashSet<FileItemData>();
