@@ -29,9 +29,12 @@ namespace Bb.Modules
         public Document GeDocument(Guid uuid)
         {
             Document feature = _store.Load(uuid);
-            feature.Parent = this;
-            var s = _referentiel.GetFeature(feature.Specification);
-            feature.Feature = s;
+            if (feature != null)
+            {
+                feature.Parent = this;
+                var s = _referentiel.GetFeature(feature.Specification);
+                feature.Feature = s;
+            }
             return feature;
         }
 

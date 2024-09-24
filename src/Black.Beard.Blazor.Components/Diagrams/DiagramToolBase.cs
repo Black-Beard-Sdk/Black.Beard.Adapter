@@ -6,16 +6,23 @@ namespace Bb.Diagrams
 {
 
 
-    public class DiagramSpecificationBase
+    public class DiagramToolBase
     {
 
-        public DiagramSpecificationBase(Guid uuid, TranslatedKeyLabel name, TranslatedKeyLabel description, string icon)
+        public DiagramToolBase
+        (
+            Guid uuid,
+            TranslatedKeyLabel category,
+            TranslatedKeyLabel name, 
+            TranslatedKeyLabel description, 
+            string icon)
         {
             this.Uuid = uuid;
             this.Name = name;
             this.ToolTip = description;
             Icon = icon;
-            Category = Bb.ComponentConstants.Tools;
+            Category = category;
+            //  
         }
 
         public virtual string GetDefaultName()
@@ -26,19 +33,17 @@ namespace Bb.Diagrams
         /// <summary>
         /// Unique identifier
         /// </summary>
-        public Guid Uuid { get; set; }
-
+        public Guid Uuid { get; }
 
         public virtual void SetTypeModel<T>()
-            where T : CustomizedNodeModel
+            where T : INodeModel
         {
-            var type = typeof(T);
-            TypeModel = type;
+            TypeModel = typeof(T);
         }
 
-        public Type TypeModel { get; private set; } = typeof(CustomizedNodeModel);
+        public Type TypeModel { get; private set; } = typeof(UIModel);
 
-        public virtual void SetTypeUI<T>()
+        internal protected virtual void SetTypeUI<T>()
             where T : Microsoft.AspNetCore.Components.IComponent
         {
             TypeUI = typeof(T);
@@ -46,7 +51,7 @@ namespace Bb.Diagrams
 
         public Type TypeUI { get; private set; } 
 
-        public TranslatedKeyLabel Category { get; protected set; }
+        public TranslatedKeyLabel Category { get; }
 
         /// <summary>
         /// Name of the entity tool
@@ -64,7 +69,6 @@ namespace Bb.Diagrams
         public string Icon { get; }
 
         public ToolKind Kind { get; protected set; }
-
 
     }
 

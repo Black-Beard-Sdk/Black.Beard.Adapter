@@ -7,20 +7,19 @@ using Blazor.Diagrams.Core.Models;
 namespace Bb.Modules.Sgbd.DiagramTools
 {
 
-    [ExposeClass(SgbdDiagramFeature.Filter, ExposedType = typeof(DiagramSpecificationBase))]
-    public class ConstraintRelationship : DiagramSpecificationRelationshipBase
+    [ExposeClass(SgbdDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
+    public class ConstraintRelationship : DiagramToolRelationshipBase
     {
 
         public ConstraintRelationship()
             : base(new Guid(Key),
-                   "Contraint",
+                   Bb.ComponentConstants.Relationships,
+                   "Constraint",
                    "Create a constraint",
                    GlyphFilled.ArrowUpward)
         {
 
             IsDefaultLink = true;
-
-
 
         }
 
@@ -35,7 +34,7 @@ namespace Bb.Modules.Sgbd.DiagramTools
             return base.CreateAnchor(model);
         }
 
-        public override CustomizedLinkModel CreateLink(DiagramRelationship link, Anchor source, Anchor target)
+        public override CustomizedLinkModel CreateLink(SerializableRelationship link, Anchor source, Anchor target)
         {
 
             var result = base.CreateLink(link, source, target);
@@ -46,7 +45,7 @@ namespace Bb.Modules.Sgbd.DiagramTools
             return result;
         }
 
-        public override CustomizedLinkModel CreateLink(DiagramRelationship link, PortModel source, PortModel target)
+        public override CustomizedLinkModel CreateLink(SerializableRelationship link, PortModel source, PortModel target)
         {
             return base.CreateLink(link, source, target);
         }
@@ -65,12 +64,6 @@ namespace Bb.Modules.Sgbd.DiagramTools
         {
             base.SetTypeModel<T>();
         }
-
-        public override void SetTypeUI<T>()
-        {
-            base.SetTypeUI<T>();
-        }
-
 
         public const string Key = "0A385005-4391-42A9-B538-2C33E1266801";
 

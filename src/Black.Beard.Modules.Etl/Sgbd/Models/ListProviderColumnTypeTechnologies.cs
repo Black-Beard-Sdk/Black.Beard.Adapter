@@ -22,8 +22,10 @@ namespace Bb.Modules
             if (Instance != null && Property != null)
             {
 
-                if (Instance is Column c && c.Table.Source.Diagram is SgbdDiagram d)
+                if (Instance is Column c && c.Table.Source.DiagramIs<SgbdDiagram>())
                 {
+
+                    var d = c.Table.Source.GetDiagram<SgbdDiagram>();
 
                     SgbdTechnology techno = d.GetTechnology();
                     if (techno != null)

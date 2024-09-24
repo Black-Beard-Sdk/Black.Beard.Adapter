@@ -179,7 +179,7 @@ namespace Bb.Modules.Sgbd.Models
                 c.GetModels(
                     c =>
                     {
-                        return c.Models.OfType<DiagramNode>()
+                        return c.Models.OfType<SerializableDiagramNode>()
                             .Where(c => c.Type == new Guid(TableTool.Key))
                             .Select(c => new Table(c));
                     },

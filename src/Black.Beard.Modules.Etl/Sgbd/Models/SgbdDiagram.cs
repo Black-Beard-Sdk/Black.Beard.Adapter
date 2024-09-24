@@ -13,6 +13,7 @@ namespace Bb.Modules.Sgbd.Models
 
         public SgbdDiagram()
         {
+            this.TypeModelId = new Guid("7BDE57DD-14BE-4E19-9896-54E4B2F35050");
             this._container = new DynamicDescriptorInstanceContainer(this);
         }
 

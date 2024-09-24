@@ -9,6 +9,8 @@ using Bb.PropertyGrid;
 using Blazor.Diagrams.Core.Models.Base;
 using Bb.ComponentModel.Translations;
 using MudBlazor;
+using Bb.ComponentModel.Attributes;
+using Bb.Toolbars;
 
 namespace Bb.Diagrams
 {
@@ -16,26 +18,32 @@ namespace Bb.Diagrams
     public partial class DiagramUI : ComponentBase, IDisposable, ITranslateHost
     {
 
-
-
         public DiagramUI()
         {
-           
+
         }
 
+        [EvaluateValidation(false)]
         public Diagnostics Diagnostics { get; set; }
 
+        [EvaluateValidation(false)]
         [Inject]
         public ITranslateService TranslationService { get; set; }
 
+        [EvaluateValidation(false)]
         [Inject]
-        public IFocusedService FocusedService { get; set; }
+        public IFocusedService<ToolbarList> GlobalBarFocusService { get; set; }
+
+        [EvaluateValidation(false)]
+        [Inject]
+        public IFocusedService<PropertyGridView> PropertyGridFocusedService { get; set; }
 
         [Parameter]
         public Diagram DiagramModel { get; set; }
 
+        [EvaluateValidation(false)]
         [Inject]
-        public IBusyService BusyService 
+        public IBusyService BusyService
         {
             get => _busyService;
             set
@@ -48,41 +56,43 @@ namespace Bb.Diagrams
             }
         }
 
+
+
+        [EvaluateValidation(false)]
+        private BlazorDiagram Diagram { get; set; } = null!;
+
         [Parameter]
         public MudExpansionPanel ExpansionDiagnostic { get; set; }
-
-        public ToolboxList Toolbox { get => _toolboxList ?? (_toolboxList = new ToolboxList(DiagramModel.Specifications)); }
 
         protected override void OnInitialized()
         {
 
-            _linkFactory = new LinkFactory(DiagramModel.Specifications);
             _anchorFactory = new AnchorFactory();
 
             Diagram = CreateDiagram();
             Diagram.PointerClick += PointerClick;
             Diagram.SelectionChanged += SelectionChanged;
-            FocusedService.FocusChanged += FocusedService_FocusChanged;
-            DiagramModel.Apply(Diagram);
+            //PropertyGridFocusedService.FocusChanged += FocusedService_FocusChanged;
+            if (DiagramModel != null)
+            {
+                _linkFactory = new LinkFactory(DiagramModel.Specifications);
+                DiagramModel.Apply(Diagram);
+            }
         }
-
-        private void FocusedService_FocusChanged(object? sender, EventArgs e)
-        {
-            this.PropertyGrid.SelectedObject = sender;
-        }
+                
 
         private void PointerClick(Model? model, Blazor.Diagrams.Core.Events.PointerEventArgs args)
         {
             if (model == null)
-                FocusedService.FocusChange(DiagramModel);
+                PropertyGridFocusedService.FocusChange(DiagramModel);
             else
-                FocusedService.FocusChange(model);
+                PropertyGridFocusedService.FocusChange(model);
         }
 
         private void SelectionChanged(SelectableModel model)
         {
             if (model != null)
-                FocusedService.FocusChange(model);
+                PropertyGridFocusedService.FocusChange(model);
         }
 
         private BlazorDiagram CreateDiagram()
@@ -101,8 +111,17 @@ namespace Bb.Diagrams
                 {
                     DefaultRouter = new NormalRouter(),
                     DefaultPathGenerator = new SmoothPathGenerator(),
-                    Factory = (diagram, source, targetAnchor) => _linkFactory.CreateLinkModel(Toolbox.CurrentLink, diagram, source, targetAnchor),
-                    TargetAnchorFactory = (diagram, link, model) => _anchorFactory.CreateLinkModel(Toolbox.CurrentLink, diagram, link, model),
+                    Factory = (diagram, source, targetAnchor) =>
+                    {
+                        var tool = ToolBar.CurrentClicked?.Tag as DiagramToolRelationshipBase;
+                        return _linkFactory.CreateLinkModel(tool, diagram, source, targetAnchor);
+                    },
+
+                    TargetAnchorFactory = (diagram, link, model) =>
+                    {
+                        var tool = ToolBar.CurrentClicked?.Tag as DiagramToolRelationshipBase;
+                        return _anchorFactory.CreateLinkModel(tool, diagram, link, model);
+                    },
                 },
                 AllowPanning = true,
                 GridSnapToCenter = true,
@@ -130,7 +149,6 @@ namespace Bb.Diagrams
             SaveToMyServer(Diagram);
         }
 
-
         private async ValueTask SaveToMyServer(Blazor.Diagrams.Core.Diagram diagram)
         {
 
@@ -148,9 +166,8 @@ namespace Bb.Diagrams
                     if (Diagnostics.Where(c => c.Level == DiagnosticLevel.Error).Any())
                         ExpansionDiagnostic.Expand();
 
-                    foreach (var node in Diagram.Nodes)
-                        if (node is CustomizedNodeModel model)
-                            model.SynchronizeSource();
+                    foreach (INodeModel node in Diagram.Nodes)
+                        node.SynchronizeSource();
 
                     DiagramModel.LastDiagnostics = diagnostic;
                     DiagramModel?.Save(DiagramModel);
@@ -159,12 +176,20 @@ namespace Bb.Diagrams
 
         }
 
+
+
+        public ToolBar? ToolBar { get; set; }
+
         private async Task HandleDragEnter()
         {
-            var dragItem = _toolbox.CurrentDragStarted;
-            if (dragItem == null) return;
-            //    dropClass = "no-drop";
-            dropClass = "can-drop";
+            if (ToolBar != null)
+            {
+                if (ToolBar.CurrentDragStarted != null)
+                {
+                    dropClass = "can-drop";
+                    return;
+                }
+            }
         }
 
         private async Task HandleDragLeave()
@@ -174,16 +199,22 @@ namespace Bb.Diagrams
 
         private async Task HandleDrop(DragEventArgs args)
         {
-            dropClass = "";
-            var dragItem = _toolbox.CurrentDragStarted as DiagramSpecificationNodeBase;
-            if (dragItem == null) return;
-            var point = Diagram.GetRelativePoint(args.ClientX, args.ClientY);
-            DiagramModel.AddModel(dragItem, point.X, point.Y);
-            StateHasChanged();
 
-            _toolbox.Tools.EnsureCategoryIsShown(dragItem);
+            dropClass = string.Empty;
+            if (ToolBar != null)
+            {
+                var i = ToolBar.CurrentDragStarted;
+                if (i != null && i.Tag is DiagramToolNode dragedItem)
+                {
+                    var point1 = Diagram.GetRelativePoint(args.ClientX, args.ClientY);
+                    var m1 = DiagramModel.AddModel(dragedItem, point1.X, point1.Y);
+                    StateHasChanged();
+                    return;
+                }
+            }
 
         }
+
 
         private void _busyService_BusyChanged(object? sender, BusyEventArgs e)
         {
@@ -194,19 +225,6 @@ namespace Bb.Diagrams
                 // StateHasChanged();
             }
         }
-
-
-        private BlazorDiagram Diagram { get; set; } = null!;
-
-        private IBusyService _busyService;
-        private string dropClass = "";
-        private Toolbox _toolbox;
-        private ToolboxList _toolboxList;
-        private LinkFactory _linkFactory;
-        private AnchorFactory _anchorFactory;
-
-        private PropertyGridView PropertyGrid;
-        private bool disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -220,9 +238,9 @@ namespace Bb.Diagrams
                         Diagram.SelectionChanged -= SelectionChanged;
                     }
 
-                    if (FocusedService != null)
-                        FocusedService.FocusChanged -= FocusedService_FocusChanged;
-    
+                    //if (PropertyGridFocusedService != null)
+                    //    PropertyGridFocusedService.FocusChanged -= FocusedService_FocusChanged;
+
                     if (_busyService != null)
                         _busyService.BusyChanged -= _busyService_BusyChanged;
                 }
@@ -231,25 +249,29 @@ namespace Bb.Diagrams
             }
         }
 
-        // // TODO: substituer le finaliseur uniquement si 'Dispose(bool disposing)' a du code pour libérer les ressources non managées
-        // ~DiagramUI()
-        // {
-        //     // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
-        //     Dispose(disposing: false);
-        // }
-
         public void Dispose()
         {
             // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-  
+
         protected override void OnAfterRender(bool firstRender)
         {
             base.OnAfterRender(firstRender);
             if (firstRender)
             {
+
+                var t = DiagramModel.GetToolbar();
+
+                this.GlobalBarFocusService.FocusChange(this.DiagramModel
+                    , (a, b) => true
+                    , (a, b) =>
+                {
+                    this.ToolBar = a.Component as ToolBar;
+                    var diagram = (Diagram)b;
+                    a.ApplyChange(diagram.GetToolbar());
+                });
 
             }
 
@@ -260,6 +282,12 @@ namespace Bb.Diagrams
             return base.OnAfterRenderAsync(firstRender);
         }
 
+        private IBusyService _busyService;
+        private string dropClass = "";
+        private LinkFactory _linkFactory;
+        private AnchorFactory _anchorFactory;
+        private PropertyGridView PropertyGrid;
+        private bool disposedValue;
         private BusySession _session;
 
     }

@@ -1,16 +1,26 @@
 ﻿using Bb;
+using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Translations;
-using Bb.UIComponents;
-using Bb.UserInterfaces;
+using Bb.PropertyGrid;
+using Bb.Toolbars;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace Site.Shared
 {
 
-    public partial class MainLayout : IDisposable
+    public partial class MainLayout : IDisposable, ITranslateHost
     {
 
+        public MainLayout()
+        {
+
+        }
+
+
+        [EvaluateValidation(false)]
+        [Inject]
+        public ITranslateService TranslationService { get; set; }
 
         [Inject]
         public IBusyService BusyService
@@ -29,10 +39,21 @@ namespace Site.Shared
 
         }
 
+
+        [EvaluateValidation(false)]
+        [Inject]
+        public IFocusedService<PropertyGridView> PropertyGridFocusedService { get; set; }
+
+
         [Inject]
         public IDialogService DialogService { get; set; }
 
-
+        protected override Task OnInitializedAsync()
+        {
+            var result = base.OnInitializedAsync();
+            PropertyGridFocusedService.FocusChanged += FocusedService_FocusChanged;
+            return result;
+        }
 
         private async void _busyService_BusyChanged(object? sender, BusyEventArgs e)
         {
@@ -82,6 +103,12 @@ namespace Site.Shared
 
         }
 
+        private void FocusedService_FocusChanged(object? sender, EvaluatorEventArgs<PropertyGridView> e)
+        {
+            if (this.PropertyGrid != null)
+                if (e.Evaluate == null || e.Evaluate(this.PropertyGrid, sender))
+                    this.PropertyGrid.SelectedObject = sender;
+        }
 
         private bool _busyVisible = false;
 
@@ -97,35 +124,24 @@ namespace Site.Shared
                     if (_busyService != null)
                         _busyService.BusyChanged -= _busyService_BusyChanged;
                 }
-
-                // TODO: libérer les ressources non managées (objets non managés) et substituer le finaliseur
-                // TODO: affecter aux grands champs une valeur null
                 disposedValue = true;
             }
         }
 
-        // // TODO: substituer le finaliseur uniquement si 'Dispose(bool disposing)' a du code pour libérer les ressources non managées
-        // ~MainLayout()
-        // {
-        //     // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
-        //     Dispose(disposing: false);
-        // }
-
         public void Dispose()
         {
-            // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
 
-        private MudBlazorAdminDashboard _theme = new();
-
-        public bool _drawerOpen = true;
 
         void DrawerToggle()
         {
-            _drawerOpen = !_drawerOpen;
+            _drawer1pen = !_drawer1pen;
         }
+
+        public bool _drawer1pen = true;
+
 
         protected override void OnInitialized()
         {
@@ -137,6 +153,9 @@ namespace Site.Shared
             new BreadcrumbItem("Personal", href: "#"),
             new BreadcrumbItem("Dashboard", href: "#"),
         };
+
+        private PropertyGridView PropertyGrid;
+        private MudBlazorAdminDashboard _theme = new();
 
     }
 

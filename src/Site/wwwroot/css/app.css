@@ -7,6 +7,13 @@
 }
 
 
+.expandable-container {
+    /*resize: both;*/
+    overflow: auto;
+    display: inline-block; /* Permet au conteneur de s'ajuster à son contenu */
+    white-space: nowrap; /* Empêche le contenu de se casser en plusieurs lignes */
+    /*overflow: visible;*/ /* Permet au contenu de dépasser le conteneur */
+}
 
 /*sgbd*/
 .fully-transparent {

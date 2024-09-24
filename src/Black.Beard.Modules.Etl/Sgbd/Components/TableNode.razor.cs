@@ -47,7 +47,7 @@ namespace Bb.Modules.Sgbd.Components
                 Id = Guid.NewGuid()
             };
 
-            var diagram = this.Node.Source.Diagram as SgbdDiagram;
+            var diagram = this.Node.Source.GetDiagram<SgbdDiagram>();
             var t = diagram.GetTechnology();
             if (t != null)
                 column.Type = t.DefaultColumnType.Code;
@@ -73,7 +73,7 @@ namespace Bb.Modules.Sgbd.Components
                 Id = Guid.NewGuid()
             };
 
-            var diagram = this.Node.Source.Diagram as SgbdDiagram;
+            var diagram = this.Node.Source.GetDiagram<SgbdDiagram>();
             var t = diagram.GetTechnology();
             if (t != null)
             {

@@ -1,6 +1,7 @@
 ﻿using Blazor.Diagrams;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
@@ -9,11 +10,7 @@ namespace Bb.Diagrams
     {
 
 
-        public void ApplyToUI(DiagramSpecificationNodeBase specification, DiagramNode model)
-        {
-            var ui = _diagram.Nodes.Add(specification.CreateUI(model));
-            ui.Source.Diagram = this;
-        }
+        #region Load graphicalModel
 
         public void Apply(BlazorDiagram diagram)
         {
@@ -32,44 +29,103 @@ namespace Bb.Diagrams
         private void Apply()
         {
 
+            // Register components
             foreach (var item in this.Specifications)
-                if (item is DiagramSpecificationNodeBase specModel)
+                if (item is DiagramToolNode specModel)
                     if (item.TypeUI != null)
                         _diagram.RegisterComponent(specModel.TypeModel, specModel.TypeUI, true);
 
-            var dic = new Dictionary<Guid, PortModel>();
-            foreach (var item in this.Models)
-                if (_dicModels.TryGetValue(item.Type, out var specModel))
-                {
+            // Create nodes
+            var dicPort = new Dictionary<Guid, PortModel>();
+            var dicNodes = new Dictionary<Guid, UIModel>();
+            ApplyNodes(dicPort, dicNodes);
 
-                    var ui = _diagram.Nodes.Add(specModel.CreateUI(item));
-                    ui.Source.Diagram = this;
-                    foreach (var port in ui.Ports)
-                        dic.Add(new Guid(port.Id), port);
+            // Create links
+            ApplyLinks(dicPort);
+
+            // Maps groups
+            ApplyGroups(dicNodes);
+
+            CleanUnused();
+
+        }
+
+        private void ApplyGroups(Dictionary<Guid, UIModel> dicNodes)
+        {
+            foreach (var item in this.Models.Where(c => c.UuidParent != null))
+            {
+                if (dicNodes.TryGetValue(item.UuidParent.Value, out UIModel? parent))
+                {
+                    if (parent is UIGroupModel group)
+                        group.Attach(item as NodeModel);
+                    else
+                    {
+                        CleanChild(dicNodes, item);
+                    }
                 }
                 else
                 {
-
+                    CleanChild(dicNodes, item);
                 }
+            }
+        }
 
-            foreach (DiagramRelationship item in this.Relationships)
+        private void ApplyLinks(Dictionary<Guid, PortModel> dicPort)
+        {
+            foreach (SerializableRelationship item in this.Relationships)
                 if (_dicLinks.TryGetValue(item.Type, out var specLink))
-                {
-
-                    if (dic.TryGetValue(item.Source, out PortModel source))
-                        if (dic.TryGetValue(item.Target, out PortModel target))
+                    if (dicPort.TryGetValue(item.Source, out PortModel source))
+                        if (dicPort.TryGetValue(item.Target, out PortModel target))
                         {
                             var link = specLink.CreateLink(item, source, target);
                             var linkUI = _diagram.Links.Add(link);
                         }
+        }
 
-                }
-                else
+        private void ApplyNodes(Dictionary<Guid, PortModel> dicPort, Dictionary<Guid, UIModel> dicNodes)
+        {
+            foreach (var item in this.Models)
+                if (_dicModels.TryGetValue(item.Type, out var specModel))
                 {
-
+                    // Register ports
+                    var ui = specModel.CreateUI(item, this);
+                    dicNodes.Add(new Guid(ui.Id), ui);
+                    foreach (var port in ui.Ports)
+                        dicPort.Add(new Guid(port.Id), port);
                 }
+        }
 
-            CleanUnused();
+        private static void CleanChild(Dictionary<Guid, UIModel> dicNodes, IDiagramNode? item)
+        {
+            if (dicNodes.TryGetValue(item.UuidParent.Value, out UIModel? child))
+                child.SetParent(null);
+        }
+
+        private void CleanUnused()
+        {
+            List<SerializableRelationship> _toRemove = new List<SerializableRelationship>();
+            foreach (var item in Relationships)
+                if (!this._diagram.Links.Where(c => c.Id == item.Uuid.ToString()).Any())
+                    _toRemove.Add(item);
+
+            foreach (var item in _toRemove)
+                Relationships.Remove(item);
+        }
+
+
+        #endregion Load graphicalModel
+
+
+        #region add/Remove
+
+        public void AddNode(INodeModel ui)
+        {
+
+            if (ui is NodeModel group)
+                _diagram.Nodes.Add(group);
+
+            else
+                throw new Exception("Invalid type");
 
         }
 
@@ -82,7 +138,6 @@ namespace Bb.Diagrams
             CleanUnused();
 
         }
-
 
         private void Links_Added(BaseLinkModel link)
         {
@@ -98,17 +153,6 @@ namespace Bb.Diagrams
 
             CleanUnused();
 
-        }
-
-        private void CleanUnused()
-        {
-            List<DiagramRelationship> _toRemove = new List<DiagramRelationship>();
-            foreach (var item in Relationships)
-                if (!this._diagram.Links.Where(c => c.Id == item.Uuid.ToString()).Any())
-                    _toRemove.Add(item);
-
-            foreach (var item in _toRemove)
-                Relationships.Remove(item);
         }
 
         private void Links_TargetMapped(BaseLinkModel link)
@@ -134,7 +178,7 @@ namespace Bb.Diagrams
 
         private void Nodes_Added(NodeModel obj)
         {
-            if (obj is CustomizedNodeModel m)
+            if (obj is UIModel m)
             {
 
                 var p = this.Models.FirstOrDefault(c => c.Uuid == m.Source.Uuid);
@@ -147,7 +191,7 @@ namespace Bb.Diagrams
 
         private void Nodes_Removed(NodeModel model)
         {
-            if (model is CustomizedNodeModel m)
+            if (model is UIModel m)
             {
                 var p = this.Models.FirstOrDefault(c => c.Uuid == m.Source.Uuid);
                 if (p != null)
@@ -155,8 +199,7 @@ namespace Bb.Diagrams
             }
         }
 
-
-
+        #endregion add/Remove
 
 
         protected virtual void Dispose(bool disposing)
@@ -177,18 +220,36 @@ namespace Bb.Diagrams
             }
         }
 
-        // // TODO: substituer le finaliseur uniquement si 'Dispose(bool disposing)' a du code pour libérer les ressources non managées
-        // ~Diagram()
-        // {
-        //     // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
-        //     Dispose(disposing: false);
-        // }
+        public UIGroupModel? GetParentByPosition(INodeModel model)
+        {
+
+            UIGroupModel parent = null;
+
+            var list = _diagram.Groups
+                .OfType<UIGroupModel>()
+                .Where(c => c.ContainsPoint(model.Position)
+                         && model.CanAcceptLikeParent(c))
+                .ToList();
+
+            if (list.Any())
+                parent = list[0];
+
+            return parent;
+
+        }
 
         public void Dispose()
         {
-            // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        
+        public bool TryGetUIModel(Guid id, out NodeModel? result)
+        {
+            var i = id.ToString().ToUpper();
+            result = this._diagram.Nodes.FirstOrDefault(c => c.Id == i);
+            return result != null;
         }
 
         private BlazorDiagram _diagram;

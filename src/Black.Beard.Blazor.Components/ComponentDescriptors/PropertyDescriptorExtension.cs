@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Bb.ComponentDescriptors
 {
@@ -98,10 +99,12 @@ namespace Bb.ComponentDescriptors
         public static bool ToEvaluate(this PropertyDescriptor self)
         {
 
-            var value = self.Attributes
-                .Cast<Attribute>()
-                .OfType<EvaluateValidationAttribute>()
-                .FirstOrDefault();
+            if (self.PropertyType == typeof(Type))
+                return false;
+
+            var value = self.Attributes.Cast<Attribute>()
+                                       .OfType<EvaluateValidationAttribute>()
+                                       .FirstOrDefault();
 
             if (value != null)
                 return value.ToEvaluate;

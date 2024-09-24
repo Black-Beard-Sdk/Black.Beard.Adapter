@@ -6,10 +6,10 @@ namespace Bb.Diagrams
 {
 
 
-    public class DiagramRelationship
+    public class SerializableRelationship
     {
 
-        public DiagramRelationship()
+        public SerializableRelationship()
         {
             Properties = new Properties();
         }

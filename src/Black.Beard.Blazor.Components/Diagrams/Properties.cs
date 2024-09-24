@@ -9,7 +9,6 @@ namespace Bb.Diagrams
     public class Properties : List<Property>
     {
 
-
         public void SetProperty(string name, string value)
         {
             var property = this.FirstOrDefault(c => c.Name == name);
@@ -59,9 +58,14 @@ namespace Bb.Diagrams
 
             HashSet<string> _h = new HashSet<string>(this.Select(c => c.Name));
 
-            var properties = container.Properties().Where(c => !c.IsReadOnly).OrderBy(c => c.Name).ToList();
-            foreach (var item in properties.OrderBy(c => c.Name))
+            var properties = container.Properties()
+                .Where(c => !c.IsReadOnly)
+                .OrderBy(c => c.Name)
+                .ToList();
+
+            foreach (var item in properties)
             {
+
                 if (_h.Contains(item.Name))
                     _h.Remove(item.Name);
 

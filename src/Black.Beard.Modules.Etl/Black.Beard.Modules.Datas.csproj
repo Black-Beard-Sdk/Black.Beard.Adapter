@@ -28,4 +28,9 @@
 		<ProjectReference Include="..\Black.Beard.Modules\Black.Beard.Modules.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Etl\Components\" />
+	  <Folder Include="mcd\" />
+	</ItemGroup>
+
 </Project>

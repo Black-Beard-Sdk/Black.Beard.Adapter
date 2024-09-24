@@ -2,15 +2,16 @@
 using Bb.Diagrams;
 using Bb.UIComponents.Glyphs;
 
-namespace Bb.Modules.Etl.Etl
+namespace Bb.Modules.Etl
 {
 
-    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramSpecificationBase))]
-    public class ConstraintRelationship : DiagramSpecificationRelationshipBase
+    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
+    public class ConstraintRelationship : DiagramToolRelationshipBase
     {
 
         public ConstraintRelationship()
             : base(new Guid(Key),
+                  Bb.ComponentConstants.Relationships,
                    "Call",
                    "Call a WebService",
                    GlyphFilled.ArrowUpward)

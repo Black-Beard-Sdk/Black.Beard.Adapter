@@ -6,7 +6,10 @@ using Bb.ComponentModel.Attributes;
 
 namespace Bb.Diagrams
 {
-    public class CustomizedLinkModel : LinkModel, IDynamicDescriptorInstance, IValidationService
+    public class CustomizedLinkModel 
+        : LinkModel
+        , IDynamicDescriptorInstance
+        , IValidationService
     {
 
 
@@ -16,7 +19,7 @@ namespace Bb.Diagrams
         }
 
 
-        public CustomizedLinkModel(DiagramRelationship relationship, Anchor source, Anchor target)
+        public CustomizedLinkModel(SerializableRelationship relationship, Anchor source, Anchor target)
             : base(relationship.Uuid.ToString(), source, target)
         {
 
@@ -54,7 +57,7 @@ namespace Bb.Diagrams
         private readonly DynamicDescriptorInstanceContainer _container;
 
         [EvaluateValidation(false)]
-        public DiagramRelationship Source { get; }
+        public SerializableRelationship Source { get; }
 
         private static List<Type> _typeToExcludes;
 

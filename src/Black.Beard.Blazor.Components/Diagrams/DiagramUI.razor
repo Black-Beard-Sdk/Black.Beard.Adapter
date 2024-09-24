@@ -11,74 +11,55 @@
     </MudToolBar>
 </MudPaper>
 
-<FluentSplitter Class="full-size" Orientation="@Microsoft.Fast.Components.FluentUI.Orientation.Horizontal"
-                BarSize="6"
-                Panel1Size="8%"
-                Panel1MinSize="8%"
-                Panel2MinSize="50px">
-    <Panel1>
 
-        <MudStack>
-            <Toolbox @ref=_toolbox Tools="@Toolbox" />
-            <MudDivider />
-            @ComponentConstants.Properties.Translate(this)
-            <PropertyGridView @ref="PropertyGrid" />
-        </MudStack>
+<MudExpansionPanels>
+    <MudExpansionPanel @ref=ExpansionDiagnostic Dense="true">
+        <MudSimpleTable>
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Description</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Diagnostics != null)
+                    @foreach (var row in Diagnostics)
+                    {
+                        <DiagnosticRow Row="@row" PropertyGridView="PropertyGrid" />
+                    }
+            </tbody>
 
-    </Panel1>
+        </MudSimpleTable>
+    </MudExpansionPanel>
+</MudExpansionPanels>
 
-    <Panel2>
+<div class="full-size diagram-container dropzone @dropClass"
+     ondrop="@((DragEventArgs args)=>{HandleDrop(args);})"
+     ondragover="event.preventDefault();"
+     ondragenter="@HandleDragEnter"
+     ondragleave="@HandleDragLeave">
 
-            <MudExpansionPanels>
-                <MudExpansionPanel @ref=ExpansionDiagnostic Dense="true">
-                    <MudSimpleTable>
-                        <thead>
-                            <tr>
-                                <th>Level</th>
-                                <th>Description</th>
-                                <th>Source</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Diagnostics != null)
-                                @foreach (var row in Diagnostics)
-                                {
-                                    <DiagnosticRow Row="@row" PropertyGridView="PropertyGrid" />
-                                }
-                        </tbody>
+    <CascadingValue Value="Diagram" IsFixed="true">
+        <DiagramCanvas Class="flex-grow">
 
-                    </MudSimpleTable>
-                </MudExpansionPanel>
-            </MudExpansionPanels>
+            <Widgets>
 
-        <div class="full-size diagram-container dropzone @dropClass"
-                 ondrop="@((DragEventArgs args)=>{HandleDrop(args);})"
-                 ondragover="event.preventDefault();"
-                 ondragenter="@HandleDragEnter"
-                 ondragleave="@HandleDragLeave">
+                <NavigatorWidget Width="200"
+                                 Height="120"
+                                 UseNodeShape="false"
+                                 Class="border border-black bg-white absolute"
+                                 Style="bottom: 15px; right: 15px;">
 
-                <CascadingValue Value="Diagram" IsFixed="true">
-                <DiagramCanvas Class="flex-grow">
+                </NavigatorWidget>
 
-                        <Widgets>
+                <GridWidget Size="20" Mode="GridMode.Point" BackgroundColor="white" />
 
-                            <NavigatorWidget Width="200"
-                                             Height="120"
-                                             UseNodeShape="false"
-                                             Class="border border-black bg-white absolute"
-                                             Style="bottom: 15px; right: 15px;">
+                <SelectionBoxWidget />
 
-                            </NavigatorWidget>
+            </Widgets>
 
-                            <GridWidget Size="20" Mode="GridMode.Point" BackgroundColor="white" />
+        </DiagramCanvas>
+    </CascadingValue>
+</div>
 
-                            <SelectionBoxWidget />
-
-                        </Widgets>
-
-                    </DiagramCanvas>
-                </CascadingValue>
-            </div>
-
-    </Panel2>
-</FluentSplitter>

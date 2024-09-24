@@ -3,15 +3,16 @@ using Bb.Diagrams;
 using Bb.UIComponents.Glyphs;
 using Blazor.Diagrams.Core.Models;
 
-namespace Bb.Modules.Etl.Etl
+namespace Bb.Modules.Etl
 {
 
-    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramSpecificationBase))]
-    public class FolderTool : DiagramSpecificationNodeBase
+    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
+    public class FolderTool : DiagramToolNode
     {
 
         public FolderTool()
             : base(new Guid(Key),
+                  Bb.ComponentConstants.Tools,
                   "Parse folder",
                   "Parse folder and filter file",
                   GlyphFilled.Folder)

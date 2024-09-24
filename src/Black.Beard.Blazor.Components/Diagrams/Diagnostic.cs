@@ -1,10 +1,11 @@
 ﻿using Microsoft.Fast.Components.FluentUI;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace Bb.Diagrams
 {
 
-
+    [DebuggerDisplay("S:{Source} - {Message}")]
     public class Diagnostic
     {
 

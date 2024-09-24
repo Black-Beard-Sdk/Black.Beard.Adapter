@@ -1,36 +1,55 @@
-﻿using System.ComponentModel;
+﻿using Bb.ComponentModel.Attributes;
+using Bb.Toolbars;
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
 {
 
-    public partial class Diagram : IValidationService
+    public partial class Diagram : IValidationService, ISave<Diagram>
     {
 
         public Diagram()
         {
-            Specifications = new List<DiagramSpecificationBase>();
-            Models = new List<DiagramNode>();
-            Relationships = new List<DiagramRelationship>();
-            _dicModels = new Dictionary<Guid, DiagramSpecificationNodeBase>();
-            _dicLinks = new Dictionary<Guid, DiagramSpecificationRelationshipBase>();
+            this.TypeModelId = new Guid("5DEB3803-4EE7-4727-AC05-3CB76A4DCCA9");
+            Specifications = new List<DiagramToolBase>();
+            Models = new List<IDiagramNode>();
+            Relationships = new List<SerializableRelationship>();
+            _dicModels = new Dictionary<Guid, DiagramToolNode>();
+            _dicLinks = new Dictionary<Guid, DiagramToolRelationshipBase>();
         }
 
         public string Name { get; set; }
 
         public string Description { get; set; }
 
-        public List<DiagramNode> Models { get; set; }
+        public List<IDiagramNode> Models { get; set; }
 
-        public List<DiagramRelationship> Relationships { get; set; }
+        public List<SerializableRelationship> Relationships { get; set; }
 
-        public DiagramNode AddModel(Guid specification, double x, double y, string? name = null, Guid? uuid = null)
+
+        public SerializableDiagramNode AddModel(Guid specification, double x, double y, string? name = null, Guid? uuid = null)
         {
-            var spec = Specifications.OfType<DiagramSpecificationNodeBase>().Where(c => c.Uuid == specification).FirstOrDefault();
+            var spec = Specifications.OfType<DiagramToolNode>().Where(c => c.Uuid == specification).FirstOrDefault();
             return AddModel(spec, x, y, name, uuid);
         }
 
-        public DiagramNode AddModel(DiagramSpecificationNodeBase specification, double x, double y, string? name = null, Guid? uuid = null)
+        public SerializableDiagramNode AddModel(Guid specification, Guid parent, double x, double y, string? name = null, Guid? uuid = null)
+        {
+            var spec = Specifications.OfType<DiagramToolNode>().Where(c => c.Uuid == specification).FirstOrDefault();
+            return AddModel(spec, parent, x, y, name, uuid);
+        }
+
+        public SerializableDiagramNode AddModel(DiagramToolNode specification, Guid parent, double x, double y, string? name = null, Guid? uuid = null)
+        {
+            var child = AddModel(specification, x, y, name, uuid);
+            var p = GetModel(parent);
+            if (p != null)
+                child.UuidParent = parent;
+            return child;
+        }
+
+        public SerializableDiagramNode AddModel(DiagramToolNode specification, double x, double y, string? name = null, Guid? uuid = null)
         {
 
             if (string.IsNullOrEmpty(name))
@@ -44,45 +63,59 @@ namespace Bb.Diagrams
             var result = AddModel(specification.CreateModel(x, y, name, uuid));
 
             if (_diagram != null)
-                ApplyToUI(specification, result);
-        
+            {
+                var r = specification.CreateUI(result, this);
+
+                var parent = this.GetParentByPosition(r);
+                if (parent != null)
+                    parent.AddChildren(r);
+
+            }
+
             return result;
+
         }
 
-        public DiagramNode AddModel(DiagramNode customizedNodeModel)
+        public SerializableDiagramNode AddModel(SerializableDiagramNode child)
         {
-            this.Models.Add(customizedNodeModel);
+            this.Models.Add(child);
             this.Models.Sort((x, y) => x.Uuid.CompareTo(y.Uuid));
-            return customizedNodeModel;
+            return child;
         }
 
-        public DiagramNode GetModel(Guid id)
+        public IDiagramNode GetModel(Guid id)
         {
             return this.Models.FirstOrDefault(c => c.Uuid == id);
         }
 
-        public DiagramRelationship AddLink(Guid specification, Port left, Port right, string name, Guid? uuid = null)
+        public bool TryGetModel(Guid id, out IDiagramNode? result)
         {
-            var spec = Specifications.OfType<DiagramSpecificationRelationshipBase>().Where(c => c.Uuid == specification).FirstOrDefault();
+            result = this.Models.FirstOrDefault(c => c.Uuid == id);
+            return result != null;
+        }
+
+        public SerializableRelationship AddLink(Guid specification, Port left, Port right, string name, Guid? uuid = null)
+        {
+            var spec = Specifications.OfType<DiagramToolRelationshipBase>().Where(c => c.Uuid == specification).FirstOrDefault();
             return AddLink(spec, left, right, name, uuid);
         }
 
-        public DiagramRelationship AddLink(DiagramSpecificationRelationshipBase specification, Port left, Port right, string name, Guid? uuid = null)
+        public SerializableRelationship AddLink(DiagramToolRelationshipBase specification, Port left, Port right, string name, Guid? uuid = null)
         {
-            var link = new DiagramRelationship() 
+            var link = new SerializableRelationship()
             {
                 Uuid = uuid.HasValue ? uuid.Value : Guid.NewGuid(),
                 Name = name,
-                Type = specification.Uuid, 
-                Source = left.Uuid, 
-                Target = right.Uuid 
+                Type = specification.Uuid,
+                Source = left.Uuid,
+                Target = right.Uuid
             };
             this.Relationships.Add(link);
             this.Models.Sort((x, y) => x.Uuid.CompareTo(y.Uuid));
             return link;
         }
 
-        public DiagramNode? GetModelByPort(Guid id)
+        public IDiagramNode? GetModelByPort(Guid id)
         {
 
             foreach (var item in this.Models)
@@ -94,18 +127,17 @@ namespace Bb.Diagrams
 
         }
 
-        public void SetSpecifications(IEnumerable<DiagramSpecificationBase> specifications)
+        public void SetSpecifications(IEnumerable<DiagramToolBase> specifications)
         {
             Specifications = specifications.ToList();
             foreach (var item in specifications)
             {
-                if (item is DiagramSpecificationNodeBase model)
+                if (item is DiagramToolNode model)
                     _dicModels.Add(model.Uuid, model);
-                else if (item is DiagramSpecificationRelationshipBase link)
+                else if (item is DiagramToolRelationshipBase link)
                     _dicLinks.Add(link.Uuid, link);
             }
         }
-
 
         public virtual void Validate(Diagnostics Diagnostics)
         {
@@ -120,16 +152,65 @@ namespace Bb.Diagrams
 
         }
 
+        public Guid TypeModelId { get; protected set; }
 
         [JsonIgnore]
-        public IEnumerable<DiagramSpecificationBase> Specifications { get; private set; }
+        public IEnumerable<DiagramToolBase> Specifications { get; private set; }
 
+        [EvaluateValidation(false)]
         [JsonIgnore]
         public Action<Diagram> Save { get; private set; }
 
         [Browsable(false)]
         [JsonIgnore]
+        [EvaluateValidation(false)]
         public Diagnostics LastDiagnostics { get; internal set; }
+
+
+        #region propagate toolbox
+
+        public DiagramToolbox Toolbox => _toolbox ?? (_toolbox = CreateTool());
+
+        public virtual DiagramToolbox CreateTool()
+        {
+            return new DiagramToolbox();
+        }
+
+        public Toolbars.ToolbarList GetToolbar()
+        {
+
+            if (_list == null)
+            {
+
+                Dictionary<string, ToolbarGroup> groups = new Dictionary<string, ToolbarGroup>();
+                foreach (var item in this.Toolbox)
+                {
+
+                    if (!groups.TryGetValue(item.Category.DefaultDisplay, out var group))
+                        groups.Add(item.Category, group = new ToolbarGroup(Guid.NewGuid(), item.Category));
+
+                    group.Add
+                    (
+                        new Tool (item.Name, item.Icon, item.ToolTip, item, 
+                            item.Kind == ToolKind.Link, // withToggle
+                            item.Kind == ToolKind.Node  // draggable
+                        )
+                    );
+
+                }
+
+                _list = new ToolbarList(Guid.NewGuid(), this.Name, groups.Values);
+
+            }
+
+            return _list;
+
+        }
+
+        #endregion propagate toolbox
+
+
+
 
         public void SetSave(Action<Diagram> save)
         {
@@ -149,12 +230,26 @@ namespace Bb.Diagrams
 
         }
 
+        public void SetSave<T>(Action<T> save)
+        {
+            SetSave(model => save((T)(object)model));
+        }
+
+        public void Getii(double value)
+        {
+
+            var p = _diagram.Pan;
+
+
+        }
+
         public event EventHandler<Diagram>? OnModelSaved;
 
-        private readonly Dictionary<Guid, DiagramSpecificationNodeBase> _dicModels;
-        private readonly Dictionary<Guid, DiagramSpecificationRelationshipBase> _dicLinks;
+        private readonly Dictionary<Guid, DiagramToolNode> _dicModels;
+        private readonly Dictionary<Guid, DiagramToolRelationshipBase> _dicLinks;
+        private DiagramToolbox _toolbox;
+        private ToolbarList _list;
 
     }
-
 
 }

@@ -10,15 +10,14 @@ using System.Linq;
 namespace Bb.Modules.Sgbd.Models
 {
 
-    public class Table : CustomizedNodeModel, INotifyPropertyChanged
+    public class Table : UIModel
     {
 
-        public Table(DiagramNode source)
+        public Table(SerializableDiagramNode source)
             : base(source)
         {
 
         }
-
 
 
         private void Index_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -186,11 +185,6 @@ namespace Bb.Modules.Sgbd.Models
         }
 
         #endregion Links
-
-
-        public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        public event PropertyChangedEventHandler? PropertyChanged;
 
 
         private List<Column> _columns;

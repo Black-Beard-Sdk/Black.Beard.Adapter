@@ -5,13 +5,12 @@ using Blazor.Diagrams.Core.Models.Base;
 
 namespace Bb.Diagrams
 {
-    public class DiagramSpecificationRelationshipBase : DiagramSpecificationBase
+    public class DiagramToolRelationshipBase : DiagramToolBase
     {
 
-        public DiagramSpecificationRelationshipBase(Guid uuid, TranslatedKeyLabel name, TranslatedKeyLabel description, string icon)
-            : base(uuid, name, description, icon)
+        public DiagramToolRelationshipBase(Guid uuid, TranslatedKeyLabel category, TranslatedKeyLabel name, TranslatedKeyLabel description, string icon)
+            : base(uuid, category, name, description, icon)
         {
-            Category = Bb.ComponentConstants.Relationships;
             Kind = ToolKind.Link;
         }
 
@@ -44,7 +43,7 @@ namespace Bb.Diagrams
             Guid sourceId = source.Model.GetId();
             Guid targetId = target.Model.GetId();
 
-            DiagramRelationship relationship = new DiagramRelationship()
+            SerializableRelationship relationship = new SerializableRelationship()
             {
                 Name = string.Empty,
                 Uuid = uuid,
@@ -57,13 +56,13 @@ namespace Bb.Diagrams
 
         }
 
-        public virtual CustomizedLinkModel CreateLink(DiagramRelationship link, PortModel source, PortModel target)
+        public virtual CustomizedLinkModel CreateLink(SerializableRelationship link, PortModel source, PortModel target)
         {
             var l = CreateLink(link, CreateAnchor(source), CreateAnchor(target));
             return l;
         }
 
-        public virtual CustomizedLinkModel CreateLink(DiagramRelationship link, Anchor source, Anchor target)
+        public virtual CustomizedLinkModel CreateLink(SerializableRelationship link, Anchor source, Anchor target)
         {
             var l = new CustomizedLinkModel(link, source, target);
             return l;

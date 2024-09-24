@@ -8,7 +8,7 @@ namespace Bb.Diagrams
     public class LinkFactory
     {
 
-        public LinkFactory(IEnumerable<DiagramSpecificationBase> specifications)
+        public LinkFactory(IEnumerable<DiagramToolBase> specifications)
         {
             this._specifications = specifications.Where(c => c.Kind == ToolKind.Link).ToDictionary(c => c.Uuid.ToString());
         }
@@ -16,34 +16,41 @@ namespace Bb.Diagrams
 
         public virtual LinkModel CreateLinkModel
         (
-            DiagramSpecificationRelationshipBase current,
+            DiagramToolRelationshipBase current,
             Blazor.Diagrams.Core.Diagram diagram,
             ILinkable source,
             Anchor targetAnchor
         )
         {
 
-            Anchor source2;
-
-            if (source is NodeModel model3)
-                source2 = current.CreateAnchor(model3);
-
-            else
+            if (current != null)
             {
 
-                if (source is PortModel port2)
-                    source2 = current.CreateAnchor(port2);
-                
+                Anchor source2;
+
+                if (source is NodeModel model3)
+                    source2 = current.CreateAnchor(model3);
+
                 else
-                    throw new NotImplementedException();
+                {
+
+                    if (source is PortModel port2)
+                        source2 = current.CreateAnchor(port2);
+
+                    else
+                        throw new NotImplementedException();
+
+                }
+
+                return current.CreateLink(Guid.NewGuid(), source2, targetAnchor);
 
             }
 
-            return current.CreateLink(Guid.NewGuid(), source2, targetAnchor);
+            return null;
 
         }
 
-        private readonly Dictionary<string, DiagramSpecificationBase> _specifications;
+        private readonly Dictionary<string, DiagramToolBase> _specifications;
 
     }
 

@@ -32,7 +32,6 @@ namespace Bb.Modules
         public Documents Parent { get; internal set; }
 
 
-
         public JsonNode Model { get; set; }
 
         public string GetRoute()
@@ -42,7 +41,13 @@ namespace Bb.Modules
 
         public object Load()
         {
-            return Feature.Load(this);
+        
+            if (Feature != null)
+                if (Feature.LoadDocument(this, out var result))
+                    return result;
+            
+            return null;
+
         }
 
         public void Save(object model)

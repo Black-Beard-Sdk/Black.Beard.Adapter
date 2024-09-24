@@ -28,15 +28,15 @@ namespace Bb.Modules.Sgbd
         public SgbdTechnologies SgbdTechnologies { get; set; }
 
 
-        public SgbdDiagram DiagramModel { get => _diagramModel ?? (_diagramModel = Initialize((SgbdDiagram)Document.Load())); }
+        public SgbdDiagram DiagramModel { get => _diagramModel ?? (_diagramModel = Initialize((SgbdDiagram)Document?.Load())); }
 
         private SgbdDiagram? Initialize(SgbdDiagram sgbdDiagram)
         {
-
-            sgbdDiagram.SgbdTechnologies = SgbdTechnologies;
-
-            sgbdDiagram.OnModelSaved += ModelSaved;
-
+            if (sgbdDiagram != null)
+            {
+                sgbdDiagram.SgbdTechnologies = SgbdTechnologies;
+                sgbdDiagram.OnModelSaved += ModelSaved;
+            }
             return sgbdDiagram;
         }
 

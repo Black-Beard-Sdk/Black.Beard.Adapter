@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using MudBlazor
+
+<MudTooltip Text="@Item.ToolTip.Translate(this)" Color="Color.Default">
+
+    @if (Item.WithToggle)
+    {
+        <ClickableMudToggleIconButton Item="@Item"
+                                      Panel="@Panel"
+                                      Icon="@Item.Icon"
+                                      ToggledIcon="@Item.Icon"
+                                      Color="@Color.Default"
+                                      ToggledColor="@Color.Warning"
+                                      Title="Off"
+                                      ToggledTitle="On"
+                                      draggable="@Item.Draggable"
+                                      ondragstart="@((DragEventArgs args) => { Panel.DragStart(args, Item); })"
+                                      Class="draggable mr-1"
+                                      />
+    }
+    else
+    {
+
+        <MudIconButton draggable="@Item.Draggable"
+                       ondragstart="@((DragEventArgs args) => { Panel.DragStart(args, Item); })"
+                       Icon="@Item.Icon"
+                       Color="Color.Default"
+                       Class="draggable mr-1"
+                       Size="Size.Small" 
+                       />
+    }
+
+</MudTooltip>
+

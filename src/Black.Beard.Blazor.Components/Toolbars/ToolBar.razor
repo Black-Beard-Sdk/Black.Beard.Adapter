@@ -1,0 +1,21 @@
+﻿@using MudBlazor
+
+@if (Visible)
+{
+    @foreach (ToolbarGroup barGroup in Bars)
+    {
+        <MudStack Spacing="1">
+            <MudButton OnClick="@barGroup.Select">@barGroup.Name.Translate(this)</MudButton>
+            <MudCollapse Expanded="@barGroup.IsSelected">
+                <MudToolBar WrapContent="true">
+
+                    @foreach (Tool tool in barGroup)
+                    {
+                        <ToolItemButton Item="@tool" Panel="this" />
+                    }
+
+                </MudToolBar>
+            </MudCollapse>
+        </MudStack>
+    }
+}

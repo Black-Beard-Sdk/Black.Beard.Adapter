@@ -14,7 +14,7 @@ namespace Bb.Diagrams
 
         public virtual Anchor CreateLinkModel
         (
-            DiagramSpecificationRelationshipBase current,
+            DiagramToolRelationshipBase current,
             Blazor.Diagrams.Core.Diagram diagram,
             BaseLinkModel source,
             ILinkable model

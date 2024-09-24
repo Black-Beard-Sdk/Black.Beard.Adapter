@@ -3,14 +3,15 @@ using Bb.Diagrams;
 using Bb.UIComponents.Glyphs;
 using Blazor.Diagrams.Core.Models;
 
-namespace Bb.Modules.Etl.Etl
+namespace Bb.Modules.Etl
 {
-    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramSpecificationBase))]
-    public class TemplateJsltTool : DiagramSpecificationNodeBase
+    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
+    public class TemplateJsltTool : DiagramToolNode
     {
 
         public TemplateJsltTool()
             : base(new Guid(Key),
+                  Bb.ComponentConstants.Tools,
                   "Template jslt",
                   "transform json",
                   GlyphFilled.Transform)

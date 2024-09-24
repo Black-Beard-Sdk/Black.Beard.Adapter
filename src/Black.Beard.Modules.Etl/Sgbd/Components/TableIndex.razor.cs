@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.Modules.Sgbd.Models;
+using Bb.PropertyGrid;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel;
@@ -23,7 +24,7 @@ namespace Bb.Modules.Sgbd.Components
 
 
         [Inject]
-        public IFocusedService FocusedService { get; set; }
+        public IFocusedService<PropertyGridView> FocusedService { get; set; }
 
         [Inject]
         public ITranslateService TranslationService { get; set; }
@@ -105,7 +106,7 @@ namespace Bb.Modules.Sgbd.Components
                 Id = Guid.NewGuid()
             };
 
-            var diagram = this.Index.Table.Source.Diagram as SgbdDiagram;
+            var diagram = this.Index.Table.Source.GetDiagram<SgbdDiagram>();
             var t = diagram.GetTechnology();
             if (t != null)
             {

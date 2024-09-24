@@ -4,15 +4,17 @@ using Bb.ComponentModel.Translations;
 using Bb.TypeDescriptors;
 using System.Collections;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace Bb.Diagrams
 {
+
     public class Diagnostics : List<Diagnostic>
     {
 
         public Diagnostics()
         {
-            
+
         }
 
         public void EvaluateModel(object model)
@@ -20,7 +22,7 @@ namespace Bb.Diagrams
 
             if (_currentCtx != null)
                 throw new InvalidOperationException("Context already initialized");
-            
+
             _currentCtx = new Context();
             EvaluateModel(model, _currentCtx);
 
@@ -32,7 +34,6 @@ namespace Bb.Diagrams
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
-
             if (ctx.Contains(model))
                 return;
 
@@ -42,41 +43,44 @@ namespace Bb.Diagrams
                 if (model is IValidationService v)
                     v.Validate(this);
 
-                var properties = TypeDescriptor.GetProperties(model).Where(c => !c.Attributes.OfType<EvaluateValidationAttribute>().Where(d => d.ToEvaluate).Any()).ToList();
+                var properties = TypeDescriptor.GetProperties(model)
+                    .Where(c => c.ToEvaluate())
+                    .ToList();
+
                 foreach (PropertyDescriptor item in properties)
-                    if (item.ToEvaluate())
+                {
+
+                    try
                     {
 
-                        try
+                        var value = item.GetValue(model);
+                        var result = item.ValidateValue(value, this.Translator);
+
+                        foreach (var message in result.Messages)
+                            this.AddError(message, item.Name, new TargetSource(model));
+
+                        if (MustEvaluate(result.Value))
                         {
 
-                            var result = item.ValidateValue(item.GetValue(model), this.Translator);
+                            if (result.Value is IEnumerable list)
+                                foreach (var item2 in list)
+                                {
+                                    if (MustEvaluate(result.Value))
+                                        EvaluateModel(item2, ctx);
+                                }
 
-                            foreach (var message in result.Messages)
-                                this.AddError(message, item.Name, new TargetSource(model));
+                            else
+                                EvaluateModel(result.Value, ctx);
 
-                            if (MustEvaluate(result.Value))
-                            {
-
-                                if (result.Value is IEnumerable list)
-                                    foreach (var item2 in list)
-                                    {
-                                        if (MustEvaluate(result.Value))
-                                            EvaluateModel(item2, ctx);
-                                    }
-
-                                else
-                                    EvaluateModel(result.Value, ctx);
-
-                            }
-
-                        }
-                        catch (Exception ex)
-                        {
-                            this.AddError("Failed to resolve the value." + ex.Message, item.Name, new TargetSource(model));
                         }
 
                     }
+                    catch (Exception ex)
+                    {
+                        this.AddError("Failed to resolve the value." + ex.Message, item.Name, new TargetSource(model));
+                    }
+
+                }
 
             }
 
@@ -95,6 +99,10 @@ namespace Bb.Diagrams
 
             if (_types.Contains(type))
                 return false;
+
+            foreach (var item in _types)
+                if (item.IsAssignableFrom(type))
+                    return false;
 
             return true;
 
@@ -171,6 +179,12 @@ namespace Bb.Diagrams
 
         private HashSet<Type> _types = new HashSet<Type>()
         {
+            //typeof(Delegate),
+            typeof(Diagnostics),
+            typeof(MethodInfo),
+            typeof(Module),
+            typeof(Assembly),
+            typeof(Type),
             typeof(string),
             typeof(int),
             typeof(long),
@@ -208,7 +222,7 @@ namespace Bb.Diagrams
             typeof(Guid?),
             typeof(Type),
                                                                     };
-    
+
         private Context _currentCtx;
 
     }
