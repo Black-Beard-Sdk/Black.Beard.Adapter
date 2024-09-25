@@ -88,53 +88,6 @@ namespace Bb.Modules.Sgbd.Models
 
             });
 
-
-            DynamicTypeDescriptionProvider.Configure<BlazorDiagram>(c =>
-            {
-
-                c.Property(u => u.SuspendRefresh, i =>
-                {
-                    i.DisableValidation();
-                });
-
-                c.Property(u => u.SuspendSorting, i =>
-                {
-                    i.DisableValidation();
-                });
-
-                c.Property(u => u.Container, i =>
-                {
-                    i.DisableValidation();
-                });
-
-                c.Property(u => u.Controls, i =>
-                {
-                    i.DisableValidation();
-                });
-
-                c.Property(u => u.Options, i =>
-                {
-                    i.DisableValidation();
-                });
-
-                c.Property(u => u.Pan, i =>
-                {
-                    i.DisableValidation();
-                });
-
-                c.Property(u => u.Zoom, i =>
-                {
-                    i.DisableValidation();
-                });
-
-                c.Property(u => u.OrderedSelectables, i =>
-                {
-                    i.DisableValidation();
-                });
-
-
-            });
-
         }
 
 

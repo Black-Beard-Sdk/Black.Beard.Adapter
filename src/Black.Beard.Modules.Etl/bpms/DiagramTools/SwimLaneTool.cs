@@ -9,13 +9,11 @@ using Blazor.Diagrams.Core.Geometry;
 namespace Bb.Modules.Bpms
 {
 
-
-    [ExposeClass(BpmsDiagramFeature.FeatureFilter, ExposedType = typeof(DiagramToolBase))]
     public class SwimLaneTool : DiagramToolNode
     {
 
         public SwimLaneTool()
-            : base(new Guid(Key),
+            : base(Key,
                   Bb.ComponentConstants.Tools,
                   "swimlane",
                   "Append a new swimlane",
@@ -28,7 +26,7 @@ namespace Bb.Modules.Bpms
         }
 
         protected override void CustomizeNode(IDiagramNode node, Diagram diagram)
-        {                       
+        {
 
             double y = 0;
             double x = 0d;
@@ -56,7 +54,7 @@ namespace Bb.Modules.Bpms
             return $"swimlane";
         }
 
-        public const string Key = "6A317FDD-F2D6-4BA1-9A08-071AA11C414B";
+        public static Guid Key = new Guid("6A317FDD-F2D6-4BA1-9A08-071AA11C414B");
 
         private double spacing = 1d;
         private double height = 300d;

@@ -75,7 +75,7 @@ namespace Bb.Diagrams
             //PropertyGridFocusedService.FocusChanged += FocusedService_FocusChanged;
             if (DiagramModel != null)
             {
-                _linkFactory = new LinkFactory(DiagramModel.Specifications);
+                _linkFactory = new LinkFactory(DiagramModel.Toolbox);
                 DiagramModel.Apply(Diagram);
             }
         }

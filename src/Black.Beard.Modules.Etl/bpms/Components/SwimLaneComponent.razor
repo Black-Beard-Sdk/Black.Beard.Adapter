@@ -2,7 +2,7 @@
 
 
 <div Style="border-block-color:aquamarine;border-block:dotted;width:@Width.ToString()px;height:@Height.ToString()px">
-    <div style="width:@Height.ToString()px;height:100px;transform: rotate(270deg) scale(1) translate(-@HalfHeight.ToString()px, -100px)">
+    <div style="width:@Height.ToString()px;height:100px;transform: rotate(270deg) scale(1) translate(-@HalfHeight.ToString()px, -@HalfWidth.ToString()px)">
         <MudTextField @bind-Value="Name"
                       Variant="Variant.Filled"
                       FullWidth="true"

@@ -30,7 +30,7 @@ namespace Bb.Diagrams
         {
 
             // Register components
-            foreach (var item in this.Specifications)
+            foreach (var item in this.Toolbox)
                 if (item is DiagramToolNode specModel)
                     if (item.TypeUI != null)
                         _diagram.RegisterComponent(specModel.TypeModel, specModel.TypeUI, true);

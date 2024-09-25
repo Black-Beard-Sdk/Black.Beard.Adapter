@@ -11,29 +11,6 @@
     </MudToolBar>
 </MudPaper>
 
-
-<MudExpansionPanels>
-    <MudExpansionPanel @ref=ExpansionDiagnostic Dense="true">
-        <MudSimpleTable>
-            <thead>
-                <tr>
-                    <th>Level</th>
-                    <th>Description</th>
-                    <th>Source</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Diagnostics != null)
-                    @foreach (var row in Diagnostics)
-                    {
-                        <DiagnosticRow Row="@row" PropertyGridView="PropertyGrid" />
-                    }
-            </tbody>
-
-        </MudSimpleTable>
-    </MudExpansionPanel>
-</MudExpansionPanels>
-
 <div class="full-size diagram-container dropzone @dropClass"
      ondrop="@((DragEventArgs args)=>{HandleDrop(args);})"
      ondragover="event.preventDefault();"
@@ -62,4 +39,26 @@
         </DiagramCanvas>
     </CascadingValue>
 </div>
+
+<MudExpansionPanels>
+    <MudExpansionPanel @ref=ExpansionDiagnostic Dense="true">
+        <MudSimpleTable>
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Description</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Diagnostics != null)
+                    @foreach (var row in Diagnostics)
+                    {
+                        <DiagnosticRow Row="@row" PropertyGridView="PropertyGrid" />
+                    }
+            </tbody>
+
+        </MudSimpleTable>
+    </MudExpansionPanel>
+</MudExpansionPanels>
 

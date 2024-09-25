@@ -6,12 +6,11 @@ using Blazor.Diagrams.Core.Models;
 namespace Bb.Modules.Etl
 {
 
-    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
     public class FolderTool : DiagramToolNode
     {
 
         public FolderTool()
-            : base(new Guid(Key),
+            : base(Key,
                   Bb.ComponentConstants.Tools,
                   "Parse folder",
                   "Parse folder and filter file",
@@ -28,7 +27,7 @@ namespace Bb.Modules.Etl
         }
 
 
-        public const string Key = "D9342824-E4CD-49E5-8BFB-410C7068F095";
+        public static Guid Key = new Guid("D9342824-E4CD-49E5-8BFB-410C7068F095");
 
     }
 

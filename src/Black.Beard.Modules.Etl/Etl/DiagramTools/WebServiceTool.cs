@@ -8,12 +8,11 @@ namespace Bb.Modules.Etl
 {
 
 
-    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
     public class WebServiceTool : DiagramToolNode
     {
 
         public WebServiceTool()
-            : base(new Guid(Key),
+            : base(Key,
                   "WebService",
                   Bb.ComponentConstants.Tools,
                   "Append a new WebService",
@@ -32,7 +31,7 @@ namespace Bb.Modules.Etl
             return $"ws";
         }
 
-        public const string Key = "802E6C01-E521-40CB-AE28-B35375974F21";
+        public static Guid Key = new Guid("802E6C01-E521-40CB-AE28-B35375974F21");
 
     }
 

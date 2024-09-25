@@ -1,18 +1,81 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.Toolbars;
+using Bb.TypeDescriptors;
+using Blazor.Diagrams;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
 
-    public partial class Diagram : IValidationService, ISave<Diagram>
+    public partial class Diagram
+        : IValidationService
+        , ISave<Diagram>
+        , IDynamicDescriptorInstance
+        , IDiagramToolBoxProvider
     {
 
-        public Diagram()
+        static Diagram()
         {
-            this.TypeModelId = new Guid("5DEB3803-4EE7-4727-AC05-3CB76A4DCCA9");
-            Specifications = new List<DiagramToolBase>();
+            DynamicTypeDescriptionProvider.Configure<BlazorDiagram>(c =>
+            {
+
+                c.Property(u => u.SuspendRefresh, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.SuspendSorting, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Container, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Controls, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Options, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Pan, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.Zoom, i =>
+                {
+                    i.DisableValidation();
+                });
+
+                c.Property(u => u.OrderedSelectables, i =>
+                {
+                    i.DisableValidation();
+                });
+
+
+            });
+
+        }
+
+        // If true, the toolbox is dynamic and will always be created.
+
+        public Diagram(Guid typeModelId, bool dynamicToolbox)
+        {
+
+            _toolbox = new DiagramToolbox().AppendInitializer(this);
+            this.DynamicToolbox = dynamicToolbox;
+            this._container = new DynamicDescriptorInstanceContainer(this);
+            this.TypeModelId = typeModelId;
+            //Specifications = new List<DiagramToolBase>();
             Models = new List<IDiagramNode>();
             Relationships = new List<SerializableRelationship>();
             _dicModels = new Dictionary<Guid, DiagramToolNode>();
@@ -30,13 +93,13 @@ namespace Bb.Diagrams
 
         public SerializableDiagramNode AddModel(Guid specification, double x, double y, string? name = null, Guid? uuid = null)
         {
-            var spec = Specifications.OfType<DiagramToolNode>().Where(c => c.Uuid == specification).FirstOrDefault();
+            var spec = Toolbox.OfType<DiagramToolNode>().Where(c => c.Uuid == specification).FirstOrDefault();
             return AddModel(spec, x, y, name, uuid);
         }
 
         public SerializableDiagramNode AddModel(Guid specification, Guid parent, double x, double y, string? name = null, Guid? uuid = null)
         {
-            var spec = Specifications.OfType<DiagramToolNode>().Where(c => c.Uuid == specification).FirstOrDefault();
+            var spec = Toolbox.OfType<DiagramToolNode>().Where(c => c.Uuid == specification).FirstOrDefault();
             return AddModel(spec, parent, x, y, name, uuid);
         }
 
@@ -96,7 +159,7 @@ namespace Bb.Diagrams
 
         public SerializableRelationship AddLink(Guid specification, Port left, Port right, string name, Guid? uuid = null)
         {
-            var spec = Specifications.OfType<DiagramToolRelationshipBase>().Where(c => c.Uuid == specification).FirstOrDefault();
+            var spec = Toolbox.OfType<DiagramToolRelationshipBase>().Where(c => c.Uuid == specification).FirstOrDefault();
             return AddLink(spec, left, right, name, uuid);
         }
 
@@ -127,18 +190,6 @@ namespace Bb.Diagrams
 
         }
 
-        public void SetSpecifications(IEnumerable<DiagramToolBase> specifications)
-        {
-            Specifications = specifications.ToList();
-            foreach (var item in specifications)
-            {
-                if (item is DiagramToolNode model)
-                    _dicModels.Add(model.Uuid, model);
-                else if (item is DiagramToolRelationshipBase link)
-                    _dicLinks.Add(link.Uuid, link);
-            }
-        }
-
         public virtual void Validate(Diagnostics Diagnostics)
         {
 
@@ -152,10 +203,10 @@ namespace Bb.Diagrams
 
         }
 
-        public Guid TypeModelId { get; protected set; }
+        public Guid TypeModelId { get; }
 
-        [JsonIgnore]
-        public IEnumerable<DiagramToolBase> Specifications { get; private set; }
+        //[JsonIgnore]
+        //public IEnumerable<DiagramToolBase> Specifications { get; private set; }
 
         [EvaluateValidation(false)]
         [JsonIgnore]
@@ -169,11 +220,13 @@ namespace Bb.Diagrams
 
         #region propagate toolbox
 
-        public DiagramToolbox Toolbox => _toolbox ?? (_toolbox = CreateTool());
+        public bool DynamicToolbox { get; }
 
-        public virtual DiagramToolbox CreateTool()
+        public DiagramToolbox Toolbox => _toolbox;
+
+        public virtual void InitializeToolbox(DiagramToolbox toolbox)
         {
-            return new DiagramToolbox();
+
         }
 
         public Toolbars.ToolbarList GetToolbar()
@@ -191,7 +244,7 @@ namespace Bb.Diagrams
 
                     group.Add
                     (
-                        new Tool (item.Name, item.Icon, item.ToolTip, item, 
+                        new Tool(item.Name, item.ToolTip, item.Icon, item,
                             item.Kind == ToolKind.Link, // withToggle
                             item.Kind == ToolKind.Node  // draggable
                         )
@@ -235,19 +288,34 @@ namespace Bb.Diagrams
             SetSave(model => save((T)(object)model));
         }
 
-        public void Getii(double value)
+
+        #region DynamicDescriptorInstance
+
+        public object GetProperty(string name)
         {
-
-            var p = _diagram.Pan;
-
-
+            return this._container.GetProperty(name);
         }
+
+
+        public void SetProperty(string name, object value)
+        {
+            this._container.SetProperty(name, value);
+        }
+
+        #endregion DynamicDescriptorInstance
+
+
+        //public void Getii(double value)
+        //{
+        //    var p = _diagram.Pan;
+        //}
 
         public event EventHandler<Diagram>? OnModelSaved;
 
+        private readonly DynamicDescriptorInstanceContainer _container;
         private readonly Dictionary<Guid, DiagramToolNode> _dicModels;
         private readonly Dictionary<Guid, DiagramToolRelationshipBase> _dicLinks;
-        private DiagramToolbox _toolbox;
+        private readonly DiagramToolbox _toolbox;
         private ToolbarList _list;
 
     }

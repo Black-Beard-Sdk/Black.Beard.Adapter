@@ -1,7 +1,9 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.Diagrams;
 using Bb.Modules.Etl.Models;
+using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
+using Blazor.Diagrams.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -30,9 +32,8 @@ namespace Bb.Modules.bpms.Components
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
 
-            var result = base.OnAfterRenderAsync(firstRender);
-
-            //var rect = await JSRuntime.GetBoundingClientRect(this._element);
+            //var result = base.OnAfterRenderAsync(firstRender);
+            //var rect = await Runtime.GetBoundingClientRect(this._element);
             //if (rect != null)
             //{
             //    Item.Size = new Size(rect.Width, rect.Height);
@@ -53,17 +54,24 @@ namespace Bb.Modules.bpms.Components
 
         public double Height
         {
-            get => Item?.Size?.Height ?? 10d;            
+            get => Item?.Size?.Height ?? 10d;
         }
 
         public int HalfHeight
         {
             get
             {
+                return 90;
+                //Item.Source.GetDiagram<Diagram>().Getii(Height);
+                //return (int)(Height / 2);
+            }
+        }
 
-                Item.Source.GetDiagram<Diagram>().Getii(Height);
-
-                return (int)(Height / 2);
+        public int HalfWidth
+        {
+            get
+            {
+                return 100;
             }
         }
 

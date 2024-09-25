@@ -7,12 +7,11 @@ using Blazor.Diagrams.Core.Models;
 namespace Bb.Modules.Sgbd.DiagramTools
 {
 
-    [ExposeClass(SgbdDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
     public class ConstraintRelationship : DiagramToolRelationshipBase
     {
 
         public ConstraintRelationship()
-            : base(new Guid(Key),
+            : base(Key,
                    Bb.ComponentConstants.Relationships,
                    "Constraint",
                    "Create a constraint",
@@ -23,49 +22,7 @@ namespace Bb.Modules.Sgbd.DiagramTools
 
         }
 
-
-        public override Anchor CreateAnchor(NodeModel model)
-        {
-            return base.CreateAnchor(model);
-        }
-
-        public override Anchor CreateAnchor(PortModel model)
-        {
-            return base.CreateAnchor(model);
-        }
-
-        public override CustomizedLinkModel CreateLink(SerializableRelationship link, Anchor source, Anchor target)
-        {
-
-            var result = base.CreateLink(link, source, target);
-
-            //result.Router = Routers.OrthogonalRouter;
-            //result.PathGenerator = PathGenerators.Straight;
-
-            return result;
-        }
-
-        public override CustomizedLinkModel CreateLink(SerializableRelationship link, PortModel source, PortModel target)
-        {
-            return base.CreateLink(link, source, target);
-        }
-
-        public override CustomizedLinkModel CreateLink(Guid uuid, Anchor source, Anchor target)
-        {
-            return base.CreateLink(uuid, source, target);
-        }
-
-        public override CustomizedLinkModel CreateLink(Guid uuid, PortModel source, PortModel target)
-        {
-            return base.CreateLink(uuid, source, target);
-        }
-
-        public override void SetTypeModel<T>()
-        {
-            base.SetTypeModel<T>();
-        }
-
-        public const string Key = "0A385005-4391-42A9-B538-2C33E1266801";
+        public static Guid Key = new Guid("0A385005-4391-42A9-B538-2C33E1266801");
 
     }
 

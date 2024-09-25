@@ -25,9 +25,8 @@ namespace Bb.Modules
 
             result = default;
 
-            if (base.Load<BpmsDiagram>(featureInstance, out var r))
+            if (base.Load<T>(featureInstance, out var r))
             {
-                r.SetSpecifications(GetTools());
                 result = (T)(object)r;
             }
 
@@ -47,39 +46,6 @@ namespace Bb.Modules
             options.Converters.Add(new InstanceJsonConverter());
 
             return options;
-        }
-
-        /// <summary>
-        /// Return all modules
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<DiagramToolBase> GetTools()
-        {
-
-            if (_items == null)
-                lock (_lock)
-                    if (_items == null)
-                    {
-
-                        var filter = _filter;
-                        var items = new Dictionary<Guid, DiagramToolBase>();
-
-                        var types = ComponentModel.TypeDiscovery.Instance
-                            .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object),
-                            c => c.ExposedType == typeof(DiagramToolBase) && c.Context == filter)
-                            .ToList();
-
-                        foreach (var item in types)
-                        {
-                            var module = (DiagramToolBase)Activator.CreateInstance(item);
-                            items.Add(module.Uuid, module);
-                        }
-
-                        _items = items;
-                    }
-
-            return _items.Values;
-
         }
 
         private volatile object _lock = new object();

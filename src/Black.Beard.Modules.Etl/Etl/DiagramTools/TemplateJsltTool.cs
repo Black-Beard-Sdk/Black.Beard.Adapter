@@ -5,12 +5,12 @@ using Blazor.Diagrams.Core.Models;
 
 namespace Bb.Modules.Etl
 {
-    [ExposeClass(EtlDiagramFeature.Filter, ExposedType = typeof(DiagramToolBase))]
+
     public class TemplateJsltTool : DiagramToolNode
     {
 
         public TemplateJsltTool()
-            : base(new Guid(Key),
+            : base(Key,
                   Bb.ComponentConstants.Tools,
                   "Template jslt",
                   "transform json",
@@ -27,7 +27,7 @@ namespace Bb.Modules.Etl
         }
 
 
-        public const string Key = "078884D0-0D27-421E-8332-EA08A8EBAEF5";
+        public static Guid Key = new Guid("078884D0-0D27-421E-8332-EA08A8EBAEF5");
 
     }
 }

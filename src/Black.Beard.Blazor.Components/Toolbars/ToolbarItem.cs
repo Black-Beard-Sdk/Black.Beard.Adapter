@@ -11,14 +11,15 @@ namespace Bb.Toolbars
         public Tool
         (
             TranslatedKeyLabel name,
-            string icon,
             TranslatedKeyLabel description,
+            string icon,
             object? tag, 
             bool withToggle,
             bool draggable
         )
         {
             this.Name = name;
+            
             this.Icon = icon;
             this.ToolTip = description;
             Tag = tag;

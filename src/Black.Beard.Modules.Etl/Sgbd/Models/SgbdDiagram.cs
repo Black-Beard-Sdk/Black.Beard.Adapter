@@ -1,6 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.Diagrams;
-using Bb.TypeDescriptors;
+using Bb.Modules.Sgbd.DiagramTools;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
@@ -8,13 +8,15 @@ using System.Text.Json.Serialization;
 namespace Bb.Modules.Sgbd.Models
 {
 
-    public class SgbdDiagram : Diagram, IDynamicDescriptorInstance
+    public class SgbdDiagram : Diagram
     {
 
+        public static Guid Key = new Guid("7BDE57DD-14BE-4E19-9896-54E4B2F35050");
+
         public SgbdDiagram()
+            : base(Key, false)
         {
-            this.TypeModelId = new Guid("7BDE57DD-14BE-4E19-9896-54E4B2F35050");
-            this._container = new DynamicDescriptorInstanceContainer(this);
+
         }
 
         [Description("Target technology")]
@@ -31,19 +33,13 @@ namespace Bb.Modules.Sgbd.Models
             return SgbdTechnologies.GetTechnology(Technology);
         }
 
-        public object GetProperty(string name)
+        public override void InitializeToolbox(DiagramToolbox toolbox)
         {
-            return this._container.GetProperty(name);
+            toolbox
+                .Add(new TableTool())
+                .Add(new ConstraintRelationship())
+                ;
         }
-
-
-        public void SetProperty(string name, object value)
-        {
-            this._container.SetProperty(name, value);
-        }
-    
-        private readonly DynamicDescriptorInstanceContainer _container;
-
 
     }
 
