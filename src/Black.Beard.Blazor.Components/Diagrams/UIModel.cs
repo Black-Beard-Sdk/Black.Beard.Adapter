@@ -4,6 +4,7 @@ using Blazor.Diagrams.Core.Models.Base;
 using Bb.TypeDescriptors;
 using Bb.ComponentModel.Attributes;
 using System.ComponentModel;
+using Blazor.Diagrams;
 
 namespace Bb.Diagrams
 {

@@ -86,7 +86,7 @@ namespace Bb.Addons
                 IgnoreReadOnlyFields = true,
                 IgnoreReadOnlyProperties = true,
                 IncludeFields = false,
-                DefaultIgnoreCondition = JsonIgnoreCondition.Always,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             };
 
             options.Converters.Add(new JsonStringEnumConverter());

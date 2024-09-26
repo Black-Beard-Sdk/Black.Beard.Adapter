@@ -5,6 +5,7 @@ using Bb.PropertyGrid;
 using Bb.Toolbars;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using static Bb.UIComponents.UIKeys;
 
 namespace Site.Shared
 {
@@ -21,6 +22,10 @@ namespace Site.Shared
         [EvaluateValidation(false)]
         [Inject]
         public ITranslateService TranslationService { get; set; }
+
+
+        [Inject]
+        public IRefreshService RefreshService { get; set; }
 
         [Inject]
         public IBusyService BusyService
@@ -52,7 +57,17 @@ namespace Site.Shared
         {
             var result = base.OnInitializedAsync();
             PropertyGridFocusedService.FocusChanged += FocusedService_FocusChanged;
+            RefreshService.RefreshRequested += RefreshService_RefreshRequested;
+
             return result;
+        }
+
+        private void RefreshService_RefreshRequested(object sender, RefreshEventArgs arg)
+        {
+            if (arg.MustRefresh(nameof(MainLayout)))
+                StateHasChanged();
+            else if (arg.MustRefresh(nameof(PropertyGridView)))
+                PropertyGrid?.Refresh();
         }
 
         private async void _busyService_BusyChanged(object? sender, BusyEventArgs e)
@@ -77,7 +92,8 @@ namespace Site.Shared
                     try
                     {
 
-                        await InvokeAsync(() => {
+                        await InvokeAsync(() =>
+                        {
                             var r = DialogService.ShowAsync<BusyComponent>("Simple Dialog", b, options);
                         });
 
@@ -99,7 +115,7 @@ namespace Site.Shared
                     break;
                 default:
                     break;
-            }                               
+            }
 
         }
 
@@ -123,6 +139,9 @@ namespace Site.Shared
                 {
                     if (_busyService != null)
                         _busyService.BusyChanged -= _busyService_BusyChanged;
+                    if (RefreshService != null)
+                        RefreshService.RefreshRequested -= RefreshService_RefreshRequested;
+
                 }
                 disposedValue = true;
             }

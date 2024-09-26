@@ -18,6 +18,7 @@ namespace Bb.Diagrams
 
         static Diagram()
         {
+
             DynamicTypeDescriptionProvider.Configure<BlazorDiagram>(c =>
             {
 
@@ -76,7 +77,7 @@ namespace Bb.Diagrams
             this._container = new DynamicDescriptorInstanceContainer(this);
             this.TypeModelId = typeModelId;
             //Specifications = new List<DiagramToolBase>();
-            Models = new List<IDiagramNode>();
+            Models = new List<SerializableDiagramNode>();
             Relationships = new List<SerializableRelationship>();
             _dicModels = new Dictionary<Guid, DiagramToolNode>();
             _dicLinks = new Dictionary<Guid, DiagramToolRelationshipBase>();
@@ -86,7 +87,7 @@ namespace Bb.Diagrams
 
         public string Description { get; set; }
 
-        public List<IDiagramNode> Models { get; set; }
+        public List<SerializableDiagramNode> Models { get; set; }
 
         public List<SerializableRelationship> Relationships { get; set; }
 

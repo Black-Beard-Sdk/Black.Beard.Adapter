@@ -33,7 +33,7 @@ namespace Bb.Diagrams
         }
 
         #region zoom / GridSize
-
+        
         public void GridModeChanged(MouseEventArgs args)
         {
             _showPoint = !_showPoint;
@@ -41,7 +41,6 @@ namespace Bb.Diagrams
             Diagram.Refresh();
             StateHasChanged();
         }
-
         public void ShowGridChanged(MouseEventArgs args)
         {
 
@@ -54,7 +53,6 @@ namespace Bb.Diagrams
         /**
             diagram.Options.AllowPanning     = true;
          */
-
         private void GridSizeTextChanged(string key)
         {
             //_gridMode = GridMode.Line;
@@ -70,14 +68,12 @@ namespace Bb.Diagrams
         {
             Resize();
         }
-
         private void Resize()
         {
             var d = ((double)_zoomValue / 100d);
             if (this.Diagram.Zoom != d & d > 0)
                 this.Diagram.SetZoom(d);
         }
-
         private void ZoomChanged()
         {
             var z = this.Diagram.Zoom * 100;
@@ -167,7 +163,7 @@ namespace Bb.Diagrams
                 AllowMultiSelection = true,
                 Zoom =
                 {
-                    Enabled = true,
+                    Enabled = false,
                     Minimum = 0.1f,
                     Maximum = 3f,
                     ScaleFactor = 1.1f,
@@ -203,7 +199,7 @@ namespace Bb.Diagrams
             var diagram = new BlazorDiagram(options);
 
             var ksb = diagram.GetBehavior<KeyboardShortcutsBehavior>();
-            ksb.SetShortcut("s", ctrl: false, shift: true, alt: false, SaveToMyServer);
+            ksb.SetShortcut("s", ctrl: false, shift: true, alt: false, Save);
 
             diagram.ZoomChanged += ZoomChanged;
 
@@ -212,10 +208,10 @@ namespace Bb.Diagrams
 
         public void Save()
         {
-            SaveToMyServer(Diagram);
+            Save(Diagram);
         }
 
-        private async ValueTask SaveToMyServer(Blazor.Diagrams.Core.Diagram diagram)
+        private async ValueTask Save(Blazor.Diagrams.Core.Diagram diagram)
         {
 
             if (_session == null)
@@ -328,16 +324,19 @@ namespace Bb.Diagrams
             if (firstRender)
             {
 
-                var t = DiagramModel.GetToolbar();
-
-                this.GlobalBarFocusService.FocusChange(this.DiagramModel
-                    , (a, b) => true
-                    , (a, b) =>
+                if (DiagramModel != null)
                 {
-                    this.ToolBar = a.Component as ToolBar;
-                    var diagram = (Diagram)b;
-                    a.ApplyChange(diagram.GetToolbar());
-                });
+                    var t = DiagramModel.GetToolbar();
+
+                    this.GlobalBarFocusService.FocusChange(this.DiagramModel
+                        , (a, b) => true
+                        , (a, b) =>
+                    {
+                        this.ToolBar = a.Component as ToolBar;
+                        var diagram = (Diagram)b;
+                        a.ApplyChange(diagram.GetToolbar());
+                    });
+                }
 
             }
 

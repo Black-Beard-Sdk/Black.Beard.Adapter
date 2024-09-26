@@ -1,9 +1,8 @@
 ﻿using Bb.ComponentModel.Translations;
-using Bb.Diagrams;
 using Bb.Modules.Etl.Models;
-using Blazor.Diagrams.Core.Geometry;
+using Bb.PropertyGrid;
+using Bb.TypeDescriptors;
 using Blazor.Diagrams.Core.Models;
-using Blazor.Diagrams.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -18,11 +17,16 @@ namespace Bb.Modules.bpms.Components
 
         }
 
-        [Inject]
-        private IJSRuntime Runtime { get; set; }
+        //[Inject]
+        //private IJSRuntime Runtime { get; set; }
 
         [Inject]
         public ITranslateService TranslationService { get; set; }
+
+
+        [Inject]
+        public IRefreshService RefreshService { get; set; }
+
 
         [Parameter]
         public NodeModel? Node { get; set; }
@@ -42,13 +46,16 @@ namespace Bb.Modules.bpms.Components
 
         }
 
-        public string Name
+        public string? Name
         {
             get => Node?.Title;
             set
             {
                 if (Node != null)
+                {
                     Node.Title = value;
+                    RefreshService.CallRequestRefresh(this, nameof(PropertyGridView));
+                }
             }
         }
 
@@ -80,7 +87,7 @@ namespace Bb.Modules.bpms.Components
             get => Item?.Size?.Width ?? 10d;
         }
 
-        private ElementReference _element;
+        // private ElementReference _element;
 
     }
 }

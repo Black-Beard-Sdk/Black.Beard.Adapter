@@ -1,4 +1,6 @@
 ﻿using Bb.Diagrams;
+using Bb.Modules.bpms.Components;
+using Bb.TypeDescriptors;
 using Blazor.Diagrams.Core.Models;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -8,6 +10,32 @@ namespace Bb.Modules.Etl.Models
 
     public class BpmsSwimLane : UIModel
     {
+
+        static BpmsSwimLane()
+        {
+
+            DynamicTypeDescriptionProvider.Configure<BpmsSwimLane>(c =>
+            {
+
+                c.RemoveProperties
+                (
+                    "ControlledSize",
+                    "Parent",
+                    "CanBeOrphaned",
+                    "Selected",
+                    "Uuid",
+                    "Id",
+                    "Locked",
+                    "Visible"
+
+                );
+
+
+
+            });
+
+
+        }
 
         public BpmsSwimLane(SerializableDiagramNode source)
             : base(source)

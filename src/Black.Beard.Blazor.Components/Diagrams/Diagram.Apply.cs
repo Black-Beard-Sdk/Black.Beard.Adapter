@@ -52,12 +52,16 @@ namespace Bb.Diagrams
 
         private void ApplyGroups(Dictionary<Guid, UIModel> dicNodes)
         {
+
             foreach (var item in this.Models.Where(c => c.UuidParent != null))
             {
+
+                var p = dicNodes[item.Uuid];
+
                 if (dicNodes.TryGetValue(item.UuidParent.Value, out UIModel? parent))
                 {
                     if (parent is UIGroupModel group)
-                        group.Attach(item as NodeModel);
+                        group.Attach(p);
                     else
                     {
                         CleanChild(dicNodes, item);

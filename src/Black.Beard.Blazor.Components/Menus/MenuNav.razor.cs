@@ -8,7 +8,6 @@ namespace Bb.Menus
 
     public partial class MenuNav : ITranslateHost, IDisposable
     {
-        private bool disposedValue;
 
         public MenuNav()
         {
@@ -55,6 +54,9 @@ namespace Bb.Menus
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        private bool disposedValue;
+
     }
 
 }

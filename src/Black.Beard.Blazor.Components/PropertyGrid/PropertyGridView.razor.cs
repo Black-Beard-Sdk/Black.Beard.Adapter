@@ -71,6 +71,11 @@ namespace Bb.PropertyGrid
         [Parameter]
         public bool WithGroup { get; set; }
 
+        public void Refresh()
+        {
+           Update();
+        }
+
         [Parameter]
         public object SelectedObject
         {
