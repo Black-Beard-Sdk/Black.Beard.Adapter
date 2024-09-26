@@ -11,17 +11,85 @@ using Bb.ComponentModel.Translations;
 using MudBlazor;
 using Bb.ComponentModel.Attributes;
 using Bb.Toolbars;
+using Blazor.Diagrams.Components.Widgets;
 
 namespace Bb.Diagrams
 {
 
+
+
     public partial class DiagramUI : ComponentBase, IDisposable, ITranslateHost
     {
+
 
         public DiagramUI()
         {
 
+            this._zoomTextChanged = new EventCallback<string>(this, ZoomTextChanged);
+            this._gridSizeUpTextChanged = new EventCallback<string>(this, GridSizeTextChanged);
+            this._gridShowChanged = new EventCallback<MouseEventArgs>(this, ShowGridChanged);
+            this._gridModeChanged = new EventCallback<MouseEventArgs>(this, GridModeChanged);
+
         }
+
+        #region zoom / GridSize
+
+        public void GridModeChanged(MouseEventArgs args)
+        {
+            _showPoint = !_showPoint;
+            _gridMode = _showPoint ? GridMode.Line : GridMode.Point;
+            Diagram.Refresh();
+            StateHasChanged();
+        }
+
+        public void ShowGridChanged(MouseEventArgs args)
+        {
+
+            _showGrid = !_showGrid;
+            Diagram.Refresh();
+            StateHasChanged();
+
+        }
+
+        /**
+            diagram.Options.AllowPanning     = true;
+         */
+
+        private void GridSizeTextChanged(string key)
+        {
+            //_gridMode = GridMode.Line;
+
+            if (_gridSizeValue > 10)
+            {
+                Diagram.Options.GridSize = _gridSizeValue;
+                this.Diagram.Refresh();
+            }
+        }
+
+        private void ZoomTextChanged(string key)
+        {
+            Resize();
+        }
+
+        private void Resize()
+        {
+            var d = ((double)_zoomValue / 100d);
+            if (this.Diagram.Zoom != d & d > 0)
+                this.Diagram.SetZoom(d);
+        }
+
+        private void ZoomChanged()
+        {
+            var z = this.Diagram.Zoom * 100;
+            if (_zoomValue != z)
+            {
+                _zoomValue = (int)z;
+                this.Diagram.Refresh();
+            }
+
+        }
+
+        #endregion zoom / GridSize
 
         [EvaluateValidation(false)]
         public Diagnostics Diagnostics { get; set; }
@@ -56,8 +124,6 @@ namespace Bb.Diagrams
             }
         }
 
-
-
         [EvaluateValidation(false)]
         private BlazorDiagram Diagram { get; set; } = null!;
 
@@ -72,14 +138,13 @@ namespace Bb.Diagrams
             Diagram = CreateDiagram();
             Diagram.PointerClick += PointerClick;
             Diagram.SelectionChanged += SelectionChanged;
-            //PropertyGridFocusedService.FocusChanged += FocusedService_FocusChanged;
             if (DiagramModel != null)
             {
                 _linkFactory = new LinkFactory(DiagramModel.Toolbox);
                 DiagramModel.Apply(Diagram);
             }
         }
-                
+
 
         private void PointerClick(Model? model, Blazor.Diagrams.Core.Events.PointerEventArgs args)
         {
@@ -104,7 +169,7 @@ namespace Bb.Diagrams
                 {
                     Enabled = true,
                     Minimum = 0.1f,
-                    Maximum = 4f,
+                    Maximum = 3f,
                     ScaleFactor = 1.1f,
                 },
                 Links =
@@ -125,7 +190,7 @@ namespace Bb.Diagrams
                 },
                 AllowPanning = true,
                 GridSnapToCenter = true,
-                GridSize = 20,
+                GridSize = _zoomValue,
                 //Virtualization =
                 //{
                 //    Enabled = true, 
@@ -140,8 +205,9 @@ namespace Bb.Diagrams
             var ksb = diagram.GetBehavior<KeyboardShortcutsBehavior>();
             ksb.SetShortcut("s", ctrl: false, shift: true, alt: false, SaveToMyServer);
 
-            return diagram;
+            diagram.ZoomChanged += ZoomChanged;
 
+            return diagram;
         }
 
         public void Save()
@@ -290,6 +356,16 @@ namespace Bb.Diagrams
         private bool disposedValue;
         private BusySession _session;
 
+
+        private int _zoomValue = 100;
+        private int _gridSizeValue = 20;
+        private bool _showPoint = false;
+        private bool _showGrid = true;
+        private GridMode _gridMode = GridMode.Point;
+        private readonly EventCallback<string> _zoomTextChanged;
+        private readonly EventCallback<string> _gridSizeUpTextChanged;
+        private readonly EventCallback<MouseEventArgs> _gridShowChanged;
+        private readonly EventCallback<MouseEventArgs> _gridModeChanged;
     }
 
 

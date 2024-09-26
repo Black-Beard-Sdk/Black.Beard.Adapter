@@ -1,13 +1,61 @@
 ﻿@using Blazor.Diagrams.Components
 @using Blazor.Diagrams.Components.Widgets
 @using Microsoft.AspNetCore.Components.Web
-@using Microsoft.Fast.Components.FluentUI
 @using MudBlazor
 @using Bb.PropertyGrid
 
 <MudPaper Height="10" Elevation="25">
-    <MudToolBar WrapContent="true">
-        <MudIconButton Size="Size.Small" Class="mr-5" Icon="@Icons.Material.Filled.Save" Color="MudBlazor.Color.Inherit" OnClick="Save" />
+    <MudToolBar WrapContent="true" Style="align-items: baseline;">
+
+        <MudTooltip Text="@ComponentConstants.Save.Translate(this)" Color="Color.Default">
+
+            <MudIconButton Size="Size.Small"
+                           Class="mr-5"
+                           Icon="@Icons.Material.Filled.Save"
+                           Color="MudBlazor.Color.Inherit"
+                           OnClick="Save" />
+        </MudTooltip>
+
+        <MudStack Style="width: 80px;padding-left:10px">
+            <MudTooltip Text="@ComponentConstants.Zoom.Translate(this)" Color="Color.Default">
+                <MudNumericField @bind-Value="@_zoomValue"
+                                 Variant="Variant.Text"
+                                 Min="0"
+                                 Max="300"
+                                 Step="20"
+                                 TextChanged="@_zoomTextChanged" />
+            </MudTooltip>
+        </MudStack>
+
+        <MudStack Style="width: 80px;padding-left:10px">
+            <MudTooltip Text="@ComponentConstants.GridSize.Translate(this)" Color="Color.Default">
+                <MudNumericField @bind-Value="@_gridSizeValue"
+                                 Variant="Variant.Text"
+                                 Min="0"
+                                 Max="200"
+                                 Step="5"
+                                 TextChanged="@_gridSizeUpTextChanged" />
+            </MudTooltip>
+        </MudStack>
+
+
+        <MudTooltip Text="@ComponentConstants.ShowGrid.Translate(this)" Color="Color.Default">
+            <MudToggleIconButton 
+                @bind-Toggled="_showGrid"
+                                 Icon="@Icons.Material.Filled.GridOn"
+                ToggledIcon="@Icons.Material.Filled.GridOff"
+                onclick="@_gridShowChanged" />
+        </MudTooltip>
+
+        <MudTooltip Text="@ComponentConstants.GridMode.Translate(this)" Color="Color.Default">
+            <MudToggleIconButton 
+                @bind-Toggled="_showPoint"
+                                 Icon="@Icons.Material.Filled.DragIndicator"
+                                 ToggledIcon="@Icons.Material.Filled.Grid4x4"
+                onclick="@_gridModeChanged" />
+        </MudTooltip>
+
+
     </MudToolBar>
 </MudPaper>
 
@@ -30,7 +78,12 @@
 
                 </NavigatorWidget>
 
-                <GridWidget Size="20" Mode="GridMode.Point" BackgroundColor="white" />
+                @if (_showGrid)
+                {
+                    <GridWidget Size="@_gridSizeValue"
+                                Mode="@_gridMode"
+                                BackgroundColor="white" />
+                }
 
                 <SelectionBoxWidget />
 

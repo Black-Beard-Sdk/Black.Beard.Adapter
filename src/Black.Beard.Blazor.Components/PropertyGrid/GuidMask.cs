@@ -23,6 +23,30 @@ namespace Bb.PropertyGrid
 
         private const string WhiteSpaceFilter = "(?!\\s)";
 
-    }  
+    }
+
+
+    //public class PercentMask : RegexMask
+    //{
+
+    //    protected PercentMask(string regex, string mask)
+    //        : base(regex, mask)
+    //    {
+    //    }
+
+    //    public static RegexMask GetPercent()
+    //    {
+    //        var delimiters = "%";
+    //        var mask = "XX%";            
+    //        var pattern = "[0-9]{1,2}";
+    //        var regex = $"^{pattern}{WhiteSpaceFilter}$";
+    //        var regexMask = new PercentMask(regex, mask) { Delimiters = delimiters, AllowOnlyDelimiters = true };
+    //        return regexMask;
+    //    }
+
+    //    private const string WhiteSpaceFilter = "(?!\\s)";
+
+    //}
+
 
 }

@@ -8,6 +8,12 @@ namespace Bb
 
         public static TranslatedKeyLabel Properties => new TranslatedKeyLabel("Properties");
 
+        public static TranslatedKeyLabel Save => new TranslatedKeyLabel("Save");
+        public static TranslatedKeyLabel Zoom => new TranslatedKeyLabel("Zoom");
+        public static TranslatedKeyLabel GridSize => new TranslatedKeyLabel("Grid size");
+        public static TranslatedKeyLabel ShowGrid => new TranslatedKeyLabel("Show grid");
+        public static TranslatedKeyLabel GridMode => new TranslatedKeyLabel("Grid mode");
+
 
         public static TranslatedKeyLabel Cancel => new TranslatedKeyLabel("Cancel");
         public static TranslatedKeyLabel Edit => new TranslatedKeyLabel("Edit");
