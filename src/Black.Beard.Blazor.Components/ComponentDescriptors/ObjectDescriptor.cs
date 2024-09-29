@@ -1,8 +1,5 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.TypeDescriptors;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -142,7 +139,7 @@ namespace Bb.ComponentDescriptors
 
         internal void HasChanged(PropertyObjectDescriptor propertyObjectDescriptor)
         {
-            PropertyHasChanged?.Invoke(propertyObjectDescriptor);
+            PropertyHasChanged?.Invoke(propertyObjectDescriptor, Instance);
         }
 
         public DiagnosticValidator Validate()
@@ -158,7 +155,7 @@ namespace Bb.ComponentDescriptors
 
         }
 
-        public Action<PropertyObjectDescriptor> PropertyHasChanged { get; set; }
+        public Action<PropertyObjectDescriptor, object> PropertyHasChanged { get; set; }
 
     }
 

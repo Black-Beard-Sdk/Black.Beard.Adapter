@@ -1,8 +1,6 @@
 ﻿using Bb.ComponentModel.Translations;
 using System.Collections;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Xml.Linq;
 using static MudBlazor.CategoryTypes;
 
 namespace Bb.Toolbars
@@ -14,7 +12,7 @@ namespace Bb.Toolbars
         /// <summary>
         /// Initializes a new instance of the <see cref="ToolbarGroup"/> class.
         /// </summary>
-        public ToolbarGroup(Guid id, TranslatedKeyLabel name) 
+        public ToolbarGroup(Guid? id, TranslatedKeyLabel name) 
             : this(id, name, new List<Tool>() { })
         {
             
@@ -24,7 +22,7 @@ namespace Bb.Toolbars
         /// Initializes a new instance of the <see cref="ToolbarGroup"/> class.
         /// </summary>
         /// <param name="items"></param>
-        public ToolbarGroup(Guid id, TranslatedKeyLabel name, params Tool[] items) 
+        public ToolbarGroup(Guid? id, TranslatedKeyLabel name, params Tool[] items) 
             : this(id, name, items.ToList())
         {
 
@@ -34,14 +32,17 @@ namespace Bb.Toolbars
         /// Initializes a new instance of the <see cref="ToolbarGroup"/> class.
         /// </summary>
         /// <param name="items"></param>
-        public ToolbarGroup(Guid id, TranslatedKeyLabel name, IEnumerable<Tool> items)
+        public ToolbarGroup(Guid? id, TranslatedKeyLabel name, IEnumerable<Tool> items)
         {
-            this.Id = id;
-            this.Name = name;
-            _items = new List<Tool>(items);
+            this.Id = id.HasValue ? id.Value : Guid.NewGuid();
+            this.Name = name ?? throw new NullReferenceException(nameof(name));
+            _items = new List<Tool>(items ?? new Tool[] { });
+            this.Show = _items.Any(c => c.Show);
         }
 
-
+        /// <summary>
+        /// Select the group
+        /// </summary>
         public void Select()
         {
 
@@ -50,10 +51,20 @@ namespace Bb.Toolbars
 
         }
 
+        /// <summary>
+        /// Return true if the group is selected
+        /// </summary>
         public bool IsSelected => Parent?.IsSelected(this) ?? false; 
 
+        /// <summary>
+        /// Return the <see cref="ToolbarList"/> parent
+        /// </summary>
         public ToolbarList? Parent { get; private set; }
 
+        /// <summary>
+        /// Set the parent
+        /// </summary>
+        /// <param name="parent"></param>
         public void SetParent(ToolbarList? parent)
         {
 
@@ -71,11 +82,20 @@ namespace Bb.Toolbars
 
         }
 
-
+        /// <summary>
+        /// return the count of items
+        /// </summary>
         public int Count => _items.Count;
 
+        /// <summary>
+        /// Return true if the collection is readonly
+        /// </summary>
         public bool IsReadOnly => false;
 
+        /// <summary>
+        /// Add new tools list
+        /// </summary>
+        /// <param name="items"></param>
         public void Add(params Tool[] items)
         {
 
@@ -95,8 +115,14 @@ namespace Bb.Toolbars
                 CollectionChanged.Invoke(this, e);
             }
 
+            this.Show = _items.Any(c => c.Show);
+
         }
 
+        /// <summary>
+        /// Add new tool
+        /// </summary>
+        /// <param name="item"></param>
         public void Add(Tool item)
         {
             if (item != null && !_items.Contains(item) && !_items.Any(c => c.Name == item.Name))
@@ -108,9 +134,17 @@ namespace Bb.Toolbars
                     var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Tool>() { item });
                     CollectionChanged.Invoke(this, e);
                 }
+
+                this.Show = _items.Any(c => c.Show);
             }
+                      
         }
 
+        /// <summary>
+        /// Remove the tool
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool Remove(Tool item)
         {
 
@@ -122,6 +156,9 @@ namespace Bb.Toolbars
                     {
                         var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<Tool>() { item });
                         CollectionChanged.Invoke(this, e);
+
+                        this.Show = _items.Any(c => c.Show);
+
                     }
                     return true;
                 }
@@ -130,6 +167,10 @@ namespace Bb.Toolbars
 
         }
 
+        /// <summary>
+        /// Remove the tool list
+        /// </summary>
+        /// <param name="items"></param>
         public void Remove(params Tool[] items)
         {
 
@@ -143,6 +184,8 @@ namespace Bb.Toolbars
                         _removed.Add(item);
                     }
 
+            this.Show = _items.Any(c => c.Show);
+
             if (_removed.Count > 0 && CollectionChanged != null)
             {
                 var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _removed);
@@ -151,6 +194,9 @@ namespace Bb.Toolbars
 
         }
 
+        /// <summary>
+        /// Remove all tools
+        /// </summary>
         public void Clear()
         {
             _items.Clear();
@@ -159,18 +205,35 @@ namespace Bb.Toolbars
                 var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, new List<ToolbarGroup>() { });
                 CollectionChanged.Invoke(this, e);
             }
+
+            this.Show = _items.Any(c => c.Show);
+
         }
 
+        /// <summary>
+        /// Return true if the tool is in the collection
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool Contains(Tool item)
         {
             return _items.Contains(item);
         }
 
+        /// <summary>
+        /// Copy all tool in the array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="arrayIndex"></param>
         public void CopyTo(Tool[] array, int arrayIndex)
         {
             _items.CopyTo(array, arrayIndex);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator<Tool> GetEnumerator()
         {
             return _items.GetEnumerator();
@@ -185,6 +248,8 @@ namespace Bb.Toolbars
         public TranslatedKeyLabel Name { get; }
 
         private readonly List<Tool> _items;
+
+        public bool Show { get; private set; }
 
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
 

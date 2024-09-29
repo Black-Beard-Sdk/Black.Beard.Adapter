@@ -1,8 +1,5 @@
-﻿using Bb.ComponentModel.Attributes;
-using Bb.Diagrams;
+﻿using Bb.Diagrams;
 using Bb.UIComponents.Glyphs;
-using Blazor.Diagrams.Core.Anchors;
-using Blazor.Diagrams.Core.Models;
 
 namespace Bb.Modules.Sgbd.DiagramTools
 {

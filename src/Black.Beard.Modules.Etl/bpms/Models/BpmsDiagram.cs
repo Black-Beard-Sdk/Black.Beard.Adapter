@@ -1,9 +1,5 @@
 ﻿using Bb.Diagrams;
-using Bb.Modules.Sgbd.Models;
 using Bb.TypeDescriptors;
-using Blazor.Diagrams;
-using Blazor.Diagrams.Core;
-using System.Text.Json.Serialization;
 
 namespace Bb.Modules.Bpms.Models
 {
@@ -24,7 +20,12 @@ namespace Bb.Modules.Bpms.Models
 
             toolbox
                   .Add(new SwimLaneTool())
+                  .Add(new ActionTool())
+                  .Add(new EndingTool())
+                  .Add(new StartingEventTool())
+                  .Add(new SwitchTool())
 
+                  .Add(new BpmsRelationshipLink())
                   ;
 
         }

@@ -4,7 +4,6 @@ using Blazor.Diagrams.Core.Models.Base;
 using Bb.TypeDescriptors;
 using Bb.ComponentModel.Attributes;
 using System.ComponentModel;
-using Blazor.Diagrams;
 
 namespace Bb.Diagrams
 {
@@ -95,7 +94,7 @@ namespace Bb.Diagrams
 
         public void SetProperty(string name, object? value) => this._container?.SetProperty(name, value);
 
-        public virtual void Validate(Diagnostics Diagnostics)
+        public virtual void Validate(DiagramDiagnostics Diagnostics)
         {
 
         }
@@ -146,6 +145,18 @@ namespace Bb.Diagrams
 
         #endregion INotifyPropertyChanged
 
+        public void TriggerParentMoved(MovableModel parent)
+        {
+            ParentMoved?.Invoke(parent, this);
+        }
+
+        public void TriggerParentMoving(MovableModel parent)
+        {
+            ParentMoved?.Invoke(parent, this);
+        }
+
+        public event Action<MovableModel, MovableModel>? ParentMoved;
+        public event Action<MovableModel, MovableModel>? ParentMovingd;
 
         [EvaluateValidation(false)]
         public SerializableDiagramNode Source { get; private set; }

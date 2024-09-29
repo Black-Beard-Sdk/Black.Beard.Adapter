@@ -1,5 +1,4 @@
 ﻿using Bb.ComponentDescriptors;
-using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Translations;
 using Bb.TypeDescriptors;
 using System.Collections;
@@ -9,10 +8,10 @@ using System.Reflection;
 namespace Bb.Diagrams
 {
 
-    public class Diagnostics : List<Diagnostic>
+    public class DiagramDiagnostics : List<DiagramDiagnostic>
     {
 
-        public Diagnostics()
+        public DiagramDiagnostics()
         {
 
         }
@@ -112,17 +111,17 @@ namespace Bb.Diagrams
 
         public void AddInfo(string message, string source, TargetSource target)
         {
-            this.Add(new Diagnostic() { Level = DiagnosticLevel.Info, Message = message, Source = source, Target = target });
+            this.Add(new DiagramDiagnostic() { Level = DiagnosticLevel.Info, Message = message, Source = source, Target = target });
         }
 
         public void AddWarning(string message, string source, TargetSource target)
         {
-            this.Add(new Diagnostic() { Level = DiagnosticLevel.Warning, Message = message, Source = source, Target = target });
+            this.Add(new DiagramDiagnostic() { Level = DiagnosticLevel.Warning, Message = message, Source = source, Target = target });
         }
 
         public void AddError(string message, string source, TargetSource target)
         {
-            this.Add(new Diagnostic() { Level = DiagnosticLevel.Error, Message = message, Source = source, Target = target });
+            this.Add(new DiagramDiagnostic() { Level = DiagnosticLevel.Error, Message = message, Source = source, Target = target });
         }
 
         private class Context
@@ -180,7 +179,7 @@ namespace Bb.Diagrams
         private HashSet<Type> _types = new HashSet<Type>()
         {
             //typeof(Delegate),
-            typeof(Diagnostics),
+            typeof(DiagramDiagnostics),
             typeof(MethodInfo),
             typeof(Module),
             typeof(Assembly),

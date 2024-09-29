@@ -49,7 +49,7 @@ namespace Bb.Diagrams
             this._container.SetProperty(name, value);
         }
 
-        public virtual void Validate(Diagnostics Diagnostics)
+        public virtual void Validate(DiagramDiagnostics Diagnostics)
         {
 
         }

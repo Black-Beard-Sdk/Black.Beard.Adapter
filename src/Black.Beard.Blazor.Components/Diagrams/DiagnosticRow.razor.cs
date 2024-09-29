@@ -12,7 +12,7 @@ namespace Bb.Diagrams
     {
 
         [Parameter]
-        public Diagnostic Row { get; set; }
+        public DiagramDiagnostic Row { get; set; }
 
         [Parameter]
         public PropertyGridView PropertyGridView { get; set; }

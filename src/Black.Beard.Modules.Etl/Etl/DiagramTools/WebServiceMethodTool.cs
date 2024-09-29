@@ -21,16 +21,13 @@ namespace Bb.Modules.Etl
 
             AddPort(PortAlignment.Right);
 
-            this.AddParentType<BpmsSwimLane>();
+            this.AddParentType<EtlWebService>();
             this.SetTypeModel<EtlWebMethodService>();
             //this.SetTypeUI<TableNode>();
 
         }
 
-        public override string GetDefaultName()
-        {
-            return $"ws_method";
-        }
+        public override string GetDefaultName() => $"ws_method";
 
         public static Guid Key = new Guid("071E9894-836E-435A-ADDC-FA7748609AC3");
 

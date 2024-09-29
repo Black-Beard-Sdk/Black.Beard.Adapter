@@ -1,7 +1,6 @@
 ﻿using Blazor.Diagrams;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
-using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
@@ -17,12 +16,14 @@ namespace Bb.Diagrams
 
             _diagram = diagram;
 
+            _diagram.Nodes.Added += Nodes_Added;
+            _diagram.Links.Added += Links_Added;
+
+            _diagram.Nodes.Removed += Nodes_Removed;
+            _diagram.Links.Removed += Links_Removed;
+
             Apply();
 
-            _diagram.Nodes.Added += Nodes_Added;
-            _diagram.Nodes.Removed += Nodes_Removed;
-            _diagram.Links.Added += Links_Added;
-            _diagram.Links.Removed += Links_Removed;
 
         }
 
@@ -77,19 +78,22 @@ namespace Bb.Diagrams
         private void ApplyLinks(Dictionary<Guid, PortModel> dicPort)
         {
             foreach (SerializableRelationship item in this.Relationships)
-                if (_dicLinks.TryGetValue(item.Type, out var specLink))
+                if (this.Toolbox.TryGetLinkTool(item.Type, out var specLink))
                     if (dicPort.TryGetValue(item.Source, out PortModel source))
                         if (dicPort.TryGetValue(item.Target, out PortModel target))
                         {
                             var link = specLink.CreateLink(item, source, target);
                             var linkUI = _diagram.Links.Add(link);
+
+                            specLink.Customize(linkUI);
+
                         }
         }
 
         private void ApplyNodes(Dictionary<Guid, PortModel> dicPort, Dictionary<Guid, UIModel> dicNodes)
         {
             foreach (var item in this.Models)
-                if (_dicModels.TryGetValue(item.Type, out var specModel))
+                if (this.Toolbox.TryGetNodeTool(item.Type, out DiagramToolNode? specModel))
                 {
                     // Register ports
                     var ui = specModel.CreateUI(item, this);
@@ -130,7 +134,7 @@ namespace Bb.Diagrams
 
             else
                 throw new Exception("Invalid type");
-
+            
         }
 
         private void Links_Removed(BaseLinkModel link)
@@ -180,9 +184,13 @@ namespace Bb.Diagrams
 
         }
 
-        private void Nodes_Added(NodeModel obj)
+        private void Nodes_Added(NodeModel model)
         {
-            if (obj is UIModel m)
+
+            model.Moving += Node_Moving;
+            model.Moved += Node_Moved;
+
+            if (model is UIModel m)
             {
 
                 var p = this.Models.FirstOrDefault(c => c.Uuid == m.Source.Uuid);
@@ -195,6 +203,10 @@ namespace Bb.Diagrams
 
         private void Nodes_Removed(NodeModel model)
         {
+
+            model.Moving -= Node_Moving;
+            model.Moved -= Node_Moved;
+
             if (model is UIModel m)
             {
                 var p = this.Models.FirstOrDefault(c => c.Uuid == m.Source.Uuid);
@@ -204,6 +216,24 @@ namespace Bb.Diagrams
         }
 
         #endregion add/Remove
+
+
+
+        protected virtual void Node_Moved(MovableModel obj)
+        {
+            var items = GetChildren(new Guid(obj.Id));
+            if (items.Any())
+                foreach (var item in items)
+                    item.TriggerParentMoved(obj);
+        }
+
+        protected virtual void Node_Moving(NodeModel obj)
+        {
+            var items = GetChildren(new Guid(obj.Id));
+            if (items.Any())
+                foreach (var item in items)
+                    item.TriggerParentMoving(obj);
+        }
 
 
         protected virtual void Dispose(bool disposing)
@@ -218,7 +248,15 @@ namespace Bb.Diagrams
                         _diagram.Nodes.Removed -= Nodes_Removed;
                         _diagram.Links.Added -= Links_Added;
                         _diagram.Links.Removed -= Links_Removed;
+
+                        foreach (var ui in _diagram.Nodes)
+                        {
+                            ui.Moving -= Node_Moving;
+                            ui.Moved -= Node_Moved;
+                        }
+                    
                     }
+
                 }
                 disposedValue = true;
             }
@@ -248,7 +286,7 @@ namespace Bb.Diagrams
             GC.SuppressFinalize(this);
         }
 
-        
+
         public bool TryGetUIModel(Guid id, out NodeModel? result)
         {
             var i = id.ToString().ToUpper();

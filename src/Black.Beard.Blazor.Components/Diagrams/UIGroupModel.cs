@@ -11,7 +11,7 @@ namespace Bb.Diagrams
     public class UIGroupModel : UIModel
     {
 
-        public UIGroupModel(DiagramGroupNode source)
+        public UIGroupModel(SerializableDiagramGroupNode source)
             : base(source)
         {
             Padding = source.Padding;

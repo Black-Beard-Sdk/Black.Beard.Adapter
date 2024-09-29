@@ -15,7 +15,8 @@ namespace Bb.Toolbars
             string icon,
             object? tag, 
             bool withToggle,
-            bool draggable
+            bool draggable,
+            bool show
         )
         {
             this.Name = name;
@@ -25,6 +26,7 @@ namespace Bb.Toolbars
             Tag = tag;
             this.WithToggle = withToggle;
             this.Draggable = draggable ? "true" : "false";
+            this.Show = show;
         }
 
         /// <summary>
@@ -47,6 +49,8 @@ namespace Bb.Toolbars
         public bool WithToggle { get; }
 
         public string Draggable { get; }
+
+        public bool Show { get;  }
 
         public ToolbarGroup? Group { get; internal set; }
 

@@ -2,17 +2,21 @@
 using System.ComponentModel;
 namespace Bb.Diagrams
 {
-    public class DiagramGroupNode : SerializableDiagramNode
+
+    public class SerializableDiagramGroupNode : SerializableDiagramNode
     {
 
-        public DiagramGroupNode() : base()
+        public SerializableDiagramGroupNode(Guid Type) 
+            : base(Type)
+        {
+            
+        }
+
+        public SerializableDiagramGroupNode() 
+            : base()
         {
 
         }
-
-        //[EvaluateValidation(false)]
-        //[Browsable(false)]
-        //public bool AutoSize { get; set; } = true;
 
         [EvaluateValidation(false)]
         [Browsable(false)]

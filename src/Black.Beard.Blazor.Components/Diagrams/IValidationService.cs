@@ -3,7 +3,7 @@
     public interface IValidationService
     {
 
-        void Validate(Diagnostics Diagnostics);
+        void Validate(DiagramDiagnostics Diagnostics);
 
     }
 

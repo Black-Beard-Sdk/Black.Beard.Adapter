@@ -4,7 +4,6 @@ using Bb.TypeDescriptors;
 using Blazor.Diagrams;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
-using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
@@ -76,21 +75,19 @@ namespace Bb.Diagrams
             this.DynamicToolbox = dynamicToolbox;
             this._container = new DynamicDescriptorInstanceContainer(this);
             this.TypeModelId = typeModelId;
-            //Specifications = new List<DiagramToolBase>();
             Models = new List<SerializableDiagramNode>();
             Relationships = new List<SerializableRelationship>();
-            _dicModels = new Dictionary<Guid, DiagramToolNode>();
-            _dicLinks = new Dictionary<Guid, DiagramToolRelationshipBase>();
         }
 
         public string Name { get; set; }
 
         public string Description { get; set; }
 
+
+
+        #region models
+
         public List<SerializableDiagramNode> Models { get; set; }
-
-        public List<SerializableRelationship> Relationships { get; set; }
-
 
         public SerializableDiagramNode AddModel(Guid specification, double x, double y, string? name = null, Guid? uuid = null)
         {
@@ -128,11 +125,10 @@ namespace Bb.Diagrams
 
             if (_diagram != null)
             {
-                var r = specification.CreateUI(result, this);
-
-                var parent = this.GetParentByPosition(r);
+                var ui = specification.CreateUI(result, this);
+                var parent = this.GetParentByPosition(ui);
                 if (parent != null)
-                    parent.AddChildren(r);
+                    parent.AddChildren(ui);
 
             }
 
@@ -158,6 +154,21 @@ namespace Bb.Diagrams
             return result != null;
         }
 
+        public IEnumerable<UIModel> GetChildren(Guid guid)
+        {
+            return _diagram.Nodes
+                   .OfType<UIModel>()
+                   .Where(c => c.Parent == guid).ToList();
+        }
+
+
+        #endregion models
+
+
+
+        public List<SerializableRelationship> Relationships { get; set; }
+
+
         public SerializableRelationship AddLink(Guid specification, Port left, Port right, string name, Guid? uuid = null)
         {
             var spec = Toolbox.OfType<DiagramToolRelationshipBase>().Where(c => c.Uuid == specification).FirstOrDefault();
@@ -179,6 +190,7 @@ namespace Bb.Diagrams
             return link;
         }
 
+
         public IDiagramNode? GetModelByPort(Guid id)
         {
 
@@ -191,7 +203,9 @@ namespace Bb.Diagrams
 
         }
 
-        public virtual void Validate(Diagnostics Diagnostics)
+
+
+        public virtual void Validate(DiagramDiagnostics Diagnostics)
         {
 
             // Diagnostics.EvaluateModel(this);
@@ -216,7 +230,7 @@ namespace Bb.Diagrams
         [Browsable(false)]
         [JsonIgnore]
         [EvaluateValidation(false)]
-        public Diagnostics LastDiagnostics { get; internal set; }
+        public DiagramDiagnostics LastDiagnostics { get; internal set; }
 
 
         #region propagate toolbox
@@ -240,14 +254,16 @@ namespace Bb.Diagrams
                 foreach (var item in this.Toolbox)
                 {
 
-                    if (!groups.TryGetValue(item.Category.DefaultDisplay, out var group))
-                        groups.Add(item.Category, group = new ToolbarGroup(Guid.NewGuid(), item.Category));
+                    var categoryKey = item.Category.DefaultDisplay;
+                    if (!groups.TryGetValue(categoryKey, out var group))
+                        groups.Add(categoryKey, group = new ToolbarGroup(Guid.NewGuid(), item.Category));
 
                     group.Add
                     (
                         new Tool(item.Name, item.ToolTip, item.Icon, item,
                             item.Kind == ToolKind.Link, // withToggle
-                            item.Kind == ToolKind.Node  // draggable
+                            item.Kind == ToolKind.Node,  // draggable
+                            !item.Hidden
                         )
                     );
 
@@ -314,8 +330,6 @@ namespace Bb.Diagrams
         public event EventHandler<Diagram>? OnModelSaved;
 
         private readonly DynamicDescriptorInstanceContainer _container;
-        private readonly Dictionary<Guid, DiagramToolNode> _dicModels;
-        private readonly Dictionary<Guid, DiagramToolRelationshipBase> _dicLinks;
         private readonly DiagramToolbox _toolbox;
         private ToolbarList _list;
 

@@ -27,10 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Diagrams\DiagramUI.razor.css" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Diagrams\DiagramUI.razor.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

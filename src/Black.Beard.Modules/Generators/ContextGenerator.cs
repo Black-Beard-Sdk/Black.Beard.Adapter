@@ -17,7 +17,7 @@ namespace Bb.Generators
         public string RootNamespace { get; set; }
 
 
-        public Bb.Diagrams.Diagnostics Diagnostics { get; set; }
+        public Bb.Diagrams.DiagramDiagnostics Diagnostics { get; set; }
 
 
         public void WriteOnDisk(IEnumerable<GeneratedDocument> documents)

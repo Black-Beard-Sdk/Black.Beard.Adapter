@@ -3,15 +3,13 @@ using Bb.TypeDescriptors;
 
 namespace Bb.Modules.Bpms.Models
 {
-
-
-    public class BpmsSwimLane : UIModel
+    public class BpmsEnding : UIModel
     {
 
-        static BpmsSwimLane()
+        static BpmsEnding()
         {
 
-            DynamicTypeDescriptionProvider.Configure<BpmsSwimLane>(c =>
+            DynamicTypeDescriptionProvider.Configure<BpmsEnding>(c =>
             {
 
                 c.RemoveProperties
@@ -29,10 +27,9 @@ namespace Bb.Modules.Bpms.Models
                 );
             });
 
-
         }
 
-        public BpmsSwimLane(SerializableDiagramNode source)
+        public BpmsEnding(SerializableDiagramNode source)
             : base(source)
         {
 

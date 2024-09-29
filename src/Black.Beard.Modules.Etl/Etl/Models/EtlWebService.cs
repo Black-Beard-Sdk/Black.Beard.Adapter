@@ -9,7 +9,7 @@ namespace Bb.Modules.Etl.Models
     public class EtlWebService : UIGroupModel
     {
 
-        public EtlWebService(DiagramGroupNode source)
+        public EtlWebService(SerializableDiagramGroupNode source)
             : base(source)
         {
 

@@ -2,6 +2,8 @@
 using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
+using Blazor.Diagrams.Core.PathGenerators;
+using Blazor.Diagrams.Core.Routers;
 
 namespace Bb.Diagrams
 {
@@ -56,18 +58,41 @@ namespace Bb.Diagrams
 
         }
 
-        public virtual CustomizedLinkModel CreateLink(SerializableRelationship link, PortModel source, PortModel target)
+        internal protected virtual CustomizedLinkModel CreateLink(SerializableRelationship link, PortModel source, PortModel target)
         {
             var l = CreateLink(link, CreateAnchor(source), CreateAnchor(target));
             return l;
         }
 
-        public virtual CustomizedLinkModel CreateLink(SerializableRelationship link, Anchor source, Anchor target)
+        protected virtual CustomizedLinkModel CreateLink(SerializableRelationship link, Anchor source, Anchor target)
         {
             var l = new CustomizedLinkModel(link, source, target);
+            l.PathGenerator = GetPathGenerator();
+            l.Router = GetRouter();
             return l;
         }
+
+        internal protected virtual void Customize(CustomizedLinkModel link)
+        {
+            
+
+        }
+
+        public virtual PathGenerator GetPathGenerator()
+        {
+            //return new SmoothPathGenerator();
+            return new StraightPathGenerator();
+        }
+
+        public virtual Router GetRouter()
+        {
+            //return new NormalRouter()
+            return new OrthogonalRouter();
+        }
+
+
     }
+
 
 
     internal static class LinkableExtensions

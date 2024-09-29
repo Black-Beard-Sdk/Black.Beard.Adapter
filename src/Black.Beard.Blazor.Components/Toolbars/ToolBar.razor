@@ -2,7 +2,7 @@
 
 @if (Visible)
 {
-    @foreach (ToolbarGroup barGroup in Bars)
+    @foreach (ToolbarGroup barGroup in Bars.Where(c => c.Show))
     {
         <MudStack Spacing="1">
             <MudButton OnClick="@barGroup.Select">@barGroup.Name.Translate(this)</MudButton>

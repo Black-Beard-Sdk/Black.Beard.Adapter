@@ -9,8 +9,8 @@ namespace Bb.Diagrams
     {
 
 
-        #region ctor
 
+        #region ctor
 
         /// <summary>
         /// Initialize a new toolbox
@@ -90,6 +90,7 @@ namespace Bb.Diagrams
 
         #endregion Add tools
 
+
         /// <summary>
         /// Return the tool enumerator for iteration
         /// </summary>
@@ -133,6 +134,42 @@ namespace Bb.Diagrams
             if (_dynamicToolbox)
                 foreach (var item in _providers)
                     item.InitializeToolbox(this);
+        }
+
+        public bool TryGetNodeTool(Guid type, out DiagramToolNode? specModel)
+        {
+
+            Refresh();
+
+            specModel = null;
+            
+            if (_tools.TryGetValue(type, out var result))
+                if (result is DiagramToolNode node)
+                {
+                    specModel = node;
+                    return true;
+
+                }
+
+            return false;
+        }
+
+        public bool TryGetLinkTool(Guid type, out DiagramToolRelationshipBase? specModel)
+        {
+
+            Refresh();
+
+            specModel = null;
+
+            if (_tools.TryGetValue(type, out var result))
+                if (result is DiagramToolRelationshipBase link)
+                {
+                    specModel = link;
+                    return true;
+
+                }
+
+            return false;
         }
 
         /// <summary>

@@ -1,8 +1,6 @@
-﻿using Bb.ComponentModel.Attributes;
-using Bb.Diagrams;
+﻿using Bb.Diagrams;
 using Bb.Modules.bpms.Components;
 using Bb.Modules.Bpms.Models;
-using Bb.Modules.Etl.Models;
 using Bb.UIComponents.Glyphs;
 using Blazor.Diagrams.Core.Geometry;
 
@@ -17,7 +15,7 @@ namespace Bb.Modules.Bpms
                   Bb.ComponentConstants.Tools,
                   "swimlane",
                   "Append a new swimlane",
-                  GlyphFilled.Service)
+                  GlyphFilled.AccountTree)
         {
             this.SetTypeModel<BpmsSwimLane>();
             this.SetTypeUI<SwimLaneComponent>();
@@ -49,10 +47,7 @@ namespace Bb.Modules.Bpms
 
         }
 
-        public override string GetDefaultName()
-        {
-            return $"swimlane";
-        }
+        // public override string GetDefaultName() => $"Swimlane";
 
         public static Guid Key = new Guid("6A317FDD-F2D6-4BA1-9A08-071AA11C414B");
 

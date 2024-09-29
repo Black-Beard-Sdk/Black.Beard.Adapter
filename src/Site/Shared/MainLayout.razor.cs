@@ -2,10 +2,8 @@
 using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Translations;
 using Bb.PropertyGrid;
-using Bb.Toolbars;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using static Bb.UIComponents.UIKeys;
 
 namespace Site.Shared
 {
@@ -123,7 +121,9 @@ namespace Site.Shared
         {
             if (this.PropertyGrid != null)
                 if (e.Evaluate == null || e.Evaluate(this.PropertyGrid, sender))
+                {
                     this.PropertyGrid.SelectedObject = sender;
+                }
         }
 
         private bool _busyVisible = false;

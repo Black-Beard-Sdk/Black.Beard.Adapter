@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentDescriptors;
 using Bb.ComponentModel.Translations;
+using Bb.Diagrams;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -37,10 +38,6 @@ namespace Bb.PropertyGrid
             set => _propertyFilter = value;
         }
 
-
-        [Parameter]
-        public Action<PropertyObjectDescriptor> PropertyHasChanged { get; set; }
-
         [Parameter]
         public Variant CurrentVariant { get; set; } = Variant.Text;
 
@@ -58,9 +55,16 @@ namespace Bb.PropertyGrid
                         _mapperInitialized = true;
                     }
 
-            Descriptor = new ObjectDescriptor(_selectedObject, _selectedObject?.GetType(), TranslateService, ServiceProvider, StrategyName, null, PropertyFilter)
+            Descriptor = new ObjectDescriptor(
+                _selectedObject,
+                _selectedObject?.GetType(),
+                TranslateService,
+                ServiceProvider,
+                StrategyName,
+                null,
+                PropertyFilter)
             {
-                PropertyHasChanged = this.PropertyHasChanged,
+                PropertyHasChanged = PropertyHasChanged_Impl,
             };
 
             this.Descriptor.PropertyHasChanged = this.SubPropertyHasChanged;
@@ -73,7 +77,7 @@ namespace Bb.PropertyGrid
 
         public void Refresh()
         {
-           Update();
+            Update();
         }
 
         [Parameter]
@@ -87,13 +91,44 @@ namespace Bb.PropertyGrid
             }
         }
 
-        private void SubPropertyHasChanged(PropertyObjectDescriptor obj)
+
+        #region events
+
+        private IEventArgInterceptor<PropertyObjectDescriptorEventArgs> _interceptor;
+
+        public void Raise(IEventArgInterceptor<PropertyObjectDescriptorEventArgs> interceptor)
+        {
+
+            if (interceptor != null)
+            {
+                if (_interceptor != null)
+                    UnRaise();
+                _interceptor = interceptor;
+                this.PropertyHasChanged += _interceptor.Invoke;
+            }
+        }
+
+        public void UnRaise()
+        {
+            if (_interceptor != null)
+                this.PropertyHasChanged -= _interceptor.Invoke;
+        }
+
+        public event EventHandler<PropertyObjectDescriptorEventArgs> PropertyHasChanged;
+
+        internal void PropertyHasChanged_Impl(PropertyObjectDescriptor obj, object instance)
+        {
+            PropertyHasChanged?.Invoke(this, new PropertyObjectDescriptorEventArgs(obj, instance));
+        }
+
+        private void SubPropertyHasChanged(PropertyObjectDescriptor obj, object instance)
         {
             Update();
-            //StateHasChanged();
-            if (PropertyHasChanged != null)
-                PropertyHasChanged(obj);
+            PropertyHasChanged_Impl(obj, instance);
         }
+
+        #endregion events
+
 
         public DiagnosticValidator Validate()
         {
@@ -113,6 +148,20 @@ namespace Bb.PropertyGrid
 
     }
 
+    public class PropertyObjectDescriptorEventArgs : EventArgs
+    {
+
+        public PropertyObjectDescriptorEventArgs(PropertyObjectDescriptor property, object instance)
+        {
+            this.Instance = instance;
+            this.Property = property;
+        }
+
+        public object Instance { get; }
+
+        public PropertyObjectDescriptor Property { get; }
+
+    }
 
 
 }

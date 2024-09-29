@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.Diagrams;
+using Blazor.Diagrams.Core.Models.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Specialized;
@@ -58,11 +59,10 @@ namespace Bb.Toolbars
         {
 
             if (firstRender)
-            {
                 GlobalBarFocusService.FocusChanged += FocusBar_FocusChanged;
-            }
 
             return base.OnAfterRenderAsync(firstRender);
+
         }
 
         private void FocusBar_FocusChanged(object? sender, EvaluatorEventArgs<ToolbarList> e)
@@ -85,16 +85,35 @@ namespace Bb.Toolbars
 
         public Tool CurrentClicked { get; set; }
 
+
+        public DiagramToolRelationshipBase GetLink(ILinkable linkable)
+        {
+
+            if (CurrentClicked != null)
+                return CurrentClicked.Tag as DiagramToolRelationshipBase;
+
+            var links = this.Bars.GetItems().Where(c => c.Tag is DiagramToolRelationshipBase).ToList();
+            
+            if (links.Count == 1)
+                return links[0].Tag as DiagramToolRelationshipBase;
+
+            return null;
+
+        }
+
+
         public async Task DragStart(DragEventArgs args, Tool item)
         {
             this.CurrentDragStarted = item;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
-
-            GlobalBarFocusService.FocusChanged -= FocusBar_FocusChanged;
-
+            if (GlobalBarFocusService != null)
+                GlobalBarFocusService.FocusChanged -= FocusBar_FocusChanged;
         }
 
         private ToolbarList _bars;

@@ -6,7 +6,7 @@ namespace Bb.Diagrams
 {
 
     [DebuggerDisplay("S:{Source} - {Message}")]
-    public class Diagnostic
+    public class DiagramDiagnostic
     {
 
         public DiagnosticLevel Level { get; set; }
@@ -24,23 +24,6 @@ namespace Bb.Diagrams
         Info,
         Warning,
         Error
-    }
-
-    public class TargetSource
-    {
-        private object model;
-
-        public TargetSource(object model)
-        {
-            this.model = model;
-        }
-
-        public Guid Feature { get; set; }
-
-        public List<Guid>? Target { get; set; }
-
-        public object Model => model;
-
     }
 
 

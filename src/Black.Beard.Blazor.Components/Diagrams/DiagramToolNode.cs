@@ -1,7 +1,5 @@
-﻿using Bb.ComponentModel.Loaders;
-using Bb.ComponentModel.Translations;
+﻿using Bb.ComponentModel.Translations;
 using Blazor.Diagrams.Core.Models;
-using System.Net.Sockets;
 
 namespace Bb.Diagrams
 {
@@ -9,7 +7,8 @@ namespace Bb.Diagrams
     public class DiagramToolNode : DiagramToolBase
     {
 
-        public DiagramToolNode(
+        public DiagramToolNode
+        (
             Guid uuid,
             TranslatedKeyLabel category,
             TranslatedKeyLabel name, 
@@ -22,21 +21,14 @@ namespace Bb.Diagrams
             this._parentTypes = new HashSet<Type>();
         }
 
-        public override string GetDefaultName()
-        {
-            return $"Node";
-        }
-
         /// <summary>
-        /// Append new parent type.
+        /// Append new parent type. Restrict to drop this node in the diagram only in the parent type.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Type of parent</typeparam>
         public void AddParentType<T>()
             where T : NodeModel, INodeModel
         {
-
             this._parentTypes.Add(typeof(T));
-
         }
 
         public DiagramToolBase AddPort(params PortAlignment[] ports)
@@ -45,7 +37,6 @@ namespace Bb.Diagrams
                 Ports.Add(port);
             return this;
         }
-
 
         public override void SetTypeModel<T>()
         {
@@ -71,13 +62,6 @@ namespace Bb.Diagrams
 
         }
 
-
-
-        internal protected virtual void CustomizeNode(IDiagramNode node, Diagram diagram)
-        {
-
-        }
-
         public virtual UIModel? CreateUI<T>(T model, Diagram diagram)
             where T : IDiagramNode
         {
@@ -96,13 +80,12 @@ namespace Bb.Diagrams
 
             return result;
         }
-
+            
         public virtual SerializableDiagramNode CreateModel(double x, double y, string name, Guid? uuid = null)
         {
-            SerializableDiagramNode model = Create();
-            model.Name = name;
+            SerializableDiagramNode model = Create();            
             model.Uuid = uuid.HasValue ? uuid.Value : Guid.NewGuid();
-            model.Type = Uuid;
+            model.Name = name;
             model.Position = new Position(x, y);
             model.InitializeFirst(this);
             return model;
@@ -110,45 +93,30 @@ namespace Bb.Diagrams
 
         protected virtual SerializableDiagramNode Create()
         {
-            return (SerializableDiagramNode)Activator.CreateInstance(this.SourceType, new object[] { });
+            var model = (SerializableDiagramNode)Activator.CreateInstance(this.SourceType, new object[] { Uuid });
+            //model.Type = Uuid;
+            return model;
         }
 
+        internal protected virtual void CustomizeNode(IDiagramNode node, Diagram diagram)
+        {
+
+        }
 
         public HashSet<PortAlignment> Ports { get; }
-        public bool IsGroup => this.SourceType == typeof(DiagramGroupNode);
+
+        public bool IsGroup => typeof(SerializableDiagramGroupNode).IsAssignableFrom(this.SourceType);
+        
         public byte Padding { get; internal set; }
+        
         public bool ControlledSize { get; internal set; }
+        
         public bool Locked { get; internal set; }
+        
         public Type SourceType { get; private set; }
 
 
         private HashSet<Type> _parentTypes;
-
-    }
-
-    public static class DiagramToolNodeExtension
-    {
-
-        public static T IsControlled<T>(this T self, bool value)
-            where T : DiagramToolNode
-        {
-            self.ControlledSize = value;
-            return self;
-        }
-
-        public static T SetPadding<T>(this T self, byte value)
-            where T : DiagramToolNode
-        {
-            self.Padding = value;
-            return self;
-        }
-
-        public static T IsLocked<T>(this T self, bool value)
-            where T : DiagramToolNode
-        {
-            self.Locked = value;
-            return self;
-        }
 
     }
 

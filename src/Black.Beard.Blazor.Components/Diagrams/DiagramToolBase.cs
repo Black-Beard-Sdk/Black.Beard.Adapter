@@ -11,23 +11,44 @@ namespace Bb.Diagrams
 
         public DiagramToolBase
         (
-            Guid uuid,
+            Guid? uuid,
             TranslatedKeyLabel category,
-            TranslatedKeyLabel name, 
-            TranslatedKeyLabel description, 
+            TranslatedKeyLabel name,
+            TranslatedKeyLabel description,
             string icon)
         {
-            this.Uuid = uuid;
+
+            if (uuid == null)
+                throw new NullReferenceException($"{nameof(uuid)} is required");
+            this.Uuid = uuid.Value;
+
+            if (name == null)
+                throw new NullReferenceException($"{nameof(name)} is required");
             this.Name = name;
-            this.ToolTip = description;
-            Icon = icon;
+
+            if (category == null)
+                throw new NullReferenceException($"{nameof(category)} is required");
             Category = category;
-            //  
+
+            if (description == null)
+                throw new NullReferenceException($"{nameof(description)} is required");
+            this.ToolTip = description;
+
+            _defaultName = name.DefaultDisplay.Replace(" ", "_");
+
+            Icon = icon;
+
         }
+
+        /// <summary>
+        /// Hide in the toolbox
+        /// </summary>
+        public bool Hidden { get; set; }
+
 
         public virtual string GetDefaultName()
         {
-            return $"item";
+            return _defaultName;
         }
 
         /// <summary>
@@ -49,7 +70,7 @@ namespace Bb.Diagrams
             TypeUI = typeof(T);
         }
 
-        public Type TypeUI { get; private set; } 
+        public Type TypeUI { get; private set; }
 
         public TranslatedKeyLabel Category { get; }
 
@@ -62,6 +83,8 @@ namespace Bb.Diagrams
         /// Description of the entity tool
         /// </summary>
         public TranslatedKeyLabel ToolTip { get; }
+
+        private readonly string _defaultName;
 
         /// <summary>
         /// Icon of the entity tool in the toolbox

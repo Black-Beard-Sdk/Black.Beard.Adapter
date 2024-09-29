@@ -12,28 +12,30 @@ using MudBlazor;
 using Bb.ComponentModel.Attributes;
 using Bb.Toolbars;
 using Blazor.Diagrams.Components.Widgets;
+using Blazor.Diagrams.Core.Models;
+using ICSharpCode.Decompiler.Metadata;
 
 namespace Bb.Diagrams
 {
 
 
 
-    public partial class DiagramUI : ComponentBase, IDisposable, ITranslateHost
+    public partial class DiagramUI : ComponentBase, IDisposable, ITranslateHost, IEventArgInterceptor<PropertyObjectDescriptorEventArgs>
     {
 
 
         public DiagramUI()
         {
 
-            this._zoomTextChanged = new EventCallback<string>(this, ZoomTextChanged);
-            this._gridSizeUpTextChanged = new EventCallback<string>(this, GridSizeTextChanged);
-            this._gridShowChanged = new EventCallback<MouseEventArgs>(this, ShowGridChanged);
-            this._gridModeChanged = new EventCallback<MouseEventArgs>(this, GridModeChanged);
+            _zoomTextChanged = new EventCallback<string>(this, ZoomTextChanged);
+            _gridSizeUpTextChanged = new EventCallback<string>(this, GridSizeTextChanged);
+            _gridShowChanged = new EventCallback<MouseEventArgs>(this, ShowGridChanged);
+            _gridModeChanged = new EventCallback<MouseEventArgs>(this, GridModeChanged);
 
         }
 
         #region zoom / GridSize
-        
+
         public void GridModeChanged(MouseEventArgs args)
         {
             _showPoint = !_showPoint;
@@ -60,7 +62,7 @@ namespace Bb.Diagrams
             if (_gridSizeValue > 10)
             {
                 Diagram.Options.GridSize = _gridSizeValue;
-                this.Diagram.Refresh();
+                Diagram.Refresh();
             }
         }
 
@@ -70,17 +72,17 @@ namespace Bb.Diagrams
         }
         private void Resize()
         {
-            var d = ((double)_zoomValue / 100d);
-            if (this.Diagram.Zoom != d & d > 0)
-                this.Diagram.SetZoom(d);
+            var d = _zoomValue / 100d;
+            if (Diagram.Zoom != d & d > 0)
+                Diagram.SetZoom(d);
         }
         private void ZoomChanged()
         {
-            var z = this.Diagram.Zoom * 100;
+            var z = Diagram.Zoom * 100;
             if (_zoomValue != z)
             {
                 _zoomValue = (int)z;
-                this.Diagram.Refresh();
+                Diagram.Refresh();
             }
 
         }
@@ -88,7 +90,7 @@ namespace Bb.Diagrams
         #endregion zoom / GridSize
 
         [EvaluateValidation(false)]
-        public Diagnostics Diagnostics { get; set; }
+        public DiagramDiagnostics Diagnostics { get; set; }
 
         [EvaluateValidation(false)]
         [Inject]
@@ -145,19 +147,45 @@ namespace Bb.Diagrams
         private void PointerClick(Model? model, Blazor.Diagrams.Core.Events.PointerEventArgs args)
         {
             if (model == null)
-                PropertyGridFocusedService.FocusChange(DiagramModel);
+                Select(DiagramModel);
             else
-                PropertyGridFocusedService.FocusChange(model);
+                Select(model);
         }
 
         private void SelectionChanged(SelectableModel model)
         {
-            if (model != null)
-                PropertyGridFocusedService.FocusChange(model);
+            Select(model);
         }
+
+
+        private void Select(object model)
+        {
+
+            if (model != null)
+                PropertyGridFocusedService.FocusChange
+                (
+                    model,
+                    (propertyGrid, sender) => true,
+                    (propertyGrid, sender) =>
+                    {
+                        propertyGrid.Raise(this);
+
+                    }
+
+                );
+
+        }
+
+        public void Invoke(object sender, PropertyObjectDescriptorEventArgs eventArgs)
+        {
+            if (eventArgs.Instance is NodeModel n)
+                n.Refresh();
+        }
+
 
         private BlazorDiagram CreateDiagram()
         {
+
             var options = new BlazorDiagramOptions
             {
                 AllowMultiSelection = true,
@@ -170,23 +198,37 @@ namespace Bb.Diagrams
                 },
                 Links =
                 {
-                    DefaultRouter = new NormalRouter(),
-                    DefaultPathGenerator = new SmoothPathGenerator(),
+                    
+                    DefaultRouter = new OrthogonalRouter(), 
+                    DefaultPathGenerator = new StraightPathGenerator(),
+                     
+                    //SnappingRadius = 10,
+                    //EnableSnapping = true,
+                    //DefaultColor = "#000000",
+                    //DefaultSelectedColor = "#ff0000",
+                    //RequireTarget = true,
+
                     Factory = (diagram, source, targetAnchor) =>
                     {
-                        var tool = ToolBar.CurrentClicked?.Tag as DiagramToolRelationshipBase;
-                        return _linkFactory.CreateLinkModel(tool, diagram, source, targetAnchor);
+                        var link = ToolBar?.GetLink(source);
+                        if (link != null)
+                            return _linkFactory.CreateLinkModel(link, diagram, source, targetAnchor);
+                        return null;
                     },
 
                     TargetAnchorFactory = (diagram, link, model) =>
                     {
-                        var tool = ToolBar.CurrentClicked?.Tag as DiagramToolRelationshipBase;
-                        return _anchorFactory.CreateLinkModel(tool, diagram, link, model);
+                        var link1 = ToolBar?.GetLink(link);
+                        if (link1 != null)
+                          return _anchorFactory.CreateLinkModel(link1, diagram, link, model);
+                        return null;
                     },
+
                 },
                 AllowPanning = true,
                 GridSnapToCenter = true,
                 GridSize = _zoomValue,
+
                 //Virtualization =
                 //{
                 //    Enabled = true, 
@@ -194,7 +236,10 @@ namespace Bb.Diagrams
                 //    OnLinks = true,
                 //    OnGroups = true,
                 //}
+                
             };
+
+            // options.Constraints
 
             var diagram = new BlazorDiagram(options);
 
@@ -204,6 +249,7 @@ namespace Bb.Diagrams
             diagram.ZoomChanged += ZoomChanged;
 
             return diagram;
+
         }
 
         public void Save()
@@ -220,7 +266,7 @@ namespace Bb.Diagrams
 
                     // a.Update("Saving...");
 
-                    var diagnostic = new Diagnostics() { Translator = TranslationService };
+                    var diagnostic = new DiagramDiagnostics() { Translator = TranslationService };
 
                     diagnostic.EvaluateModel(Diagram);
 
@@ -237,8 +283,6 @@ namespace Bb.Diagrams
                 });
 
         }
-
-
 
         public ToolBar? ToolBar { get; set; }
 
@@ -328,11 +372,11 @@ namespace Bb.Diagrams
                 {
                     var t = DiagramModel.GetToolbar();
 
-                    this.GlobalBarFocusService.FocusChange(this.DiagramModel
+                    GlobalBarFocusService.FocusChange(DiagramModel
                         , (a, b) => true
                         , (a, b) =>
                     {
-                        this.ToolBar = a.Component as ToolBar;
+                        ToolBar = a.Component as ToolBar;
                         var diagram = (Diagram)b;
                         a.ApplyChange(diagram.GetToolbar());
                     });
@@ -366,6 +410,5 @@ namespace Bb.Diagrams
         private readonly EventCallback<MouseEventArgs> _gridShowChanged;
         private readonly EventCallback<MouseEventArgs> _gridModeChanged;
     }
-
 
 }

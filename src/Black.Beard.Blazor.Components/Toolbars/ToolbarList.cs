@@ -114,14 +114,14 @@ namespace Bb.Toolbars
             if (_items.Count > 0)
             {
 
-                foreach (var item in _items)
-                    item.SetParent(null);
-
                 if (CollectionChanged != null)
                 {
-                    var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, _items);
+                    var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
                     CollectionChanged.Invoke(this, e);
                 }
+
+                foreach (var item in _items)
+                    item.SetParent(null);
 
                 _items.Clear();
 
@@ -146,6 +146,15 @@ namespace Bb.Toolbars
         public IEnumerator<ToolbarGroup> GetEnumerator()
         {
             return _items.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Return the list tools
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Tool> GetItems()
+        {
+            return _items.SelectMany(c => c);
         }
 
         public void ApplyChange(ToolbarList d)
