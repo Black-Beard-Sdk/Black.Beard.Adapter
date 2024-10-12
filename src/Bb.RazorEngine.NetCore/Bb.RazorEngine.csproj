@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
 		<Nullable>disable</Nullable>
 		<DefineConstants>$(DefineConstants);RAZOR4</DefineConstants>
 		<DefineConstants>$(DefineConstants);NO_APPDOMAIN;NO_CODEDOM;NO_CONFIGURATION;NETCORE</DefineConstants>
@@ -11,8 +11,6 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 	<PropertyGroup>
-		<AssemblyOriginatorKeyFile>RazorEngine.snk</AssemblyOriginatorKeyFile>
-		<SignAssembly>true</SignAssembly>
 		<RootNamespace>RazorEngine</RootNamespace>
 		<PackageId>RazorEngine.NetCore</PackageId>
 		<AssemblyName>RazorEngine.NetCore</AssemblyName>
