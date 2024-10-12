@@ -95,7 +95,7 @@ namespace Bb.PropertyGrid
         {
             CurrentItem = item;
             StateHasChanged();
-            bool? result = await mbox.Show();
+            bool? result = await mbox.ShowAsync();
         }
 
         protected async void Remove()

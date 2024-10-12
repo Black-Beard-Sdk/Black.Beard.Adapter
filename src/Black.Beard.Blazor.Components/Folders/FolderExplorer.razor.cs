@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace Bb.Folders
 {
@@ -27,7 +28,8 @@ namespace Bb.Folders
             }
         }
 
-        private HashSet<FileItemData> TreeItems { get; set; } = new HashSet<FileItemData>();
+        private HashSet<FileItemData> TreeItems1 { get; set; } = new HashSet<FileItemData>();
+        private IReadOnlyCollection<TreeItemData<FileItemData>> TreeItems { get; set; } = new HashSet<FileItemData>();
 
     }
 }

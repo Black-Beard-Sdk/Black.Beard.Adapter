@@ -291,7 +291,7 @@ namespace Bb.Diagrams
 
                     Diagnostics = diagnostic;
                     if (Diagnostics.Where(c => c.Level == DiagnosticLevel.Error).Any())
-                        ExpansionDiagnostic.Expand();
+                        ExpansionDiagnostic.ExpandAsync();
 
                     foreach (INodeModel node in Diagram.Nodes)
                         node.SynchronizeSource();

@@ -226,7 +226,7 @@ namespace Bb.ComponentDescriptors
         public string ErrorText { get; set; }
 
         /// <summary>
-        /// Return true if the validaiton is failed
+        /// Return true if the validation is failed
         /// </summary>
         public bool InError { get; set; }
 

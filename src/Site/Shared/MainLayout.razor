@@ -8,6 +8,7 @@
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
+<MudPopoverProvider />
 
 <MudLayout oncontextmenu="return false;" oncontextmenu:preventDefault>
 
@@ -51,8 +52,8 @@
 
             <ChildContent>
                 <MudDivider Class="mb-2" />
-                <MudListItem Text="Account" Icon="@Icons.Material.Outlined.Person" Href="/personal/account" />
-                <MudListItem Text="Logout" Icon="@Icons.Material.Outlined.Login" Href="/pages/authentication/login" />
+                <MudListItem T="object" Text="Account" Icon="@Icons.Material.Outlined.Person" Href="/personal/account" />
+                <MudListItem T="object" Text="Logout" Icon="@Icons.Material.Outlined.Login" Href="/pages/authentication/login" />
             </ChildContent>
 
         </MudMenu>
