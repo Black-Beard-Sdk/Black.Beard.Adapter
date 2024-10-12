@@ -130,19 +130,34 @@ namespace Bb.Diagrams
 
         protected override void OnInitialized()
         {
-
-            _anchorFactory = new AnchorFactory();
-
             Diagram = CreateDiagram();
             Diagram.PointerClick += PointerClick;
             Diagram.SelectionChanged += SelectionChanged;
             if (DiagramModel != null)
-            {
-                _linkFactory = new LinkFactory(DiagramModel.Toolbox);
                 DiagramModel.Apply(Diagram);
-            }
         }
 
+
+        //private static System.Timers.Timer _timer;
+        protected override Task OnInitializedAsync()
+        {
+            //StartTimer();
+            return base.OnInitializedAsync();
+        }
+
+        //public void StartTimer()
+        //{
+        //    _timer = new System.Timers.Timer(1000);
+        //    _timer.Elapsed += CountDownTimer;
+        //    _timer.Enabled = true;
+        //}
+
+        //public void CountDownTimer(Object source, System.Timers.ElapsedEventArgs e)
+        //{
+        //    _timer.Enabled = false;
+        //    DiagramModel?.Prepare();
+        //    StateHasChanged();
+        //}
 
         private void PointerClick(Model? model, Blazor.Diagrams.Core.Events.PointerEventArgs args)
         {
@@ -198,29 +213,34 @@ namespace Bb.Diagrams
                 },
                 Links =
                 {
-                    
-                    DefaultRouter = new OrthogonalRouter(), 
+
+                    DefaultRouter = new OrthogonalRouter(),
                     DefaultPathGenerator = new StraightPathGenerator(),
-                     
+                    EnableSnapping = true,
+
                     //SnappingRadius = 10,
-                    //EnableSnapping = true,
                     //DefaultColor = "#000000",
                     //DefaultSelectedColor = "#ff0000",
                     //RequireTarget = true,
 
                     Factory = (diagram, source, targetAnchor) =>
                     {
-                        var link = ToolBar?.GetLink(source);
-                        if (link != null)
-                            return _linkFactory.CreateLinkModel(link, diagram, source, targetAnchor);
-                        return null;
+
+                        LinkProperties link = null;
+
+                        var toolLink = ToolBar?.GetLink(source);
+                        if (toolLink != null)
+                            link = this.DiagramModel.CreateLink(toolLink, source, targetAnchor);
+
+                        return link?.UILink;
+
                     },
 
                     TargetAnchorFactory = (diagram, link, model) =>
                     {
-                        var link1 = ToolBar?.GetLink(link);
-                        if (link1 != null)
-                          return _anchorFactory.CreateLinkModel(link1, diagram, link, model);
+                        var toolLink = ToolBar?.GetLink(link);
+                        if (toolLink != null)
+                            return link.ConvertToAnchor(toolLink);
                         return null;
                     },
 
@@ -236,7 +256,7 @@ namespace Bb.Diagrams
                 //    OnLinks = true,
                 //    OnGroups = true,
                 //}
-                
+
             };
 
             // options.Constraints
@@ -289,13 +309,11 @@ namespace Bb.Diagrams
         private async Task HandleDragEnter()
         {
             if (ToolBar != null)
-            {
                 if (ToolBar.CurrentDragStarted != null)
                 {
                     dropClass = "can-drop";
                     return;
                 }
-            }
         }
 
         private async Task HandleDragLeave()
@@ -312,7 +330,7 @@ namespace Bb.Diagrams
                 var i = ToolBar.CurrentDragStarted;
                 if (i != null && i.Tag is DiagramToolNode dragedItem)
                 {
-                    var point1 = Diagram.GetRelativePoint(args.ClientX, args.ClientY);
+                    var point1 = Diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
                     var m1 = DiagramModel.AddModel(dragedItem, point1.X, point1.Y);
                     StateHasChanged();
                     return;
@@ -393,8 +411,6 @@ namespace Bb.Diagrams
 
         private IBusyService _busyService;
         private string dropClass = "";
-        private LinkFactory _linkFactory;
-        private AnchorFactory _anchorFactory;
         private PropertyGridView PropertyGrid;
         private bool disposedValue;
         private BusySession _session;

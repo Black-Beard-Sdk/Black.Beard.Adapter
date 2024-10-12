@@ -1,18 +1,72 @@
 ﻿using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.ComponentModel;
+using System.Reflection;
+using ICSharpCode.Decompiler.TypeSystem;
 
 namespace Bb.TypeDescriptors
 {
 
-    public class CustomSubPropertyJsonConverter<T> : JsonConverter<T>
-        where T : IDynamicDescriptorInstance, new()
+
+    public static class CustomSubPropertyJsonConverter
     {
 
+        static CustomSubPropertyJsonConverter()
+        {
+            _method = typeof(CustomSubPropertyJsonConverter)
+                .GetMethod(nameof(CreateInstance)
+                , BindingFlags.Public | BindingFlags.Static);
+        }
+
+        public static JsonSerializerOptions AppendConverterFor(this JsonSerializerOptions self, Type type, Action<object> initializer)
+        {
+            self.Converters.Add(type.Create(initializer));
+            return self;
+        }
+
+        public static JsonConverter Create(this Type type, Action<object> initializer)
+        {
+            var result = (JsonConverter)_method
+                .MakeGenericMethod(type)
+                .Invoke(null, new object[] { initializer });
+            return result;
+        }
+
+
+        public static CustomSubPropertyJsonConverter<T> CreateInstance<T>(Action<object> initializer)
+            where T : IDynamicDescriptorInstance, new()
+        {
+            var converter = new CustomSubPropertyJsonConverter<T>();
+            converter.OnInitializing = initializer;
+            return converter;
+        }
+
+        private static readonly MethodInfo? _method;
+
+    }
+
+    public interface IInitializer
+    {
+
+        Action<object> OnInitializing { get; set; }
+
+    }
+
+    public class CustomSubPropertyJsonConverter<T> : JsonConverter<T>, IInitializer
+        where T : IDynamicDescriptorInstance, new()
+    {
 
         public CustomSubPropertyJsonConverter()
         {
 
+        }
+
+
+        public Action<object> OnInitializing { get; set; }
+
+        public override bool CanConvert(Type typeToConvert)
+        {
+            return base.CanConvert(typeToConvert);
         }
 
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
@@ -68,7 +122,11 @@ namespace Bb.TypeDescriptors
             {
 
                 if (reader.TokenType == JsonTokenType.EndObject)
+                {
+                    if (OnInitializing != null)
+                        OnInitializing(instance);
                     return instance;
+                }
 
                 if (reader.TokenType != JsonTokenType.PropertyName)
                     throw new JsonException();

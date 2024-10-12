@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace Bb.TypeDescriptors
 {
+
     public partial class DynamicDescriptorInstanceJsonConverter : JsonConverterFactory
     {
 

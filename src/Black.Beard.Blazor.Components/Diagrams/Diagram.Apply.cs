@@ -1,6 +1,11 @@
 ﻿using Blazor.Diagrams;
+using Blazor.Diagrams.Core;
+using Blazor.Diagrams.Core.Anchors;
+using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
+using ICSharpCode.Decompiler.Metadata;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
@@ -23,7 +28,6 @@ namespace Bb.Diagrams
             _diagram.Links.Removed += Links_Removed;
 
             Apply();
-
 
         }
 
@@ -51,6 +55,12 @@ namespace Bb.Diagrams
 
         }
 
+        internal void Prepare()
+        {
+            foreach (var item in this._diagram.Nodes)
+                _diagram.SelectModel(item, true);
+        }
+
         private void ApplyGroups(Dictionary<Guid, UIModel> dicNodes)
         {
 
@@ -75,32 +85,82 @@ namespace Bb.Diagrams
             }
         }
 
+
         private void ApplyLinks(Dictionary<Guid, PortModel> dicPort)
         {
             foreach (SerializableRelationship item in this.Relationships)
-                if (this.Toolbox.TryGetLinkTool(item.Type, out var specLink))
+                if (this.Toolbox.TryGetLinkTool(item.Type, out var toolLink))
                     if (dicPort.TryGetValue(item.Source, out PortModel source))
                         if (dicPort.TryGetValue(item.Target, out PortModel target))
                         {
-                            var link = specLink.CreateLink(item, source, target);
-                            var linkUI = _diagram.Links.Add(link);
-
-                            specLink.Customize(linkUI);
-
+                            var link = CreateLink(toolLink, item, source, target);
+                            var linkUI = _diagram.Links.Add(link.UILink);
                         }
         }
 
+        public LinkProperties CreateLink(DiagramToolRelationshipBase toolLink, SerializableRelationship item, PortModel source, PortModel target)
+        {
+
+            var link = toolLink
+                .CreateLink(item, source, target);
+
+            this.Append(link);
+            toolLink.Customize(link);
+
+            return link;
+
+        }
+
+        public LinkProperties CreateLink(DiagramToolRelationshipBase toolLink, ILinkable source, Anchor target)
+        {
+
+            var sourceAnchor = source.ConvertToAnchor(toolLink);
+
+            var link = toolLink
+                .CreateLink(Guid.NewGuid(), sourceAnchor, target);
+
+            this.Append(link);
+            toolLink.Customize(link);
+
+            return link;
+
+        }
+
+
         private void ApplyNodes(Dictionary<Guid, PortModel> dicPort, Dictionary<Guid, UIModel> dicNodes)
         {
-            foreach (var item in this.Models)
-                if (this.Toolbox.TryGetNodeTool(item.Type, out DiagramToolNode? specModel))
-                {
-                    // Register ports
-                    var ui = specModel.CreateUI(item, this);
-                    dicNodes.Add(new Guid(ui.Id), ui);
-                    foreach (var port in ui.Ports)
-                        dicPort.Add(new Guid(port.Id), port);
-                }
+
+            var items = this.Models.ToList();
+            int max = items.Count + 1;
+            int count = 0;
+
+            while (items.Any() && count <= max)
+            {
+
+                count++;
+                var items2 = items.Where(c => c.UuidParent == null || dicNodes.ContainsKey(c.UuidParent.Value)).ToList();
+
+                foreach (var item in items2)
+                    CreateNodes(dicPort, dicNodes, item);
+
+                foreach (var item in items2)
+                    items.Remove(item);
+            }
+
+            foreach (var item in items)
+                CreateNodes(dicPort, dicNodes, item);
+
+        }
+
+        private void CreateNodes(Dictionary<Guid, PortModel> dicPort, Dictionary<Guid, UIModel> dicNodes, SerializableDiagramNode? item)
+        {
+            if (this.Toolbox.TryGetNodeTool(item.Type, out DiagramToolNode? specModel))
+            {
+                var ui = specModel.CreateUI(item, this);
+                dicNodes.Add(new Guid(ui.Id), ui);
+                foreach (var port in ui.Ports)
+                    dicPort.Add(new Guid(port.Id), port);
+            }
         }
 
         private static void CleanChild(Dictionary<Guid, UIModel> dicNodes, IDiagramNode? item)
@@ -134,7 +194,7 @@ namespace Bb.Diagrams
 
             else
                 throw new Exception("Invalid type");
-            
+
         }
 
         private void Links_Removed(BaseLinkModel link)
@@ -142,6 +202,12 @@ namespace Bb.Diagrams
             var m = this.Relationships.Where(c => c.Uuid.ToString() == link.Id).FirstOrDefault();
             if (m != null)
                 this.Relationships.Remove(m);
+
+            if (this._links.TryGetValue(m.Uuid, out var c))
+            {
+                link.TargetAttached -= Links_TargetMapped;
+                _links.Remove(m.Uuid);
+            }
 
             CleanUnused();
 
@@ -152,16 +218,45 @@ namespace Bb.Diagrams
 
             var m = this.Relationships.Where(c => c.Uuid.ToString() == link.Id).FirstOrDefault();
             if (m == null)
-                if (link is CustomizedLinkModel c)
-                {
-                    c.Source.Diagram = this;
+                if (this._links.TryGetValue(new Guid(link.Id), out var c))
                     this.Relationships.Add(c.Source);
-                    link.TargetAttached += Links_TargetMapped;
-                }
 
             CleanUnused();
 
         }
+
+        internal void Append(LinkProperties link)
+        {
+
+            var key = link.Uuid;
+            bool test = false;
+
+            if (this._links.ContainsKey(key))
+            {
+                var c = this._links[key];
+                if (c != link)
+                {
+                    test = true;
+                    c.UILink.TargetAttached -= Links_TargetMapped;
+                    this._links[key] = link;
+                }
+            }
+            else
+            {
+                test = true;
+                this._links.Add(key, link);
+            }
+
+            if (test)
+            {
+                link.Diagram = _diagram;
+                link.Model = this;
+                link.Source.Diagram = this;
+                link.UILink.TargetAttached += Links_TargetMapped;
+            }
+
+        }
+
 
         private void Links_TargetMapped(BaseLinkModel link)
         {
@@ -254,7 +349,7 @@ namespace Bb.Diagrams
                             ui.Moving -= Node_Moving;
                             ui.Moved -= Node_Moved;
                         }
-                    
+
                     }
 
                 }
@@ -262,12 +357,25 @@ namespace Bb.Diagrams
             }
         }
 
+        //public UIGroupModel? GetParentByPosition(Point point)
+        //{
+        //    UIGroupModel parent = null;
+        //    var list = _diagram.Nodes
+        //        .OfType<UIGroupModel>()
+        //        .Where(c => c.ContainsPoint(point)
+        //                 && model.CanAcceptLikeParent(c))
+        //        .ToList();
+        //    if (list.Any())
+        //        parent = list[0];
+        //    return parent;
+        //}
+
         public UIGroupModel? GetParentByPosition(INodeModel model)
         {
 
             UIGroupModel parent = null;
 
-            var list = _diagram.Groups
+            var list = _diagram.Nodes
                 .OfType<UIGroupModel>()
                 .Where(c => c.ContainsPoint(model.Position)
                          && model.CanAcceptLikeParent(c))
@@ -296,7 +404,7 @@ namespace Bb.Diagrams
 
         private BlazorDiagram _diagram;
         private bool disposedValue;
-
+        private Dictionary<Guid, LinkProperties> _links;
     }
 
 

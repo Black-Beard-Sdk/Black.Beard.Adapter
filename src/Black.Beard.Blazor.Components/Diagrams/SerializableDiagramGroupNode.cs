@@ -12,6 +12,10 @@ namespace Bb.Diagrams
             
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SerializableDiagramGroupNode"/> class.
+        /// For de-serialization
+        /// </summary>
         public SerializableDiagramGroupNode() 
             : base()
         {
@@ -26,11 +30,8 @@ namespace Bb.Diagrams
 
     //public class ExternalDiagramReference
     //{
-        
     //    public string Document { get; set; }    
-
     //    public Guid Uuid { get; set; }
-
     //}
 
 }

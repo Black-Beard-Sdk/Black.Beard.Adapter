@@ -1,50 +1,57 @@
-﻿using System.Text.Json.Serialization;
-using System.Text.Json;
-using System.Reflection;
-using Bb.Diagrams;
+﻿//using System.Text.Json.Serialization;
+//using System.Text.Json;
+//using System.Reflection;
+//using Bb.Diagrams;
 
-namespace Bb.TypeDescriptors
-{
-    public partial class InstanceJsonConverter : JsonConverterFactory
-    {
+//namespace Bb.TypeDescriptors
+//{
 
-        public override bool CanConvert(Type typeToConvert)
-        {
-            return typeof(INodeModel).IsAssignableFrom(typeToConvert);
-        }
+//    public partial class InstanceJsonConverter : JsonConverterFactory
+//    {
 
-        public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options)
-        {
+//        public override bool CanConvert(Type typeToConvert)
+//        {
+//            if (typeToConvert == typeof(Diagram))
+//                return false;
+//            return typeof(IDynamicDescriptorInstance).IsAssignableFrom(typeToConvert);
+//        }
 
-            JsonConverter converter = null;
+//        public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options)
+//        {
 
-            //var ctor = type.GetConstructor(new Type[0]);
-            //if (ctor != null)
-            //{
+//            JsonConverter converter = null;
 
-            //    converter = (JsonConverter)Activator.CreateInstance
-            //    (
-            //        typeof(CustomSubPropertyJsonConverter<>).MakeGenericType(type),
-            //        BindingFlags.Instance | BindingFlags.Public,
-            //        binder: null,
-            //        args: null,
-            //        culture: null
-            //    )!;
+//            var ctor = type.GetConstructor(new Type[0]);
+//            if (ctor != null)
+//            {
 
-            //}
+//                converter = (JsonConverter)Activator.CreateInstance
+//                (
+//                    typeof(CustomSubPropertyJsonConverter<>).MakeGenericType(type),
+//                    BindingFlags.Instance | BindingFlags.Public,
+//                    binder: null,
+//                    args: null,
+//                    culture: null
+//                )!;
 
-            //converter = (JsonConverter)Activator.CreateInstance
-            //(
-            //    typeof(CustomSubPropertyJsonConverter<>).MakeGenericType(type),
-            //    BindingFlags.Instance | BindingFlags.Public,
-            //    binder: null,
-            //    args: null,
-            //    culture: null
-            //)!;
+//            }
+//            else
+//            {
 
-            return converter;
-        }
+//                converter = (JsonConverter)Activator.CreateInstance
+//                (
+//                    typeof(CustomSubPropertyJsonConverter<>).MakeGenericType(type),
+//                    BindingFlags.Instance | BindingFlags.Public,
+//                    binder: null,
+//                    args: null,
+//                    culture: null
+//                )!;
 
-    }
+//            }
 
-}
+//            return converter;
+//        }
+
+//    }
+
+//}

@@ -1,5 +1,7 @@
 ﻿using Bb.Diagrams;
 using Bb.Modules;
+using Bb.TypeDescriptors;
+using Blazor.Diagrams.Core.Models.Base;
 using Microsoft.AspNetCore.Components;
 using System.Reflection;
 using System.Text.Json;
@@ -71,7 +73,7 @@ namespace Bb.Addons
         }
 
 
-        public JsonSerializerOptions GetJsonSerializerOptions() => _jsonSerializerOptions ?? (_jsonSerializerOptions = BuildJsonSerializerOptions());
+        public JsonSerializerOptions GetJsonSerializerOptions() => BuildJsonSerializerOptions();
 
         protected virtual JsonSerializerOptions BuildJsonSerializerOptions()
         {
@@ -79,10 +81,10 @@ namespace Bb.Addons
             var options = new JsonSerializerOptions()
             {
                 WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+                //PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseUpper,
+                //DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower,
                 AllowTrailingCommas = true,
-                PropertyNameCaseInsensitive = true,
+                //PropertyNameCaseInsensitive = true,
                 IgnoreReadOnlyFields = true,
                 IgnoreReadOnlyProperties = true,
                 IncludeFields = false,
@@ -220,6 +222,11 @@ namespace Bb.Addons
 
         }
 
+        protected virtual void initializer(object obj)
+        {
+
+        }
+
         public virtual void Save(Document featureInstance, object model)
         {
             if (model == null)
@@ -249,7 +256,6 @@ namespace Bb.Addons
         private Type _page;
         private string _pattern = @"{\w+(:\w+)?}";
         private const RegexOptions options = RegexOptions.Multiline;
-        private JsonSerializerOptions _jsonSerializerOptions;
     }
 
 }

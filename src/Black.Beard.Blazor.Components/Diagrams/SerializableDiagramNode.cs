@@ -1,4 +1,5 @@
 ﻿using Bb.ComponentModel.Attributes;
+using Bb.TypeDescriptors;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 using System.ComponentModel.DataAnnotations;
@@ -9,24 +10,24 @@ namespace Bb.Diagrams
     public class SerializableDiagramNode : IDiagramNode
     {
 
-
         #region ctor
 
-        public SerializableDiagramNode(Guid Type) 
+        public SerializableDiagramNode(Guid Type)
             : this()
         {
             this.Type = Type;
         }
 
-            public SerializableDiagramNode()
+        public SerializableDiagramNode()
         {
             Position = new Position();
             Name = string.Empty;
             Ports = new List<Port>();
             Properties = new Properties();
+            TypeNode = GetType().AssemblyQualifiedName;
         }
 
-        protected internal virtual void InitializeFirst(DiagramToolNode source)
+        public virtual void Initialize(DiagramToolNode source)
         {
 
             this.Locked = source.Locked;
@@ -71,7 +72,7 @@ namespace Bb.Diagrams
         public Size? Size { get; set; }
 
         public bool Locked { get; internal set; }
-        
+
         public bool ControlledSize { get; internal set; }
 
         #endregion Position / size
@@ -81,6 +82,7 @@ namespace Bb.Diagrams
 
         [EvaluateValidation(false)]
         public Properties Properties { get; set; }
+        public string? TypeNode { get; set; }
 
         public void SetProperty(string name, string value) => Properties.SetProperty(name, value);
 

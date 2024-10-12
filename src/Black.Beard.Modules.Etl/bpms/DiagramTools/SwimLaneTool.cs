@@ -20,7 +20,7 @@ namespace Bb.Modules.Bpms
             this.SetTypeModel<BpmsSwimLane>();
             this.SetTypeUI<SwimLaneComponent>();
             this.IsControlled(true);
-            this.IsLocked(false);
+            this.IsLocked(true);
         }
 
         protected override void CustomizeNode(IDiagramNode node, Diagram diagram)

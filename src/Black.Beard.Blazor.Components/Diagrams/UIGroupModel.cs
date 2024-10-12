@@ -158,14 +158,26 @@ namespace Bb.Diagrams
                 return false;
 
             Rectangle bounds = Children.GetBounds();
-            Point point = new Point(bounds.Left - (double)(int)Padding, bounds.Top - (double)(int)Padding);
-            if (!base.Position.Equals(point))
+            //Point point = new Point(bounds.Left - (double)(int)Padding, bounds.Top - (double)(int)Padding);
+            //if (!base.Position.Equals(point))
+            //{
+            //    base.Position = point;
+            //    TriggerMoving();
+            //}
+
+            if (bounds.Bottom > this.Position.Y + this.Size.Height)
             {
-                base.Position = point;
-                TriggerMoving();
+
+                base.Size = new Size(this.Size.Width, bounds.Bottom + (double)(Padding * 2));
+
             }
 
-            base.Size = new Size(bounds.Width + (double)(Padding * 2), bounds.Height + (double)(Padding * 2));
+            if (bounds.Right > this.Position.X + this.Size.Width)
+            {
+
+            }
+
+            //base.Size = new Size(bounds.Width + (double)(Padding * 2), bounds.Height + (double)(Padding * 2));
             return true;
         }
 

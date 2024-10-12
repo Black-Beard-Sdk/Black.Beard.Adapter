@@ -1,4 +1,5 @@
 ﻿using Bb.Addons;
+using Bb.ComponentModel.Loaders;
 using Bb.Diagrams;
 using Bb.TypeDescriptors;
 using System.Text.Json;
@@ -17,7 +18,6 @@ namespace Bb.Modules
             _filter = uuid.ToString().ToUpper();
         }
 
-
         public override bool Load<T>(Document featureInstance, out T result)
         {
 
@@ -25,7 +25,24 @@ namespace Bb.Modules
 
             if (base.Load<T>(featureInstance, out var r))
             {
+
+                if (r is Diagram d)
+                {
+
+                    var toolbox = d.Toolbox;
+
+                    foreach (var item in d.Models)
+                        if (toolbox.TryGetNodeTool(item.Type, out var tool))
+                            item.Initialize(tool);
+
+                    //foreach (var item in d.Relationships)
+                    //    if (toolbox.TryGetLinkTool(item.Type, out var tool))
+                    //        item.Initialize(tool);
+
+                }
+
                 result = (T)(object)r;
+
             }
 
             return result != null;
@@ -40,9 +57,8 @@ namespace Bb.Modules
         protected override JsonSerializerOptions BuildJsonSerializerOptions()
         {
             var options = base.BuildJsonSerializerOptions();
-
-            options.Converters.Add(new InstanceJsonConverter());
-
+            options.AppendConverterFor(Model, initializer);
+            options.Converters.Add(new SerializableDiagramNodeJsonConverter());
             return options;
         }
 

@@ -5,7 +5,7 @@ namespace Bb.Modules.Bpms.Models
 {
 
 
-    public class BpmsSwimLane : UIModel
+    public class BpmsSwimLane : UIGroupModel
     {
 
         static BpmsSwimLane()
@@ -29,10 +29,9 @@ namespace Bb.Modules.Bpms.Models
                 );
             });
 
-
         }
 
-        public BpmsSwimLane(SerializableDiagramNode source)
+        public BpmsSwimLane(SerializableDiagramGroupNode source)
             : base(source)
         {
 

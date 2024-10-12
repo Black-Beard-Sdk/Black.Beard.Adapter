@@ -1,8 +1,10 @@
 ﻿using Bb.ComponentModel.Translations;
+using Bb.Diagrams;
 using Bb.Modules.Bpms.Models;
 using Bb.Modules.Etl.Models;
 using Bb.PropertyGrid;
 using Bb.TypeDescriptors;
+using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -65,21 +67,31 @@ namespace Bb.Modules.bpms.Components
             get => Item?.Size?.Height ?? 10d;
         }
 
-        public int HalfHeight
+        public int GetDecaleY(int w)
         {
-            get
-            {
-                return 90;
-                //Item.Source.GetDiagram<Diagram>().Getii(Height);
-                //return (int)(Height / 2);
-            }
+            return (int)GetDecale(w) - 2 * 4;
+        }
+
+        public int GetDecaleX(int w)
+        {
+            return (int)GetDecale(w);
+        }
+
+        private int GetDecale(int w)
+        {
+            var ox = (w / 2);
+            var oy = (Item.Size.Height / 2);
+            var decale = oy - ox;
+            return (int)decale;
         }
 
         public int HalfWidth
         {
             get
             {
-                return 100;
+                var p = Item.Position;
+                var p2 = Item.Source.GetDiagram<Diagram>().GetScreenPoint(p.X, p.Y);
+                return (int)p2.X;
             }
         }
 

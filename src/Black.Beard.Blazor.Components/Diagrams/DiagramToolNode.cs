@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Translations;
 using Blazor.Diagrams.Core.Models;
+using System;
 
 namespace Bb.Diagrams
 {
@@ -68,7 +69,10 @@ namespace Bb.Diagrams
 
             CustomizeNode(model, diagram);
 
-            UIModel? result = (UIModel)Activator.CreateInstance(TypeModel, new object[] { model });
+            UIModel? result = (UIModel)Activator.CreateInstance(TypeModel, new object[] 
+            { 
+                model 
+            });
 
             if (result != null)
             {
@@ -87,7 +91,7 @@ namespace Bb.Diagrams
             model.Uuid = uuid.HasValue ? uuid.Value : Guid.NewGuid();
             model.Name = name;
             model.Position = new Position(x, y);
-            model.InitializeFirst(this);
+            model.Initialize(this);
             return model;
         }
 

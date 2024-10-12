@@ -69,7 +69,6 @@ namespace Bb.Diagrams
             Source.Position.X = this.Position.X;
             Source.Position.Y = this.Position.Y;
             Source.Name = this.Title ?? "No name";
-            Source.UuidParent = this.Parent;
             foreach (PortModel item in Ports)
                 Source.AddPort(item.Alignment, new Guid(item.Id));
 
@@ -102,7 +101,7 @@ namespace Bb.Diagrams
 
         #region Parent
 
-        public Guid? Parent { get; private set; }
+        public Guid? Parent => this.Source.UuidParent;
 
         /// <summary>
         /// Return true if the parent is changed
@@ -113,7 +112,7 @@ namespace Bb.Diagrams
         {
             if (Parent != parent)
             {
-                Parent = parent;
+                this.Source.UuidParent = parent;
                 return true;
             }
 

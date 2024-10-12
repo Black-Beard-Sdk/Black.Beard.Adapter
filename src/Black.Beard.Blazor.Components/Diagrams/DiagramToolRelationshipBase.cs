@@ -1,14 +1,16 @@
 ﻿using Bb.ComponentModel.Translations;
 using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Models;
-using Blazor.Diagrams.Core.Models.Base;
 using Blazor.Diagrams.Core.PathGenerators;
 using Blazor.Diagrams.Core.Routers;
+using System.Linq.Expressions;
 
 namespace Bb.Diagrams
 {
     public class DiagramToolRelationshipBase : DiagramToolBase
     {
+        private LinkMarker _targetMarker;
+        private LinkMarker _sourceMarker;
 
         public DiagramToolRelationshipBase(Guid uuid, TranslatedKeyLabel category, TranslatedKeyLabel name, TranslatedKeyLabel description, string icon)
             : base(uuid, category, name, description, icon)
@@ -22,7 +24,20 @@ namespace Bb.Diagrams
         }
 
 
+
+        public void SetTargetMarker(LinkMarker marker)
+        {
+            _targetMarker = marker;
+        }
+
+        public void SetSourceMarker(LinkMarker marker)
+        {
+            _sourceMarker = marker;
+        }
+
         public bool IsDefaultLink { get; protected set; }
+
+
 
         public virtual Anchor CreateAnchor(NodeModel model)
         {
@@ -34,12 +49,14 @@ namespace Bb.Diagrams
             return new SinglePortAnchor(model);
         }
 
-        public virtual CustomizedLinkModel CreateLink(Guid uuid, PortModel source, PortModel target)
+
+
+        public virtual LinkProperties CreateLink(Guid uuid, PortModel source, PortModel target)
         {
             return CreateLink(uuid, CreateAnchor(source), CreateAnchor(target));
         }
 
-        public virtual CustomizedLinkModel CreateLink(Guid uuid, Anchor source, Anchor target)
+        public virtual LinkProperties CreateLink(Guid uuid, Anchor source, Anchor target)
         {
 
             Guid sourceId = source.Model.GetId();
@@ -58,23 +75,54 @@ namespace Bb.Diagrams
 
         }
 
-        internal protected virtual CustomizedLinkModel CreateLink(SerializableRelationship link, PortModel source, PortModel target)
+        internal protected virtual LinkProperties CreateLink(SerializableRelationship relationship, PortModel source, PortModel target)
         {
-            var l = CreateLink(link, CreateAnchor(source), CreateAnchor(target));
+            var l = CreateLink(relationship, CreateAnchor(source), CreateAnchor(target));
             return l;
         }
 
-        protected virtual CustomizedLinkModel CreateLink(SerializableRelationship link, Anchor source, Anchor target)
+        protected virtual LinkProperties CreateLink(SerializableRelationship relationship, Anchor source, Anchor target)
         {
-            var l = new CustomizedLinkModel(link, source, target);
-            l.PathGenerator = GetPathGenerator();
-            l.Router = GetRouter();
-            return l;
+            //var l = new CustomizedLinkModel(link, source, target);
+            var link = new LinkModel(relationship.Uuid.ToString(), source, target);
+            var m = new LinkProperties(relationship, link);
+            link.PathGenerator = GetPathGenerator();
+            link.Router = GetRouter();
+            return m;
         }
 
-        internal protected virtual void Customize(CustomizedLinkModel link)
+
+        public void AddLabel(string value, double? distance = null, Blazor.Diagrams.Core.Geometry.Point? point = null)
         {
-            
+            AddLabel(Expression.Constant(value), distance, point);
+        }
+
+
+        public void AddLabel(Expression e, double? distance = null, Blazor.Diagrams.Core.Geometry.Point? point = null)
+        {
+
+            var model = new LabelCreator()
+            {
+                Content = e,
+                Distance = distance,
+                Point = point
+            };
+
+            _models.Add(model);
+
+        }
+
+
+        internal protected virtual void Customize(LinkProperties link)
+        {
+
+            if (_sourceMarker != null)
+                link.UILink.SourceMarker = _sourceMarker;
+
+            if (_targetMarker != null)
+                link.UILink.TargetMarker = _targetMarker;
+
+            link.SetLabels(_models);
 
         }
 
@@ -91,25 +139,7 @@ namespace Bb.Diagrams
         }
 
 
-    }
-
-
-
-    internal static class LinkableExtensions
-    {
-
-        public static Guid GetId(this ILinkable source)
-        {
-
-            if (source is NodeModel model)
-                return new Guid(model.Id);
-
-            if (source is PortModel port)
-                return new Guid(port.Id);
-
-            return Guid.Empty;
-
-        }
+        private List<LabelCreator> _models = new List<LabelCreator>();
 
     }
 

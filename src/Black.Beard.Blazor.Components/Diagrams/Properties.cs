@@ -9,6 +9,12 @@ namespace Bb.Diagrams
     public class Properties : List<Property>
     {
 
+        public Properties()
+        {
+            
+        }
+
+
         public void SetProperty(string name, string value)
         {
             var property = this.FirstOrDefault(c => c.Name == name);

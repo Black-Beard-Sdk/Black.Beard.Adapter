@@ -2,6 +2,9 @@
 using Bb.Toolbars;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams;
+using Blazor.Diagrams.Core.Geometry;
+using Blazor.Diagrams.Core.Models.Base;
+using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
@@ -20,6 +23,12 @@ namespace Bb.Diagrams
 
             DynamicTypeDescriptionProvider.Configure<BlazorDiagram>(c =>
             {
+
+                c.RemoveProperties
+               (
+
+
+               );
 
                 c.Property(u => u.SuspendRefresh, i =>
                 {
@@ -64,6 +73,16 @@ namespace Bb.Diagrams
 
             });
 
+            DynamicTypeDescriptionProvider.Configure<Diagram>(c =>
+            {
+
+                c.RemoveProperties
+                (
+                    "DynamicToolbox"
+                );
+
+            });
+
         }
 
         // If true, the toolbox is dynamic and will always be created.
@@ -75,8 +94,9 @@ namespace Bb.Diagrams
             this.DynamicToolbox = dynamicToolbox;
             this._container = new DynamicDescriptorInstanceContainer(this);
             this.TypeModelId = typeModelId;
-            Models = new List<SerializableDiagramNode>();
+            _models = new List<SerializableDiagramNode>();
             Relationships = new List<SerializableRelationship>();
+            _links = new Dictionary<Guid, LinkProperties>();
         }
 
         public string Name { get; set; }
@@ -87,7 +107,17 @@ namespace Bb.Diagrams
 
         #region models
 
-        public List<SerializableDiagramNode> Models { get; set; }
+        public List<SerializableDiagramNode> Models
+        {
+            get => _models;
+            set
+            {
+
+                if (value != null)
+                    foreach (var item in value)
+                        AddModel(item);
+            }
+        }
 
         public SerializableDiagramNode AddModel(Guid specification, double x, double y, string? name = null, Guid? uuid = null)
         {
@@ -138,9 +168,18 @@ namespace Bb.Diagrams
 
         public SerializableDiagramNode AddModel(SerializableDiagramNode child)
         {
-            this.Models.Add(child);
-            this.Models.Sort((x, y) => x.Uuid.CompareTo(y.Uuid));
+
+            var m = _models.Where(c => c.Uuid == child.Uuid && c != child).ToList();
+
+            if (m.Count > 0)
+                foreach (var item in m)
+                    this._models.Remove(item);
+
+            this._models.Add(child);
+            this._models.Sort((x, y) => x.Uuid.CompareTo(y.Uuid));
+
             return child;
+
         }
 
         public IDiagramNode GetModel(Guid id)
@@ -165,9 +204,9 @@ namespace Bb.Diagrams
         #endregion models
 
 
+        #region links 
 
         public List<SerializableRelationship> Relationships { get; set; }
-
 
         public SerializableRelationship AddLink(Guid specification, Port left, Port right, string name, Guid? uuid = null)
         {
@@ -190,7 +229,6 @@ namespace Bb.Diagrams
             return link;
         }
 
-
         public IDiagramNode? GetModelByPort(Guid id)
         {
 
@@ -203,6 +241,7 @@ namespace Bb.Diagrams
 
         }
 
+        #endregion links 
 
 
         public virtual void Validate(DiagramDiagnostics Diagnostics)
@@ -220,6 +259,8 @@ namespace Bb.Diagrams
 
         public Guid TypeModelId { get; }
 
+        private readonly List<SerializableDiagramNode> _models;
+
         //[JsonIgnore]
         //public IEnumerable<DiagramToolBase> Specifications { get; private set; }
 
@@ -231,6 +272,7 @@ namespace Bb.Diagrams
         [JsonIgnore]
         [EvaluateValidation(false)]
         public DiagramDiagnostics LastDiagnostics { get; internal set; }
+
 
 
         #region propagate toolbox
@@ -281,7 +323,6 @@ namespace Bb.Diagrams
 
 
 
-
         public void SetSave(Action<Diagram> save)
         {
 
@@ -322,10 +363,29 @@ namespace Bb.Diagrams
         #endregion DynamicDescriptorInstance
 
 
-        //public void Getii(double value)
-        //{
-        //    var p = _diagram.Pan;
-        //}
+
+        public Point GetRelativeMousePoint(double clientX, double clientY)
+        {
+            return _diagram.GetRelativeMousePoint(clientX, clientY);
+        }
+
+
+        public Point GetRelativePoint(double clientX, double clientY)
+        {
+            return _diagram.GetRelativePoint(clientX, clientY);
+        }
+
+
+        public Point GetScreenPoint(double clientX, double clientY)
+        {
+            return _diagram.GetScreenPoint(clientX, clientY);
+        }
+
+        public IEnumerable<SelectableModel> GetSelectedModels()
+        {
+            return _diagram.GetSelectedModels();
+        }
+
 
         public event EventHandler<Diagram>? OnModelSaved;
 
