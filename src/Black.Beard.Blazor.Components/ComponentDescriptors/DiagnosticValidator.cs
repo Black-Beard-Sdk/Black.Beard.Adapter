@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
+﻿
 namespace Bb.ComponentDescriptors
 {
     public class DiagnosticValidator

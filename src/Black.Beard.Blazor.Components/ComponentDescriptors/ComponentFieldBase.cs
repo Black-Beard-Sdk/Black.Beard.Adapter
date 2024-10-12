@@ -1,6 +1,5 @@
 ﻿using Bb.ComponentModel.Translations;
 
-
 namespace Bb.ComponentDescriptors
 {
 

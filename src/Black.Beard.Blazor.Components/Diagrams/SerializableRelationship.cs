@@ -1,6 +1,4 @@
-﻿using Blazor.Diagrams.Core.Models;
-using ICSharpCode.Decompiler.Metadata;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
 {

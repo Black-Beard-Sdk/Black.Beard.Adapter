@@ -1,6 +1,4 @@
-﻿
-using Bb.ComponentModel.Translations;
-using Bb.Diagrams;
+﻿using Bb.ComponentModel.Translations;
 
 namespace Bb.Toolbars
 {

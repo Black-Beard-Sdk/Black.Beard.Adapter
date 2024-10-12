@@ -13,7 +13,6 @@ using Bb.ComponentModel.Attributes;
 using Bb.Toolbars;
 using Blazor.Diagrams.Components.Widgets;
 using Blazor.Diagrams.Core.Models;
-using ICSharpCode.Decompiler.Metadata;
 
 namespace Bb.Diagrams
 {

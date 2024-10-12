@@ -1,7 +1,6 @@
 ﻿namespace Bb.Editors
 {
 
-
     public class EditorResultComponent
     {
 

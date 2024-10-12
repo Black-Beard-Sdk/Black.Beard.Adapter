@@ -5,7 +5,6 @@ using System.Collections;
 namespace Bb.PropertyGrid
 {
 
-
     public partial class ComponentFieldBaseList : ComponentFieldBase
     {
 

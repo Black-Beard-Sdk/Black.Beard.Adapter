@@ -1,5 +1,4 @@
-﻿
-using Bb.ComponentModel.Translations;
+﻿using Bb.ComponentModel.Translations;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 

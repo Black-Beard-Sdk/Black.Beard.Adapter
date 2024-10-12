@@ -1,5 +1,4 @@
-﻿
-using Bb.TypeDescriptors;
+﻿using Bb.TypeDescriptors;
 using System.Text.Json;
 
 namespace Bb.Diagrams

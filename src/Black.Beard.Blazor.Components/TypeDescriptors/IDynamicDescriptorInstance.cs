@@ -1,8 +1,6 @@
 ﻿namespace Bb.TypeDescriptors
 {
 
-
-
     public interface IDynamicDescriptorInstance
     {
 

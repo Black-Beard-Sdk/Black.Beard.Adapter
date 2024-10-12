@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Specialized;
-using static MudBlazor.CategoryTypes;
 
 namespace Bb.Toolbars
 {

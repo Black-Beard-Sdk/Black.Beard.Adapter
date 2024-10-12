@@ -1,6 +1,4 @@
-﻿using Microsoft.Fast.Components.FluentUI;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Bb.Diagrams
 {

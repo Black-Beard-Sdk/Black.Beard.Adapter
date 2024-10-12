@@ -1,6 +1,4 @@
-﻿
-
-using MudBlazor;
+﻿using MudBlazor;
 
 namespace Bb.PropertyGrid
 {

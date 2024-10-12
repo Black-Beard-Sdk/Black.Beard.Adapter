@@ -3,7 +3,6 @@ using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
 using System.ComponentModel;
-using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {

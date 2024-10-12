@@ -1,6 +1,4 @@
 ﻿using Bb.ComponentModel.Translations;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using System.ComponentModel;
 
 namespace Bb.Diagrams
 {

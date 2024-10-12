@@ -4,7 +4,6 @@ using Blazor.Diagrams.Core.Models.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Specialized;
-using System.ComponentModel;
 
 namespace Bb.Toolbars
 {

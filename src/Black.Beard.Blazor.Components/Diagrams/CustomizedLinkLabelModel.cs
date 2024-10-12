@@ -4,7 +4,6 @@ using Blazor.Diagrams.Core.Models.Base;
 namespace Bb.Diagrams
 {
 
-
     public class CustomizedLinkLabelModel : LinkLabelModel
     {
 

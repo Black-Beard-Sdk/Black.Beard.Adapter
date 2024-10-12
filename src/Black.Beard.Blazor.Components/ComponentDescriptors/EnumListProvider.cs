@@ -1,9 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.DataAnnotations;
 using Bb.ComponentModel.Translations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Bb.ComponentDescriptors
 {

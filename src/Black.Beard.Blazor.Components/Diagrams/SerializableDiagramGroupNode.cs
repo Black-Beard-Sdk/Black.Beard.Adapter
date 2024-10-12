@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
 using System.ComponentModel;
+
 namespace Bb.Diagrams
 {
 

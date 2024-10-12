@@ -1,10 +1,7 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Translations;
-using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text.Json.Serialization;
 
 namespace Bb.ComponentDescriptors
 {

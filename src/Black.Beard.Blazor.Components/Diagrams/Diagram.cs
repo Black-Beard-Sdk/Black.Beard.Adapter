@@ -4,7 +4,6 @@ using Bb.TypeDescriptors;
 using Blazor.Diagrams;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models.Base;
-using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 

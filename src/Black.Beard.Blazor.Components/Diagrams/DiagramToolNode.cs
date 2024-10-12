@@ -1,6 +1,5 @@
 ﻿using Bb.ComponentModel.Translations;
 using Blazor.Diagrams.Core.Models;
-using System;
 
 namespace Bb.Diagrams
 {

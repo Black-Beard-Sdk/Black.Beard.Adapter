@@ -24,14 +24,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Black.Beard.Helpers" Version="2.0.38" />
-		<PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.38" />
+		<PackageReference Include="Black.Beard.Helpers" Version="2.0.39" />
+		<PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.39" />
 		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.38" />
 		<PackageReference Include="LibGit2Sharp" Version="0.30.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.31" />
 		<PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>

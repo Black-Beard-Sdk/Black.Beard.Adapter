@@ -2,11 +2,9 @@
 using System.Text.Json;
 using System.ComponentModel;
 using System.Reflection;
-using ICSharpCode.Decompiler.TypeSystem;
 
 namespace Bb.TypeDescriptors
 {
-
 
     public static class CustomSubPropertyJsonConverter
     {

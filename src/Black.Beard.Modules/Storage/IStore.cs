@@ -1,9 +1,6 @@
 ﻿
-
 namespace Bb.Storage
 {
-
-
 
     public interface IStore<TKey, TValue>
     {

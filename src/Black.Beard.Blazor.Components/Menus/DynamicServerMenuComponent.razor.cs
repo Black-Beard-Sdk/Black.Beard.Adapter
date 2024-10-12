@@ -1,5 +1,4 @@
-﻿
-using Bb.ComponentModel.Translations;
+﻿using Bb.ComponentModel.Translations;
 using Bb.UserInterfaces;
 using Microsoft.AspNetCore.Components;
 

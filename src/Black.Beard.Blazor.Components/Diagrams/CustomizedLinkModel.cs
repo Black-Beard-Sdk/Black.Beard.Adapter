@@ -1,5 +1,4 @@
 ﻿using Blazor.Diagrams.Core.Models;
-using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Models.Base;
 using Bb.TypeDescriptors;
 using Bb.ComponentModel.Attributes;
