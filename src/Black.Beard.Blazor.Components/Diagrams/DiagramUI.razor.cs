@@ -129,34 +129,52 @@ namespace Bb.Diagrams
 
         protected override void OnInitialized()
         {
+            
+        }
+
+
+        protected override Task OnInitializedAsync()
+        {
+
             Diagram = CreateDiagram();
             Diagram.PointerClick += PointerClick;
             Diagram.SelectionChanged += SelectionChanged;
             if (DiagramModel != null)
+            {                
                 DiagramModel.Apply(Diagram);
-        }
+                _timer = new Timer(_ =>
+                {
+                    InvokeAsync(RenderFirstLinks);
+                    _timer.Change(Timeout.Infinite, Timeout.Infinite);
+                }, null, 500, 1500);
 
+            }
 
-        //private static System.Timers.Timer _timer;
-        protected override Task OnInitializedAsync()
-        {
-            //StartTimer();
             return base.OnInitializedAsync();
         }
 
-        //public void StartTimer()
-        //{
-        //    _timer = new System.Timers.Timer(1000);
-        //    _timer.Elapsed += CountDownTimer;
-        //    _timer.Enabled = true;
-        //}
 
-        //public void CountDownTimer(Object source, System.Timers.ElapsedEventArgs e)
-        //{
-        //    _timer.Enabled = false;
-        //    DiagramModel?.Prepare();
-        //    StateHasChanged();
-        //}
+        #region fix the bug of the diagram for shwoing the links when the diagram is loaded
+
+        private Timer _timer;
+        private Timer _timer2;
+
+        public void RenderFirstLinks()
+        {
+            _timer2 = new Timer(_ =>
+            {
+                InvokeAsync(RenderFirstLinks2);
+                _timer2.Change(Timeout.Infinite, Timeout.Infinite);
+            }, null, 500, 1500);
+        }
+
+        public void RenderFirstLinks2()
+        {         
+            DiagramModel?.Prepare();
+        }
+
+        #endregion fix the bug of the diagram for shwoing the links when the diagram is loaded
+
 
         private void PointerClick(Model? model, Blazor.Diagrams.Core.Events.PointerEventArgs args)
         {
@@ -239,7 +257,7 @@ namespace Bb.Diagrams
                     {
                         var toolLink = ToolBar?.GetLink(link);
                         if (toolLink != null)
-                            return link.ConvertToAnchor(toolLink);
+                            return model.ConvertToAnchor(toolLink);
                         return null;
                     },
 

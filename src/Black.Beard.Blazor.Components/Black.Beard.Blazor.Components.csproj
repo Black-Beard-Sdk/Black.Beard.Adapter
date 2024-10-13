@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Diagrams\InstanceJsonConverter.cs" />
     <Compile Remove="Diagrams\Toolbox.razor.cs" />
     <Compile Remove="Diagrams\ToolboxList.cs" />
     <Compile Remove="PropertyGrid\ComponentFieldTree.razor.cs" />
