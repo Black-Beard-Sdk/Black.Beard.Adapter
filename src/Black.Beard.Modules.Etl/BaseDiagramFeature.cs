@@ -33,7 +33,7 @@ namespace Bb.Modules
 
                     foreach (var item in d.Models)
                         if (toolbox.TryGetNodeTool(item.Type, out var tool))
-                            item.Initialize(tool);
+                            item.Initialize(tool, false);
 
                     //foreach (var item in d.Relationships)
                     //    if (toolbox.TryGetLinkTool(item.Type, out var tool))

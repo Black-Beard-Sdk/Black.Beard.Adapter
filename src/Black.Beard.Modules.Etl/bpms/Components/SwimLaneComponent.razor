@@ -1,9 +1,9 @@
 ﻿@using MudBlazor
 
-<div Style="border-block-color:aquamarine;border-block:dotted;width:@Width.ToString()px;height:@Height.ToString()px">
-    <div style="width:@Height.ToString()px;height:100px;transform: rotate(-90deg) translate(-@GetDecaleY(100).ToString()px, -@GetDecaleX(100).ToString()px)">
+<div Style="border-block:dotted;width:@Width.ToString()px;height:@Height.ToString()px">
+    <div style="background-color:ButtonFace;width:@Height.ToString()px;height:70px;transform: rotate(-90deg) translate(-@GetDecaleY(100).ToString()px, -@GetDecaleX(100).ToString()px)">
         <MudTextField @bind-Value="Name"
-                      Variant="Variant.Filled"
+                      Variant="Variant.Filled"                      
                       FullWidth="true"
                       Outlined="true"
                       Typo="Typo.h5"

@@ -3,6 +3,8 @@ using Blazor.Diagrams.Core.Models.Base;
 using Bb.TypeDescriptors;
 using Bb.ComponentModel.Attributes;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace Bb.Diagrams
 {
@@ -15,32 +17,53 @@ namespace Bb.Diagrams
 
         static LinkProperties()
         {
-            _typeToExcludes = new List<Type>() 
-            { 
-                typeof(Model), 
-                typeof(LinkModel), 
-                typeof(SelectableModel), 
+            _typeToExcludes = new List<Type>()
+            {
+                typeof(Model),
+                typeof(LinkModel),
+                typeof(SelectableModel),
                 typeof(BaseLinkModel)
             };
+
+            _excludes = new HashSet<string>()
+            {
+                "Source",
+                "UILink",
+                "Diagram",
+                "Model"
+            };
+
         }
 
 
         public LinkProperties(SerializableRelationship relationship, LinkModel link)
         {
 
+            _options = new JsonSerializerOptions
+            {
+                Converters = { new DynamicDescriptorInstanceJsonConverter() },
+                // Other options as required
+                IncludeFields = true,  // You must set this if MyClass.Id and MyClass.Data are really fields not properties.
+                WriteIndented = true
+            };
+
             this._container = new DynamicDescriptorInstanceContainer(this);
             this.Source = relationship;
             this.UILink = link;
 
-            var properties2 = this._container.Properties();
+            var properties2 = this._container
+                .Properties()
+                .Where(c => !c.IsReadOnly && !_excludes.Contains(c.Name))
+                .ToArray();
+
             foreach (var item in properties2)
-                item.Map(this, relationship.Properties.PropertyExists(item.Name), relationship.GetProperty(item.Name));
+                item.Map(this, relationship.Properties.PropertyExists(item.Name), relationship.GetProperty(item.Name), _options);
 
         }
 
         public void SynchronizeSource()
         {
-            Source.Properties.CopyFrom(_container);
+            Source.CopyFrom(_container);
         }
 
         public object GetProperty(string name)
@@ -99,6 +122,8 @@ namespace Bb.Diagrams
         }
 
         private static List<Type> _typeToExcludes;
+        private static readonly HashSet<string> _excludes;
+        protected JsonSerializerOptions _options;
     }
 
 }

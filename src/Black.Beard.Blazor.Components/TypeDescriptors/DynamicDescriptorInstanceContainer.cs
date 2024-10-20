@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Bb.ComponentModel.Accessors;
+using System.ComponentModel;
+using System.Reflection;
 using System.Text.Json.Serialization;
 
 namespace Bb.TypeDescriptors
@@ -15,6 +17,7 @@ namespace Bb.TypeDescriptors
         public DynamicDescriptorInstanceContainer(object parent)
         {
             this._instance = parent;
+            _realProperties = PropertyAccessor.GetProperties(parent.GetType(), AccessorStrategyEnum.Direct);
             _properties = new Dictionary<string, object>();
         }
 
@@ -35,6 +38,7 @@ namespace Bb.TypeDescriptors
                 return s;
 
             return value.Serialize(false);
+
         }
 
         /// <summary>
@@ -44,6 +48,10 @@ namespace Bb.TypeDescriptors
         /// <returns></returns>
         public object GetProperty(string name)
         {
+
+            if (_realProperties.TryGetValue(name, out var accessor))
+                return accessor.GetValue(this._instance);
+
             if (_properties.TryGetValue(name, out object value))
                 return value;
 
@@ -52,6 +60,7 @@ namespace Bb.TypeDescriptors
                 return property.GetDefaultValue();
 
             return null;
+
         }
 
         /// <summary>
@@ -62,7 +71,10 @@ namespace Bb.TypeDescriptors
         public void SetProperty(string name, object? value)
         {
 
-            if (_properties.TryGetValue(name, out object? v))
+            if (_realProperties.TryGetValue(name, out var accessor))
+                accessor.SetValue(this._instance, value);
+            
+            else if (_properties.TryGetValue(name, out object? v))
             {
                 if (v == value)
                     _properties.Remove(name);
@@ -89,7 +101,7 @@ namespace Bb.TypeDescriptors
 
         private readonly object _instance;
         private readonly Dictionary<string, object> _properties;
-
+        private readonly AccessorList _realProperties;
     }
 
 }

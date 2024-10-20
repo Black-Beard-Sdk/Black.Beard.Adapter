@@ -25,12 +25,10 @@ namespace Bb.Diagrams
 
         public DiagramUI()
         {
-
             _zoomTextChanged = new EventCallback<string>(this, ZoomTextChanged);
             _gridSizeUpTextChanged = new EventCallback<string>(this, GridSizeTextChanged);
             _gridShowChanged = new EventCallback<MouseEventArgs>(this, ShowGridChanged);
             _gridModeChanged = new EventCallback<MouseEventArgs>(this, GridModeChanged);
-
         }
 
         #region zoom / GridSize

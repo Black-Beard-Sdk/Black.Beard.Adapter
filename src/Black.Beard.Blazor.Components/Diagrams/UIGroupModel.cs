@@ -1,6 +1,7 @@
 ﻿using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Extensions;
+using Blazor.Diagrams.Core.Models.Base;
 
 namespace Bb.Diagrams
 {
@@ -167,9 +168,7 @@ namespace Bb.Diagrams
 
             if (bounds.Bottom > this.Position.Y + this.Size.Height)
             {
-
                 base.Size = new Size(this.Size.Width, bounds.Bottom + (double)(Padding * 2));
-
             }
 
             if (bounds.Right > this.Position.X + this.Size.Width)
@@ -181,6 +180,12 @@ namespace Bb.Diagrams
             return true;
         }
 
+
+        protected override void UIModel_Moved(MovableModel model)
+        {
+
+        }
+            
         public byte Padding { get; }
 
         public IEnumerable<NodeModel> Children => _children;

@@ -407,7 +407,7 @@ namespace Bb.Storage
         {
 
             List<TableField> _items = new List<TableField>();
-            var properties = PropertyAccessor.GetProperties(typeof(TValue), true);
+            var properties = PropertyAccessor.GetProperties(typeof(TValue), AccessorStrategyEnum.Direct);
 
             foreach (AccessorItem property in properties)
             {

@@ -10,11 +10,11 @@ namespace Bb.Diagrams
 
         public Properties()
         {
-            
+
         }
 
 
-        public void SetProperty(string name, string value)
+        public void SetProperty(string name, string? value)
         {
             var property = this.FirstOrDefault(c => c.Name == name);
             if (property == null)
@@ -55,18 +55,18 @@ namespace Bb.Diagrams
 
             var options = new JsonSerializerOptions
             {
-                Converters = { new DynamicDescriptorInstanceJsonConverter() },                
+                Converters = { new DynamicDescriptorInstanceJsonConverter() },
                 // Other options as required
-                IncludeFields = true,  // You must set this if MyClass.Id and MyClass.Data are really fields not properties.
+                IncludeFields = true,  // You must set this if MyClass.Id and MyClass.Data are really fields and not a property.
                 WriteIndented = true
-            };            
+            };
 
             HashSet<string> _h = new HashSet<string>(this.Select(c => c.Name));
 
             var properties = container.Properties()
                 .Where(c => !c.IsReadOnly)
                 .OrderBy(c => c.Name)
-                .ToList();
+                .ToList();                 
 
             foreach (var item in properties)
             {
@@ -75,12 +75,7 @@ namespace Bb.Diagrams
                     _h.Remove(item.Name);
 
                 var value = item.GetValue(container.Instance);
-
-                //var value = container.GetProperty(item.Name);
-                if (value != null)
-                    SetProperty(item.Name, value.Serialize(options));
-                else
-                    SetProperty(item.Name, null);
+                SetProperty(item.Name, value?.Serialize(options));
 
             }
 

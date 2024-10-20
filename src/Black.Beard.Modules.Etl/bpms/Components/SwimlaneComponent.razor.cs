@@ -36,19 +36,6 @@ namespace Bb.Modules.bpms.Components
 
         public BpmsSwimLane? Item => Node as BpmsSwimLane;
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-
-            //var result = base.OnAfterRenderAsync(firstRender);
-            //var rect = await Runtime.GetBoundingClientRect(this._element);
-            //if (rect != null)
-            //{
-            //    Item.Size = new Size(rect.Width, rect.Height);
-            //    StateHasChanged();
-            //}
-
-        }
-
         public string? Name
         {
             get => Node?.Title;
@@ -64,17 +51,17 @@ namespace Bb.Modules.bpms.Components
 
         public double Height
         {
-            get => Item?.Size?.Height ?? 10d;
+            get => Item?.Size?.Height - 2d ?? 10d;
         }
 
         public int GetDecaleY(int w)
         {
-            return (int)GetDecale(w) - 2 * 4;
+            return (int)GetDecale(w) + 11;
         }
 
         public int GetDecaleX(int w)
         {
-            return (int)GetDecale(w);
+            return (int)GetDecale(w) + 16;
         }
 
         private int GetDecale(int w)

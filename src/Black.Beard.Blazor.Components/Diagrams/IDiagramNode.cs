@@ -10,7 +10,7 @@ namespace Bb.Diagrams
         void SetDiagram<T>(T diagram) where T : Diagram;
 
 
-        string Name { get; set; }
+        string Title { get; set; }
         List<Port> Ports { get; set; }
         
         Position Position { get; set; }
@@ -26,7 +26,7 @@ namespace Bb.Diagrams
         Port AddPort(PortAlignment alignment, Guid id);
         Port GetPort(Guid id);
         Port GetPort(PortAlignment alignment);
-        string? GetProperty(string name);
-        void SetProperty(string name, string value);
+        object? GetProperty(string name);
+        void SetProperty(string name, object? value);
     }
 }

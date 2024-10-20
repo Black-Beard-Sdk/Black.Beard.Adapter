@@ -2,6 +2,7 @@
 using Bb.Toolbars;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams;
+using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models.Base;
 using System.ComponentModel;
@@ -144,13 +145,13 @@ namespace Bb.Diagrams
 
             if (string.IsNullOrEmpty(name))
             {
-                var currentNames = new HashSet<string>(Models.Select(c => c.Name));
+                var currentNames = new HashSet<string>(Models.Select(c => c.Title));
                 int count = 1;
                 while (currentNames.Contains(name = $"{specification.GetDefaultName()}{count}"))
                     count++;
             }
 
-            var result = AddModel(specification.CreateModel(x, y, name, uuid));
+            var result = AddModel(specification.CreateModel(this, x, y, name, uuid));
 
             if (_diagram != null)
             {

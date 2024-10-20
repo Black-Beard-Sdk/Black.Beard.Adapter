@@ -1,8 +1,11 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.ComponentModel.Accessors;
+using Bb.ComponentModel.Attributes;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using static MudBlazor.Colors;
 
 namespace Bb.Diagrams
 {
@@ -22,20 +25,36 @@ namespace Bb.Diagrams
         public SerializableDiagramNode()
         {
             Position = new Position();
-            Name = string.Empty;
+            Title = string.Empty;
             Ports = new List<Port>();
             Properties = new Properties();
             TypeNode = GetType().AssemblyQualifiedName;
+
+            _realProperties = PropertyAccessor.GetProperties(this.GetType(), AccessorStrategyEnum.ConvertSettingIfDifferent);
+
+            _options = new JsonSerializerOptions
+            {
+                Converters = { new DynamicDescriptorInstanceJsonConverter() },
+                // Other options as required
+                IncludeFields = true,  // You must set this if MyClass.Id and MyClass.Data are really fields and not a property.
+                WriteIndented = true
+            };
+
         }
 
-        public virtual void Initialize(DiagramToolNode source)
+        public virtual void Initialize(DiagramToolNode source, bool newNode)
         {
 
             this.Locked = source.Locked;
             this.ControlledSize = source.ControlledSize;
 
-            foreach (var port in source.Ports)
-                AddPort(port, Guid.NewGuid());
+            if (newNode)
+            {
+
+                foreach (var port in source.InitializingPorts)
+                    AddPort(port, Guid.NewGuid());
+
+            }
 
         }
 
@@ -56,7 +75,7 @@ namespace Bb.Diagrams
         /// Name of the node
         /// </summary>
         [Required]
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         /// <summary>
         /// Type of node
@@ -83,11 +102,35 @@ namespace Bb.Diagrams
 
         [EvaluateValidation(false)]
         public Properties Properties { get; set; }
+
         public string? TypeNode { get; set; }
 
-        public void SetProperty(string name, string value) => Properties.SetProperty(name, value);
+        private readonly AccessorList _realProperties;
+        private readonly JsonSerializerOptions _options;
 
-        public string? GetProperty(string name) => Properties.GetProperty(name);
+        public void SetProperty(string name, object? value)
+        {
+
+            if (_realProperties.TryGetValue(name, out var accessor))
+            {
+                accessor.SetValue(this, value);
+            }
+            else
+            {
+                var valueString = value?.Serialize(_options);
+                Properties.SetProperty(name, valueString);
+            }
+
+        }
+
+        public object? GetProperty(string name)
+        {
+
+            if (_realProperties.TryGetValue(name, out var accessor))
+                return accessor.GetValue(this);
+
+            return Properties.GetProperty(name);
+        }
 
         #endregion Dynamic properties
 
@@ -105,14 +148,9 @@ namespace Bb.Diagrams
                 p = new Port() { Uuid = id, Alignment = alignment };
                 Ports.Add(p);
             }
-            else
-            {
-                if (p.Alignment != alignment)
-                {
-                    p.Alignment = alignment;
-                }
+            else if (p.Alignment != alignment)
+                p.Alignment = alignment;
 
-            }
             return p;
         }
 
@@ -130,6 +168,22 @@ namespace Bb.Diagrams
 
 
         #region diagram
+
+        public virtual void CopyFrom(DynamicDescriptorInstanceContainer container)
+        {
+
+            var properties = container.Properties()
+                .Where(c => !c.IsReadOnly)
+                .OrderBy(c => c.Name)
+                .ToList();
+
+            foreach (var item in properties)
+            {
+                var v = item.GetValue(container.Instance);
+                SetProperty(item.Name, v);
+            }
+
+        }
 
         public T? GetDiagram<T>()
             where T : Diagram

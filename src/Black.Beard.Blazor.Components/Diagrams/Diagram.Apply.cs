@@ -53,8 +53,9 @@ namespace Bb.Diagrams
 
         internal void Prepare()
         {
-            foreach (var item in this._diagram.Nodes)
-                _diagram.SelectModel(item, true);
+            if (this._diagram != null)
+                foreach (var item in this._diagram.Nodes)
+                    _diagram.SelectModel(item, true);
         }
 
         private void ApplyGroups(Dictionary<Guid, UIModel> dicNodes)
@@ -152,7 +153,7 @@ namespace Bb.Diagrams
         {
             if (this.Toolbox.TryGetNodeTool(item.Type, out DiagramToolNode? specModel))
             {
-                var ui = specModel.CreateUI(item, this);
+                var ui = specModel. CreateUI(item, this);
                 dicNodes.Add(new Guid(ui.Id), ui);
                 foreach (var port in ui.Ports)
                     dicPort.Add(new Guid(port.Id), port);

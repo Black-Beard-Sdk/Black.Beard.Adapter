@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Blazor.Diagrams.Core.Geometry;
+using System.Diagnostics;
 
 namespace Bb.Diagrams
 {
@@ -12,6 +13,12 @@ namespace Bb.Diagrams
 
         }
 
+        public Position(Point point)
+            : this(point.X, point.Y)
+        {
+
+        }
+
         public Position(double x, double y)
         {
             X = x;
@@ -21,6 +28,15 @@ namespace Bb.Diagrams
         public double X { get; set; }
 
         public double Y { get; set; }
+
+        /// <summary>
+        /// Implicit conversion from Point to Position
+        /// </summary>
+        /// <param name="p"></param>
+        public static implicit operator Point(Position p)
+        {
+            return new Point(p.X, p.Y);
+        }
 
     }
 

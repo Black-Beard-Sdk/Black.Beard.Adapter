@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.114" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.114" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.116" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.116" />
     <PackageReference Include="Black.Beard.Helpers" Version="2.0.39" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.14" />

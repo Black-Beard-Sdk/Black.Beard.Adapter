@@ -16,7 +16,7 @@ namespace Bb.Diagrams
             string icon)
             : base(uuid, category, name, description, icon)
         {
-            this.Ports = new HashSet<PortAlignment>();
+            this.InitializingPorts = new HashSet<PortAlignment>();
             Kind = ToolKind.Node;
             this._parentTypes = new HashSet<Type>();
         }
@@ -34,7 +34,7 @@ namespace Bb.Diagrams
         public DiagramToolBase AddPort(params PortAlignment[] ports)
         {
             foreach (var port in ports)
-                Ports.Add(port);
+                InitializingPorts.Add(port);
             return this;
         }
 
@@ -65,9 +65,7 @@ namespace Bb.Diagrams
         public virtual UIModel? CreateUI<T>(T model, Diagram diagram)
             where T : IDiagramNode
         {
-
-            CustomizeNode(model, diagram);
-
+                     
             UIModel? result = (UIModel)Activator.CreateInstance(TypeModel, new object[] 
             { 
                 model 
@@ -84,13 +82,17 @@ namespace Bb.Diagrams
             return result;
         }
             
-        public virtual SerializableDiagramNode CreateModel(double x, double y, string name, Guid? uuid = null)
+        public virtual SerializableDiagramNode CreateModel(Diagram diagram, double x, double y, string name, Guid? uuid = null)
         {
+
             SerializableDiagramNode model = Create();            
             model.Uuid = uuid.HasValue ? uuid.Value : Guid.NewGuid();
-            model.Name = name;
+            model.Title = name;
             model.Position = new Position(x, y);
-            model.Initialize(this);
+            model.Initialize(this, true);
+        
+            CustomizeNode(model, diagram);
+
             return model;
         }
 
@@ -101,12 +103,12 @@ namespace Bb.Diagrams
             return model;
         }
 
-        internal protected virtual void CustomizeNode(IDiagramNode node, Diagram diagram)
+        internal protected virtual void CustomizeNode(SerializableDiagramNode node, Diagram diagram)
         {
 
         }
 
-        public HashSet<PortAlignment> Ports { get; }
+        public HashSet<PortAlignment> InitializingPorts { get; }
 
         public bool IsGroup => typeof(SerializableDiagramGroupNode).IsAssignableFrom(this.SourceType);
         

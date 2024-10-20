@@ -23,7 +23,7 @@ namespace Bb.Modules.Bpms
             this.IsLocked(true);
         }
 
-        protected override void CustomizeNode(IDiagramNode node, Diagram diagram)
+        protected override void CustomizeNode(SerializableDiagramNode node, Diagram diagram)
         {
 
             double y = 0;
@@ -31,7 +31,7 @@ namespace Bb.Modules.Bpms
 
             IDiagramNode last = null;
 
-            foreach (var item in diagram.Models)
+            foreach (var item in diagram.Models.Where(c => c.Type == Key))
                 if (item != node)
                     if (item.Position.Y >= y)
                     {
@@ -40,7 +40,12 @@ namespace Bb.Modules.Bpms
                     }
 
             if (last != null)
-                y = last.Position.Y + height + spacing;
+                y = last.Position.Y + last.Size.Height;
+
+            else
+            {
+
+            }
 
             node.Position = new Position() { X = x, Y = y };
             node.Size = new Size(2000, height);

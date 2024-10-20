@@ -83,7 +83,6 @@ namespace Bb.Diagrams
 
         protected virtual LinkProperties CreateLink(SerializableRelationship relationship, Anchor source, Anchor target)
         {
-            //var l = new CustomizedLinkModel(link, source, target);
             var link = new LinkModel(relationship.Uuid.ToString(), source, target);
             var m = new LinkProperties(relationship, link);
             link.PathGenerator = GetPathGenerator();
