@@ -149,7 +149,7 @@ namespace Bb.Diagrams
                 Refresh();
         }
 
-        private bool UpdateDimensions()
+        public override bool UpdateDimensions()
         {
 
             if (Children.Count() == 0)
@@ -159,25 +159,18 @@ namespace Bb.Diagrams
                 return false;
 
             Rectangle bounds = Children.GetBounds();
-            //Point point = new Point(bounds.Left - (double)(int)Padding, bounds.Top - (double)(int)Padding);
-            //if (!base.Position.Equals(point))
-            //{
-            //    base.Position = point;
-            //    TriggerMoving();
-            //}
+
 
             if (bounds.Bottom > this.Position.Y + this.Size.Height)
-            {
                 base.Size = new Size(this.Size.Width, bounds.Bottom + (double)(Padding * 2));
-            }
+            
 
             if (bounds.Right > this.Position.X + this.Size.Width)
-            {
+                base.Size = new Size(bounds.Right + (double)(Padding * 2), base.Size.Height);
 
-            }
 
-            //base.Size = new Size(bounds.Width + (double)(Padding * 2), bounds.Height + (double)(Padding * 2));
             return true;
+
         }
 
 

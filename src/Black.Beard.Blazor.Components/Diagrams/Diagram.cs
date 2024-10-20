@@ -193,11 +193,22 @@ namespace Bb.Diagrams
             return result != null;
         }
 
-        public IEnumerable<UIModel> GetChildren(Guid guid)
+        public IEnumerable<UIModel> GetUIChildren(Guid guid)
         {
             return _diagram.Nodes
                    .OfType<UIModel>()
                    .Where(c => c.Parent == guid).ToList();
+        }
+
+        public UIModel GetUI(Guid guid)
+        {
+
+            var uuid = guid.ToString();
+
+            return _diagram.Nodes
+                   .OfType<UIModel>()
+                   .Where(c => c.Id == uuid).FirstOrDefault();
+
         }
 
 

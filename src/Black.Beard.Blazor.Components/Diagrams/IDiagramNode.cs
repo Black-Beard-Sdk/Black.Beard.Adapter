@@ -7,9 +7,7 @@ namespace Bb.Diagrams
     {
 
         T? GetDiagram<T>() where T : Diagram;
-        void SetDiagram<T>(T diagram) where T : Diagram;
-
-
+       
         string Title { get; set; }
         List<Port> Ports { get; set; }
         

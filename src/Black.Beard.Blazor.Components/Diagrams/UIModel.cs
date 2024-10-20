@@ -49,7 +49,6 @@ namespace Bb.Diagrams
             this.ControlledSize = source.ControlledSize;
             this.Locked = source.Locked;
             this._parents = new HashSet<Type>();
-            Uuid = source.Uuid.ToString();
             this._container = new DynamicDescriptorInstanceContainer(this);
             this.Source = source;
 
@@ -75,6 +74,12 @@ namespace Bb.Diagrams
 
         }
 
+        public virtual bool UpdateDimensions()
+        {
+            return false;
+        }
+
+
         #region events
 
         protected virtual void UIModel_OrderChanged(SelectableModel model)
@@ -84,8 +89,10 @@ namespace Bb.Diagrams
 
         protected virtual void UIModel_Moved(MovableModel model)
         {
+
             if (Position != null || Source.Position.Y != Position.Y || Source.Position.X != Position.X)
                 Source.Position = new Position(Position.X, Position.Y);
+
         }
 
         protected virtual void UIModel_Moving(NodeModel model)
@@ -215,8 +222,6 @@ namespace Bb.Diagrams
 
         [EvaluateValidation(false)]
         public SerializableDiagramNode Source { get; private set; }
-
-        public string Uuid { get; }
 
         private readonly DynamicDescriptorInstanceContainer _container;
         private static List<Type> _typeToExcludes;

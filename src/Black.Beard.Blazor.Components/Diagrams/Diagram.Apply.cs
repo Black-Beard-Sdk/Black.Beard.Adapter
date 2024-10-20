@@ -153,7 +153,7 @@ namespace Bb.Diagrams
         {
             if (this.Toolbox.TryGetNodeTool(item.Type, out DiagramToolNode? specModel))
             {
-                var ui = specModel. CreateUI(item, this);
+                var ui = specModel.CreateUI(item, this);
                 dicNodes.Add(new Guid(ui.Id), ui);
                 foreach (var port in ui.Ports)
                     dicPort.Add(new Guid(port.Id), port);
@@ -183,15 +183,10 @@ namespace Bb.Diagrams
 
         #region add/Remove
 
-        public void AddNode(INodeModel ui)
+        public void AddNode(UIModel ui)
         {
 
-            if (ui is NodeModel group)
-                _diagram.Nodes.Add(group);
-
-            else
-                throw new Exception("Invalid type");
-
+            _diagram.Nodes.Add(ui);
         }
 
         private void Links_Removed(BaseLinkModel link)
@@ -281,6 +276,9 @@ namespace Bb.Diagrams
 
             model.Moving += Node_Moving;
             model.Moved += Node_Moved;
+            model.SizeChanged += Node_SizeChanged;
+            model.OrderChanged += Node_OrderChanged;
+
 
             if (model is UIModel m)
             {
@@ -298,6 +296,8 @@ namespace Bb.Diagrams
 
             model.Moving -= Node_Moving;
             model.Moved -= Node_Moved;
+            model.SizeChanged -= Node_SizeChanged;
+            model.OrderChanged -= Node_OrderChanged;
 
             if (model is UIModel m)
             {
@@ -311,17 +311,34 @@ namespace Bb.Diagrams
 
 
 
+        protected virtual void Node_OrderChanged(SelectableModel model)
+        {
+
+        }
+
+        protected virtual void Node_SizeChanged(NodeModel model)
+        {
+
+        }
+
         protected virtual void Node_Moved(MovableModel obj)
         {
-            var items = GetChildren(new Guid(obj.Id));
+            var items = GetUIChildren(new Guid(obj.Id));
             if (items.Any())
                 foreach (var item in items)
                     item.TriggerParentMoved(obj);
+
+            if (obj is UIModel ui && ui.Parent.HasValue)
+            {
+                var parent = GetUI(ui.Parent.Value);
+                parent?.UpdateDimensions();
+            }
+
         }
 
         protected virtual void Node_Moving(NodeModel obj)
         {
-            var items = GetChildren(new Guid(obj.Id));
+            var items = GetUIChildren(new Guid(obj.Id));
             if (items.Any())
                 foreach (var item in items)
                     item.TriggerParentMoving(obj);
@@ -354,18 +371,6 @@ namespace Bb.Diagrams
             }
         }
 
-        //public UIGroupModel? GetParentByPosition(Point point)
-        //{
-        //    UIGroupModel parent = null;
-        //    var list = _diagram.Nodes
-        //        .OfType<UIGroupModel>()
-        //        .Where(c => c.ContainsPoint(point)
-        //                 && model.CanAcceptLikeParent(c))
-        //        .ToList();
-        //    if (list.Any())
-        //        parent = list[0];
-        //    return parent;
-        //}
 
         public UIGroupModel? GetParentByPosition(INodeModel model)
         {
