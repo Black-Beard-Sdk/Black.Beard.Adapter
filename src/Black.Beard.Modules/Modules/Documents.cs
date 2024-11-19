@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Bb.Modules
 {
+
     [ExposeClass(UIConstants.Service, ExposedType = typeof(Documents), LifeCycle = IocScopeEnum.Scoped)]
     public class Documents
     {
@@ -82,7 +83,7 @@ namespace Bb.Modules
             Initialize();
 
             if (_store.Exists(uuid))
-                throw new Exception("Feature already exists");
+                throw new Exception("document already exists");
 
             var result = new Document()
             {

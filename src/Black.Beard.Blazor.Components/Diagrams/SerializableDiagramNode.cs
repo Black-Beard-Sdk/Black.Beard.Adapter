@@ -30,7 +30,7 @@ namespace Bb.Diagrams
             Properties = new Properties();
             TypeNode = GetType().AssemblyQualifiedName;
 
-            _realProperties = PropertyAccessor.GetProperties(this.GetType(), AccessorStrategyEnum.ConvertSettingIfDifferent);
+            _realProperties = this.GetType().GetAccessors(AccessorStrategyEnum.ConvertSettingIfDifferent);
 
             _options = new JsonSerializerOptions
             {

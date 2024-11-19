@@ -6,6 +6,7 @@ using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models.Base;
 using System.ComponentModel;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
@@ -13,7 +14,7 @@ namespace Bb.Diagrams
 
     public partial class Diagram
         : IValidationService
-        , ISave<Diagram>
+        , ICommandMemorizer
         , IDynamicDescriptorInstance
         , IDiagramToolBoxProvider
     {
@@ -97,6 +98,7 @@ namespace Bb.Diagrams
             _models = new List<SerializableDiagramNode>();
             Relationships = new List<SerializableRelationship>();
             _links = new Dictionary<Guid, LinkProperties>();
+
         }
 
         public string Name { get; set; }
@@ -270,10 +272,6 @@ namespace Bb.Diagrams
 
         public Guid TypeModelId { get; }
 
-        private readonly List<SerializableDiagramNode> _models;
-
-        //[JsonIgnore]
-        //public IEnumerable<DiagramToolBase> Specifications { get; private set; }
 
         [EvaluateValidation(false)]
         [JsonIgnore]
@@ -291,6 +289,7 @@ namespace Bb.Diagrams
         public bool DynamicToolbox { get; }
 
         public DiagramToolbox Toolbox => _toolbox;
+
 
         public virtual void InitializeToolbox(DiagramToolbox toolbox)
         {
@@ -334,29 +333,46 @@ namespace Bb.Diagrams
 
 
 
-        public void SetSave(Action<Diagram> save)
+        protected void SetSave(Action<Diagram> save)
         {
 
-            Action<Diagram> _save = model =>
+            Save = model =>
             {
 
-                save(model);
+                if (model != null)
+                {
 
-                if (model.OnModelSaved != null)
-                    model.OnModelSaved.Invoke(model, model);
+                    save(model);
 
+                    if (model.OnModelSaved != null)
+                        model.OnModelSaved.Invoke(model, model);
+
+                }
             };
 
-            Save = _save;
-
-
         }
 
-        public void SetSave<T>(Action<T> save)
+
+        public ICommandTransactionManager CommandManager { get; private set; }
+
+        public bool CanMemorize => this._memorize != null;
+
+        protected void SetMemorize(Action<object, Stream> save)
         {
-            SetSave(model => save((T)(object)model));
+            this._memorize = save;
+            CommandManager = new CommandTransactionManager(this);
+            CommandManager.Pause();
         }
 
+        public virtual void Memorize(Stream stream)
+        {
+            this._memorize(this, stream);
+        }
+
+        public void Restore(CommandTransaction command)
+        {
+
+        }
 
         #region DynamicDescriptorInstance
 
@@ -372,7 +388,6 @@ namespace Bb.Diagrams
         }
 
         #endregion DynamicDescriptorInstance
-
 
 
         public Point GetRelativeMousePoint(double clientX, double clientY)
@@ -397,12 +412,15 @@ namespace Bb.Diagrams
             return _diagram.GetSelectedModels();
         }
 
-
         public event EventHandler<Diagram>? OnModelSaved;
 
         private readonly DynamicDescriptorInstanceContainer _container;
         private readonly DiagramToolbox _toolbox;
         private ToolbarList _list;
+        private ICommandMemorizer _command;
+        private Action<object, Stream> _memorize;
+        private readonly List<SerializableDiagramNode> _models;
+
 
     }
 

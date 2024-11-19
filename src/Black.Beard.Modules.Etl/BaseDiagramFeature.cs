@@ -9,7 +9,7 @@ namespace Bb.Modules
 
     public class BaseDiagramFeature<T1>
         : Feature<T1>
-            where T1 : ISave
+            where T1 : IFeatureInitializer
     {
 
         public BaseDiagramFeature(Guid uuid, string name, string description, Guid owner)
@@ -57,7 +57,7 @@ namespace Bb.Modules
         protected override JsonSerializerOptions BuildJsonSerializerOptions()
         {
             var options = base.BuildJsonSerializerOptions();
-            options.AppendConverterFor(Model, initializer);
+            options.AppendConverterFor(Model, Initializer);
             options.Converters.Add(new SerializableDiagramNodeJsonConverter());
             return options;
         }

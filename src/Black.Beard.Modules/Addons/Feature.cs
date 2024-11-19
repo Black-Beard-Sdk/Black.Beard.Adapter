@@ -1,7 +1,4 @@
-﻿using Bb.Diagrams;
-using Bb.Modules;
-using Bb.TypeDescriptors;
-using Blazor.Diagrams.Core.Models.Base;
+﻿using Bb.Modules;
 using Microsoft.AspNetCore.Components;
 using System.Reflection;
 using System.Text.Json;
@@ -13,7 +10,7 @@ namespace Bb.Addons
 {
 
     public class Feature<T> : Feature
-            where T : ISave
+            where T : IFeatureInitializer
     {
 
         protected Feature(Guid uuid, string name, string description, Guid owner)
@@ -22,12 +19,12 @@ namespace Bb.Addons
 
         }
 
-        public override bool LoadDocument(Document featureInstance, out object result)
+        public override bool LoadDocument(Document document, out object result)
         {
 
             result = default(T);
 
-            if (Load<T>(featureInstance, out var r))
+            if (Load<T>(document, out var r))
                 result = r;
 
             return result != null;
@@ -144,8 +141,6 @@ namespace Bb.Addons
 
         public string Route { get; private set; }
 
-
-
         public string GetRoute(Guid uuid)
         {
             return Replace(Route, uuid.ToString());
@@ -173,22 +168,22 @@ namespace Bb.Addons
         /// Load the document
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="featureInstance"></param>
+        /// <param name="document"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public virtual bool Load<T>(Document featureInstance, out T result)
-            where T : ISave
+        public virtual bool Load<T>(Document document, out T result)
+            where T : IFeatureInitializer
         {
 
             result = default(T);
 
-            if (featureInstance.Model == null)
+            if (document.Model == null)
                 result = (T)Activator.CreateInstance(Model);
 
             else
             {
 
-                var payload = featureInstance
+                var payload = document
                     .Model
                     .ToJsonString();
 
@@ -208,11 +203,7 @@ namespace Bb.Addons
             if (result != null)
             {
 
-                result.SetSave<T>(d =>
-                {
-                    Save(featureInstance, d);
-                    featureInstance.Parent.Save(featureInstance);
-                });
+                result.Initialize(this, document);
 
                 return true;
 
@@ -222,25 +213,22 @@ namespace Bb.Addons
 
         }
 
-        protected virtual void initializer(object obj)
+        protected virtual void Initializer(object obj)
         {
 
         }
 
         public virtual void Save(Document featureInstance, object model)
         {
+
             if (model == null)
                 featureInstance.Model = null;
 
             else
             {
-
-                var options = GetJsonSerializerOptions() ?? new JsonSerializerOptions();
-
                 try
                 {
-                    var modelText = model.Serialize(options);
-                    featureInstance.Model = JsonNode.Parse(modelText);
+                    featureInstance.Model = JsonNode.Parse(Memorize(model));
                 }
                 catch (Exception ex)
                 {
@@ -248,6 +236,20 @@ namespace Bb.Addons
                 }
             }
 
+        }
+
+        public virtual string Memorize(object model)
+        {
+            var options = GetJsonSerializerOptions() ?? new JsonSerializerOptions();
+            var modelText = model.Serialize(options);
+            return modelText;
+
+        }
+
+        public virtual void Memorize(object model, Stream stream)
+        {
+            var options = GetJsonSerializerOptions() ?? new JsonSerializerOptions();
+            model.SerializeToStream(stream, options);
         }
 
         #endregion In/Out

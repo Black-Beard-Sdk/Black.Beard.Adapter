@@ -1,10 +1,11 @@
-﻿using Bb.Diagrams;
+﻿using Bb.Addons;
+using Bb.Diagrams;
 using Bb.TypeDescriptors;
 
 namespace Bb.Modules.Bpms.Models
 {
 
-    public class BpmsDiagram : Diagrams.Diagram
+    public class BpmsDiagram : FeatureDiagram
     {
 
         public static Guid Key = new Guid("0E61164D-92C8-4A3E-8BD8-68EF1EAAB2BA");
@@ -112,6 +113,7 @@ namespace Bb.Modules.Bpms.Models
 
         }
 
+        private Feature _feature;
 
     }
 

@@ -37,14 +37,14 @@ namespace Bb.Diagrams
         {
             _showPoint = !_showPoint;
             _gridMode = _showPoint ? GridMode.Line : GridMode.Point;
-            Diagram.Refresh();
+            UIDiagram.Refresh();
             StateHasChanged();
         }
         public void ShowGridChanged(MouseEventArgs args)
         {
 
             _showGrid = !_showGrid;
-            Diagram.Refresh();
+            UIDiagram.Refresh();
             StateHasChanged();
 
         }
@@ -58,8 +58,8 @@ namespace Bb.Diagrams
 
             if (_gridSizeValue > 10)
             {
-                Diagram.Options.GridSize = _gridSizeValue;
-                Diagram.Refresh();
+                UIDiagram.Options.GridSize = _gridSizeValue;
+                UIDiagram.Refresh();
             }
         }
 
@@ -70,16 +70,16 @@ namespace Bb.Diagrams
         private void Resize()
         {
             var d = _zoomValue / 100d;
-            if (Diagram.Zoom != d & d > 0)
-                Diagram.SetZoom(d);
+            if (UIDiagram.Zoom != d & d > 0)
+                UIDiagram.SetZoom(d);
         }
         private void ZoomChanged()
         {
-            var z = Diagram.Zoom * 100;
+            var z = UIDiagram.Zoom * 100;
             if (_zoomValue != z)
             {
                 _zoomValue = (int)z;
-                Diagram.Refresh();
+                UIDiagram.Refresh();
             }
 
         }
@@ -102,7 +102,7 @@ namespace Bb.Diagrams
         public IFocusedService<PropertyGridView> PropertyGridFocusedService { get; set; }
 
         [Parameter]
-        public Diagram DiagramModel { get; set; }
+        public Diagram Diagram { get; set; }
 
         [EvaluateValidation(false)]
         [Inject]
@@ -120,7 +120,7 @@ namespace Bb.Diagrams
         }
 
         [EvaluateValidation(false)]
-        private BlazorDiagram Diagram { get; set; } = null!;
+        private BlazorDiagram UIDiagram { get; set; } = null!;
 
         [Parameter]
         public MudExpansionPanel ExpansionDiagnostic { get; set; }
@@ -134,12 +134,12 @@ namespace Bb.Diagrams
         protected override Task OnInitializedAsync()
         {
 
-            Diagram = CreateDiagram();
-            Diagram.PointerClick += PointerClick;
-            Diagram.SelectionChanged += SelectionChanged;
-            if (DiagramModel != null)
+            UIDiagram = CreateDiagram();
+            UIDiagram.PointerClick += PointerClick;
+            UIDiagram.SelectionChanged += SelectionChanged;
+            if (Diagram != null)
             {                
-                DiagramModel.Apply(Diagram);
+                Diagram.Apply(UIDiagram);
                 _timer = new Timer(_ =>
                 {
                     InvokeAsync(RenderFirstLinks);
@@ -168,7 +168,7 @@ namespace Bb.Diagrams
 
         public void RenderFirstLinks2()
         {         
-            DiagramModel?.Prepare();
+            Diagram?.Prepare();
         }
 
         #endregion fix the bug of the diagram for shwoing the links when the diagram is loaded
@@ -177,7 +177,7 @@ namespace Bb.Diagrams
         private void PointerClick(Model? model, Blazor.Diagrams.Core.Events.PointerEventArgs args)
         {
             if (model == null)
-                Select(DiagramModel);
+                Select(Diagram);
             else
                 Select(model);
         }
@@ -245,7 +245,7 @@ namespace Bb.Diagrams
 
                         var toolLink = ToolBar?.GetLink(source);
                         if (toolLink != null)
-                            link = this.DiagramModel.CreateLink(toolLink, source, targetAnchor);
+                            link = this.Diagram.CreateLink(toolLink, source, targetAnchor);
 
                         return link?.UILink;
 
@@ -289,7 +289,7 @@ namespace Bb.Diagrams
 
         public void Save()
         {
-            Save(Diagram);
+            Save(UIDiagram);
         }
 
         private async ValueTask Save(Blazor.Diagrams.Core.Diagram diagram)
@@ -303,17 +303,17 @@ namespace Bb.Diagrams
 
                     var diagnostic = new DiagramDiagnostics() { Translator = TranslationService };
 
-                    diagnostic.EvaluateModel(Diagram);
+                    diagnostic.EvaluateModel(UIDiagram);
 
                     Diagnostics = diagnostic;
                     if (Diagnostics.Where(c => c.Level == DiagnosticLevel.Error).Any())
                         ExpansionDiagnostic.ExpandAsync();
 
-                    foreach (INodeModel node in Diagram.Nodes)
+                    foreach (INodeModel node in UIDiagram.Nodes)
                         node.SynchronizeSource();
 
-                    DiagramModel.LastDiagnostics = diagnostic;
-                    DiagramModel?.Save(DiagramModel);
+                    Diagram.LastDiagnostics = diagnostic;
+                    Diagram?.Save(Diagram);
 
                 });
 
@@ -345,8 +345,8 @@ namespace Bb.Diagrams
                 var i = ToolBar.CurrentDragStarted;
                 if (i != null && i.Tag is DiagramToolNode dragedItem)
                 {
-                    var point1 = Diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
-                    var m1 = DiagramModel.AddModel(dragedItem, point1.X, point1.Y);
+                    var point1 = UIDiagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
+                    var m1 = Diagram.AddModel(dragedItem, point1.X, point1.Y);
                     StateHasChanged();
                     return;
                 }
@@ -371,10 +371,10 @@ namespace Bb.Diagrams
             {
                 if (disposing)
                 {
-                    if (Diagram != null)
+                    if (UIDiagram != null)
                     {
-                        Diagram.PointerClick -= PointerClick;
-                        Diagram.SelectionChanged -= SelectionChanged;
+                        UIDiagram.PointerClick -= PointerClick;
+                        UIDiagram.SelectionChanged -= SelectionChanged;
                     }
 
                     //if (PropertyGridFocusedService != null)
@@ -401,11 +401,11 @@ namespace Bb.Diagrams
             if (firstRender)
             {
 
-                if (DiagramModel != null)
+                if (Diagram != null)
                 {
-                    var t = DiagramModel.GetToolbar();
+                    var t = Diagram.GetToolbar();
 
-                    GlobalBarFocusService.FocusChange(DiagramModel
+                    GlobalBarFocusService.FocusChange(Diagram
                         , (a, b) => true
                         , (a, b) =>
                     {
@@ -421,7 +421,16 @@ namespace Bb.Diagrams
 
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
-            return base.OnAfterRenderAsync(firstRender);
+
+            var result = base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                Diagram.CommandManager.Resume();
+            }
+
+            return result;
+        
         }
 
         private IBusyService _busyService;

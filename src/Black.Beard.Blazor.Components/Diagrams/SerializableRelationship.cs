@@ -13,7 +13,7 @@ namespace Bb.Diagrams
         public SerializableRelationship()
         {
             Properties = new Properties();
-            _realProperties = PropertyAccessor.GetProperties(this.GetType(), AccessorStrategyEnum.Direct);
+            _realProperties = this.GetType().GetAccessors(AccessorStrategyEnum.Direct);
             _options = new JsonSerializerOptions
             {
                 Converters = { new DynamicDescriptorInstanceJsonConverter() },

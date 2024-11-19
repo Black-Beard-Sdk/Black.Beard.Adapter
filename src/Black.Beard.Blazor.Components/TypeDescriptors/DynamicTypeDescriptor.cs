@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Bb.ComponentModel.Accessors;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Bb.TypeDescriptors
@@ -87,7 +88,7 @@ namespace Bb.TypeDescriptors
 
                         if (dynamicPropertyDescriptor == null)
                         {
-                            var items = ComponentModel.Accessors.PropertyAccessor.GetProperties(configuration.ComponentType);
+                            var items = configuration.ComponentType.GetAccessors();
                             var accessor = items[property.Key];
                             dynamicPropertyDescriptor = new DynamicExistingPropertyDescriptor(propertyDescriptor, accessor);
                             dynamicPropertyDescriptor.AddValueChanged(this, (s, e) => OnPropertyChanged(propertyDescriptor.Name));

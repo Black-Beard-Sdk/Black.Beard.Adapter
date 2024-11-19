@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 namespace Bb.Modules.Sgbd.Models
 {
 
-    public class SgbdDiagram : Diagram
+    public class SgbdDiagram : FeatureDiagram
     {
 
         public static Guid Key = new Guid("7BDE57DD-14BE-4E19-9896-54E4B2F35050");

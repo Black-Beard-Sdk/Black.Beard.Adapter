@@ -1,5 +1,9 @@
-﻿namespace Bb.Diagrams
+﻿
+
+namespace Bb.Diagrams
 {
+
+
     public interface ISave
     {
 
@@ -7,5 +11,6 @@
 
 
     }
+
 
 }

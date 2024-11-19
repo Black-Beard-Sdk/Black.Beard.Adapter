@@ -1,4 +1,5 @@
 ﻿using Blazor.Diagrams;
+using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
@@ -16,6 +17,7 @@ namespace Bb.Diagrams
         {
 
             _diagram = diagram;
+            _diagram.Changed += Diagram_Changed;
 
             _diagram.Nodes.Added += Nodes_Added;
             _diagram.Links.Added += Links_Added;
@@ -185,7 +187,6 @@ namespace Bb.Diagrams
 
         public void AddNode(UIModel ui)
         {
-
             _diagram.Nodes.Add(ui);
         }
 
@@ -278,19 +279,20 @@ namespace Bb.Diagrams
             model.Moved += Node_Moved;
             model.SizeChanged += Node_SizeChanged;
             model.OrderChanged += Node_OrderChanged;
+            model.Changed += Node_Changed;
 
+            //if (model is UIModel m)
+            //{
 
-            if (model is UIModel m)
-            {
+            //    var p = this.Models.FirstOrDefault(c => c.Uuid == m.Source.Uuid);
+            //    if (p == null)
+            //    {
 
-                var p = this.Models.FirstOrDefault(c => c.Uuid == m.Source.Uuid);
-                if (p == null)
-                {
+            //    }
+            //}
 
-                }
-            }
         }
-
+              
         private void Nodes_Removed(NodeModel model)
         {
 
@@ -310,6 +312,15 @@ namespace Bb.Diagrams
         #endregion add/Remove
 
 
+        protected virtual void Diagram_Changed()
+        {
+            // CommandManager?.BeginTransaction("Diagram_Changed");
+        }
+
+        protected virtual void Node_Changed(Model model)
+        {
+            
+        }
 
         protected virtual void Node_OrderChanged(SelectableModel model)
         {
@@ -329,10 +340,7 @@ namespace Bb.Diagrams
                     item.TriggerParentMoved(obj);
 
             if (obj is UIModel ui && ui.Parent.HasValue)
-            {
-                var parent = GetUI(ui.Parent.Value);
-                parent?.UpdateDimensions();
-            }
+                 GetUI(ui.Parent.Value)?.UpdateDimensions();
 
         }
 
@@ -407,6 +415,7 @@ namespace Bb.Diagrams
         private BlazorDiagram _diagram;
         private bool disposedValue;
         private Dictionary<Guid, LinkProperties> _links;
+
     }
 
 

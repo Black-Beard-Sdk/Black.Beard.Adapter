@@ -7,8 +7,7 @@ namespace Bb.Modules.Bpms.Models
 
     [ExposeClass(Bb.ComponentModel.ConstantsCore.Plugin, ExposedType = typeof(Feature), LifeCycle = IocScopeEnum.Transiant)]
     public class BpmsDiagramFeature : BaseDiagramFeature<BpmsDiagram>
-    {
-        private const string Description = "Business process management";
+    { 
 
         public BpmsDiagramFeature()
             : base(new Guid(FeatureFilter),
@@ -22,6 +21,7 @@ namespace Bb.Modules.Bpms.Models
 
 
         public const string FeatureFilter = "ABEA097C-FB59-42DB-B5CB-F667C3F19752";
+        private const string Description = "Business process management";
 
     }
 

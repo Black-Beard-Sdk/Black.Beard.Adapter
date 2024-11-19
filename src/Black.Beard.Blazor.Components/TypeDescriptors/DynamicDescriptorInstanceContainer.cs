@@ -17,7 +17,7 @@ namespace Bb.TypeDescriptors
         public DynamicDescriptorInstanceContainer(object parent)
         {
             this._instance = parent;
-            _realProperties = PropertyAccessor.GetProperties(parent.GetType(), AccessorStrategyEnum.Direct);
+            _realProperties = parent.GetType().GetAccessors(AccessorStrategyEnum.Direct);
             _properties = new Dictionary<string, object>();
         }
 

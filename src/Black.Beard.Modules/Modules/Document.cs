@@ -6,23 +6,22 @@ using Bb.Storage;
 namespace Bb.Modules
 {
 
-
     public class Document : ModelBase<Guid>
     {
 
+        /// <summary>
+        /// Generic document
+        /// </summary>
         public Document()
         {
 
         }
 
 
-
-
         [StoreDescriptor(externalize: true, order: 5)]
         public Guid ModuleUuid { get; set; }
 
         public Guid Specification { get; set; }
-
 
 
         [JsonIgnore]
@@ -34,6 +33,10 @@ namespace Bb.Modules
 
         public JsonNode Model { get; set; }
 
+        public CommandTransactionManager Command { get; private set; }
+
+        public bool CanBeCommand => Command != null;
+
         public string GetRoute()
         {
             return Feature.GetRoute(Uuid);
@@ -41,11 +44,17 @@ namespace Bb.Modules
 
         public object Load()
         {
-        
+
             if (Feature != null)
                 if (Feature.LoadDocument(this, out var result))
+                {
+
+                    if (result is ICommandMemorizer m)
+                        m.CommandManager?.Reset();
+
                     return result;
-            
+                }
+
             return null;
 
         }

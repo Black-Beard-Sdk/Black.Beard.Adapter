@@ -90,7 +90,7 @@ namespace Bb.TypeDescriptors
                 lock (_lock)
                     if (!_resolved)
                     {
-                        var properties = PropertyAccessor.GetProperties(GetType(), AccessorStrategyEnum.Direct);
+                        var properties = GetType().GetAccessors(AccessorStrategyEnum.Direct);
                         _property = properties.Where(c => c.Name == this.Name).FirstOrDefault();
                         _resolved = true;
                     }
