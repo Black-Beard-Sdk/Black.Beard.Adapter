@@ -29,7 +29,7 @@ namespace Bb.Modules.Bpms
             double y = 0;
             double x = 0d;
 
-            IDiagramNode last = null;
+            SerializableDiagramNode last = null;
 
             foreach (var item in diagram.Models.Where(c => c.Type == Key))
                 if (item != node)

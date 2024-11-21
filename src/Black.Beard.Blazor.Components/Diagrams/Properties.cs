@@ -1,4 +1,5 @@
 ﻿using Bb.TypeDescriptors;
+using System.ComponentModel;
 using System.Text.Json;
 
 namespace Bb.Diagrams
@@ -6,13 +7,14 @@ namespace Bb.Diagrams
 
 
     public class Properties : List<Property>
+        , INotifyPropertyChanging
+        , INotifyPropertyChanged
     {
 
         public Properties()
         {
 
         }
-
 
         public void SetProperty(string name, string? value)
         {
@@ -21,17 +23,39 @@ namespace Bb.Diagrams
             {
                 if (!string.IsNullOrEmpty(value))
                 {
-                    Add(new Property() { Name = name, Value = value });
-                    this.Sort((x, y) => x.Name.CompareTo(y.Name));
+                    if (SetValue(name, value))
+                        this.Sort((x, y) => x.Name.CompareTo(y.Name));
                 }
             }
             else
             {
-                if (!string.IsNullOrEmpty(value))
-                    property.Value = value;
-                else
+                if (!SetValue(name, value))
+                {
+                    OnPropertyChanging(name);
                     Remove(property);
+                    OnPropertyChanged(name);
+                }
             }
+        }
+
+        private bool SetValue(string name, string? value)
+        {
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                OnPropertyChanging(name);
+                Add(new Property() { Name = name, Value = value });
+                OnPropertyChanged(name);
+                return true;
+            }
+
+            return false;
+
+        }
+
+        private void SetProperty(Property item)
+        {
+            SetProperty(item.Name, item.Value);
         }
 
 
@@ -66,7 +90,7 @@ namespace Bb.Diagrams
             var properties = container.Properties()
                 .Where(c => !c.IsReadOnly)
                 .OrderBy(c => c.Name)
-                .ToList();                 
+                .ToList();
 
             foreach (var item in properties)
             {
@@ -83,6 +107,31 @@ namespace Bb.Diagrams
                 SetProperty(item, null);
 
         }
+
+
+        #region OnChange
+
+        protected void OnPropertyChanging(string propertyName)
+        {
+            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
+        }
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        internal void Merge(Properties value)
+        {
+            foreach (var item in value)
+                SetProperty(item);
+        }
+
+        public event PropertyChangingEventHandler? PropertyChanging;
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+
+        #endregion OnChange
 
 
     }

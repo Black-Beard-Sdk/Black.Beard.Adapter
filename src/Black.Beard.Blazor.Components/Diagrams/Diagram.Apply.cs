@@ -162,7 +162,7 @@ namespace Bb.Diagrams
             }
         }
 
-        private static void CleanChild(Dictionary<Guid, UIModel> dicNodes, IDiagramNode? item)
+        private static void CleanChild(Dictionary<Guid, UIModel> dicNodes, SerializableDiagramNode? item)
         {
             if (dicNodes.TryGetValue(item.UuidParent.Value, out UIModel? child))
                 child.SetParent(null);
@@ -274,23 +274,11 @@ namespace Bb.Diagrams
 
         private void Nodes_Added(NodeModel model)
         {
-
             model.Moving += Node_Moving;
             model.Moved += Node_Moved;
             model.SizeChanged += Node_SizeChanged;
             model.OrderChanged += Node_OrderChanged;
             model.Changed += Node_Changed;
-
-            //if (model is UIModel m)
-            //{
-
-            //    var p = this.Models.FirstOrDefault(c => c.Uuid == m.Source.Uuid);
-            //    if (p == null)
-            //    {
-
-            //    }
-            //}
-
         }
               
         private void Nodes_Removed(NodeModel model)

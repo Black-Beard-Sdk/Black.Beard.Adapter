@@ -3,6 +3,15 @@
 namespace Bb
 {
 
+
+    //public interface ICommandTransaction
+    //{
+
+    //    void SetCommandManager(ICommandTransactionManager manager);
+
+    //}
+
+
     public interface ICommandMemorizer
     {
 
@@ -15,5 +24,6 @@ namespace Bb
         ICommandTransactionManager CommandManager { get; }
 
     }
+
 
 }

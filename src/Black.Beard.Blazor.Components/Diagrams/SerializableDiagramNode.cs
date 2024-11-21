@@ -3,6 +3,7 @@ using Bb.ComponentModel.Attributes;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using static MudBlazor.Colors;
@@ -10,12 +11,26 @@ using static MudBlazor.Colors;
 namespace Bb.Diagrams
 {
 
+    public interface IKey
+    {
+        Guid Uuid { get; }
+    }
 
-    public class SerializableDiagramNode : IDiagramNode
+    /// <summary>
+    /// diagram node object specialized for serialization
+    /// </summary>
+    public class SerializableDiagramNode
+        : INotifyPropertyChanging
+        , INotifyPropertyChanged
+        , IKey
     {
 
         #region ctor
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Type"></param>
         public SerializableDiagramNode(Guid Type)
             : this()
         {
@@ -60,40 +75,166 @@ namespace Bb.Diagrams
 
         #endregion ctor
 
+
+        #region properties
+
         /// <summary>
         /// Unique identifier
         /// </summary>
         [Required]
-        public Guid Uuid { get; set; }
+        public Guid Uuid
+        {
+            get => _uid;
+            set
+            {
+                if (_uid != value)
+                {
+                    OnPropertyChanging(nameof(Uuid));
+                    _uid = value;
+                    OnPropertyChanged(nameof(Uuid));
+                }
+            }
+        }
 
         /// <summary>
         /// Identifier of the parent
         /// </summary>
-        public Guid? UuidParent { get; set; }
+        public Guid? UuidParent
+        {
+            get => _uuidParent;
+            set
+            {
+                if (_uuidParent != value)
+                {
+                    OnPropertyChanging(nameof(UuidParent));
+                    _uuidParent = value;
+                    OnPropertyChanged(nameof(UuidParent));
+                }
+            }
+        }
 
         /// <summary>
         /// Name of the node
         /// </summary>
         [Required]
-        public string Title { get; set; }
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                if (_title != value)
+                {
+                    OnPropertyChanging(nameof(Title));
+                    _title = value;
+                    OnPropertyChanged(nameof(Title));
+                }
+            }
+        }
 
         /// <summary>
         /// Type of node
         /// </summary>
         [Required]
-        public Guid Type { get; set; }
+        public Guid Type
+        {
+            get => _type;
+            set
+            {
+                if (_type != value)
+                {
+                    OnPropertyChanging(nameof(Type));
+                    _type = value;
+                    OnPropertyChanged(nameof(Type));
+                }
+            }
+        }
+
+        public string? TypeNode
+        {
+            get => _typeNode;
+            set
+            {
+                if (_typeNode != value)
+                {
+                    OnPropertyChanging(nameof(TypeNode));
+                    _typeNode = value;
+                    OnPropertyChanged(nameof(TypeNode));
+                }
+            }
+        }
+
+        private Guid _type;
+        private Guid _uid;
+        private string _title;
+        private Guid? _uuidParent;
+
+        #endregion properties
 
 
         #region Position / size
 
         [EvaluateValidation(false)]
-        public Position Position { get; set; }
+        public Position Position
+        {
+            get => _position;
+            set
+            {
+                if (_position != value)
+                {
+                    OnPropertyChanging(nameof(Position));
+                    _position = value;
+                    OnPropertyChanged(nameof(Position));
+                }
+            }
+        }
 
-        public Size? Size { get; set; }
+        public Size? Size
+        {
+            get => _size;
+            set
+            {
+                if (_size != value)
+                {
+                    OnPropertyChanging(nameof(Size));
+                    _size = value;
+                    OnPropertyChanged(nameof(Size));
+                }
+            }
+        }
 
-        public bool Locked { get; internal set; }
+        public bool Locked
+        {
+            get => _Locked;
+            internal set
+            {
+                if (_Locked != value)
+                {
+                    OnPropertyChanging(nameof(Locked));
+                    _Locked = value;
+                    OnPropertyChanged(nameof(Locked));
 
-        public bool ControlledSize { get; internal set; }
+                }
+            }
+        }
+
+        public bool ControlledSize
+        {
+            get => _ControlledSize;
+            internal set
+            {
+                if (_ControlledSize != value)
+                {
+                    OnPropertyChanging(nameof(ControlledSize));
+                    _ControlledSize = value;
+                    OnPropertyChanged(nameof(ControlledSize));
+                }
+            }
+        }
+
+        private bool _ControlledSize;
+        private Position _position;
+        private Size? _size;
+        private bool _Locked;
 
         #endregion Position / size
 
@@ -101,12 +242,39 @@ namespace Bb.Diagrams
         #region Dynamic properties
 
         [EvaluateValidation(false)]
-        public Properties Properties { get; set; }
+        public Properties Properties
+        {
+            get => _properties;
+            set
+            {
+                if (_properties != value)
+                {
 
-        public string? TypeNode { get; set; }
+                    if (_properties != null)
+                        _properties.Merge(value);
 
-        private readonly AccessorList _realProperties;
-        private readonly JsonSerializerOptions _options;
+                    else
+                    {
+                        OnPropertyChanging(nameof(Properties));
+                        _properties = value;
+                        OnPropertyChanged(nameof(Properties));
+                        _properties.PropertyChanging += _properties_PropertyChanging;
+                        _properties.PropertyChanged += _properties_PropertyChanged;
+                    }
+
+                }
+            }
+        }
+
+        private void _properties_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        private void _properties_PropertyChanging(object? sender, PropertyChangingEventArgs e)
+        {
+            PropertyChanging?.Invoke(this, e);
+        }
 
         public void SetProperty(string name, object? value)
         {
@@ -132,12 +300,31 @@ namespace Bb.Diagrams
             return Properties.GetProperty(name);
         }
 
+
+        private readonly AccessorList _realProperties;
+        private readonly JsonSerializerOptions _options;
+        private string? _typeNode;
+        private Properties _properties;
+
+
         #endregion Dynamic properties
 
 
         #region ports
 
-        public List<Port> Ports { get; set; }
+        public List<Port> Ports
+        {
+            get => _ports;
+            set
+            {
+                if (_ports != value)
+                {
+                    OnPropertyChanging(nameof(Ports));
+                    _ports = value;
+                    OnPropertyChanged(nameof(Ports));
+                }
+            }
+        }
 
         public Port AddPort(PortAlignment alignment, Guid id)
         {
@@ -205,11 +392,30 @@ namespace Bb.Diagrams
         }
 
         private Diagram? _diagram;
+        private List<Port> _ports;
+
 
         #endregion diagram
 
 
-        // public ExternalDiagramReference ExternalReference { get; set; }
+        #region OnChange
+
+        public event PropertyChangingEventHandler? PropertyChanging;
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanging(string propertyName)
+        {
+            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
+        }
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+
+        #endregion OnChange
+
 
     }
 

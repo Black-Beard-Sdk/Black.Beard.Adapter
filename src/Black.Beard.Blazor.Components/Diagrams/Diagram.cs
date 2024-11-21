@@ -2,11 +2,11 @@
 using Bb.Toolbars;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams;
-using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models.Base;
+using MudBlazor;
+using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
@@ -17,6 +17,9 @@ namespace Bb.Diagrams
         , ICommandMemorizer
         , IDynamicDescriptorInstance
         , IDiagramToolBoxProvider
+        , INotifyPropertyChanging
+        , INotifyPropertyChanged
+        , INotifyCollectionChanged
     {
 
         static Diagram()
@@ -90,34 +93,65 @@ namespace Bb.Diagrams
 
         public Diagram(Guid typeModelId, bool dynamicToolbox)
         {
-
             _toolbox = new DiagramToolbox().AppendInitializer(this);
             this.DynamicToolbox = dynamicToolbox;
             this._container = new DynamicDescriptorInstanceContainer(this);
             this.TypeModelId = typeModelId;
-            _models = new List<SerializableDiagramNode>();
-            Relationships = new List<SerializableRelationship>();
+            Models = new DiagramList<Guid, SerializableDiagramNode>();
+            Relationships = new DiagramList<Guid, SerializableRelationship>();
             _links = new Dictionary<Guid, LinkProperties>();
 
         }
 
-        public string Name { get; set; }
+        /// <summary>
+        /// Name / label of the link
+        /// </summary>
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name != value)
+                {
+                    OnPropertyChanging(nameof(Name));
+                    _name = value;
+                    OnPropertyChanged(nameof(Name));
+                }
+            }
+        }
 
-        public string Description { get; set; }
 
-
+        /// <summary>
+        /// Description of the diagram
+        /// </summary>
+        public string Description
+        {
+            get => _descriptions;
+            set
+            {
+                if (_descriptions != value)
+                {
+                    OnPropertyChanging(nameof(Description));
+                    _descriptions = value;
+                    OnPropertyChanged(nameof(Description));
+                }
+            }
+        }
 
         #region models
 
-        public List<SerializableDiagramNode> Models
+        public DiagramList<Guid, SerializableDiagramNode> Models
         {
             get => _models;
             set
             {
 
-                if (value != null)
-                    foreach (var item in value)
-                        AddModel(item);
+                if (_models != null)
+                    _models.CollectionChanged -= _relayCollectionChanged;
+                
+                _models = value;
+                _models.CollectionChanged += _relayCollectionChanged;
+            
             }
         }
 
@@ -136,9 +170,11 @@ namespace Bb.Diagrams
         public SerializableDiagramNode AddModel(DiagramToolNode specification, Guid parent, double x, double y, string? name = null, Guid? uuid = null)
         {
             var child = AddModel(specification, x, y, name, uuid);
-            var p = GetModel(parent);
-            if (p != null)
+            if (_models.TryGetValue(parent, out var p))
+            {
                 child.UuidParent = parent;
+            }
+
             return child;
         }
 
@@ -153,7 +189,8 @@ namespace Bb.Diagrams
                     count++;
             }
 
-            var result = AddModel(specification.CreateModel(this, x, y, name, uuid));
+            var result = specification.CreateModel(this, x, y, name, uuid);
+            _models.Add(result);
 
             if (_diagram != null)
             {
@@ -166,33 +203,6 @@ namespace Bb.Diagrams
 
             return result;
 
-        }
-
-        public SerializableDiagramNode AddModel(SerializableDiagramNode child)
-        {
-
-            var m = _models.Where(c => c.Uuid == child.Uuid && c != child).ToList();
-
-            if (m.Count > 0)
-                foreach (var item in m)
-                    this._models.Remove(item);
-
-            this._models.Add(child);
-            this._models.Sort((x, y) => x.Uuid.CompareTo(y.Uuid));
-
-            return child;
-
-        }
-
-        public IDiagramNode GetModel(Guid id)
-        {
-            return this.Models.FirstOrDefault(c => c.Uuid == id);
-        }
-
-        public bool TryGetModel(Guid id, out IDiagramNode? result)
-        {
-            result = this.Models.FirstOrDefault(c => c.Uuid == id);
-            return result != null;
         }
 
         public IEnumerable<UIModel> GetUIChildren(Guid guid)
@@ -213,13 +223,37 @@ namespace Bb.Diagrams
 
         }
 
+        public SerializableDiagramNode? GetModelByPort(Guid id)
+        {
+
+            foreach (var item in this.Models)
+                foreach (var port in item.Ports)
+                    if (port.Uuid == id)
+                        return item;
+
+            return null;
+
+        }
 
         #endregion models
 
 
         #region links 
 
-        public List<SerializableRelationship> Relationships { get; set; }
+        public DiagramList<Guid, SerializableRelationship> Relationships
+        {
+            get => _relationships;
+            set
+            {
+
+                if (_relationships != null)
+                    _relationships.CollectionChanged -= _relayCollectionChanged;
+
+                _relationships = value;
+                _relationships.CollectionChanged += _relayCollectionChanged;
+
+            }
+        }
 
         public SerializableRelationship AddLink(Guid specification, Port left, Port right, string name, Guid? uuid = null)
         {
@@ -238,20 +272,7 @@ namespace Bb.Diagrams
                 Target = right.Uuid
             };
             this.Relationships.Add(link);
-            this.Models.Sort((x, y) => x.Uuid.CompareTo(y.Uuid));
             return link;
-        }
-
-        public IDiagramNode? GetModelByPort(Guid id)
-        {
-
-            foreach (var item in this.Models)
-                foreach (var port in item.Ports)
-                    if (port.Uuid == id)
-                        return item;
-
-            return null;
-
         }
 
         #endregion links 
@@ -281,7 +302,6 @@ namespace Bb.Diagrams
         [JsonIgnore]
         [EvaluateValidation(false)]
         public DiagramDiagnostics LastDiagnostics { get; internal set; }
-
 
 
         #region propagate toolbox
@@ -330,7 +350,6 @@ namespace Bb.Diagrams
         }
 
         #endregion propagate toolbox
-
 
 
         protected void SetSave(Action<Diagram> save)
@@ -412,16 +431,68 @@ namespace Bb.Diagrams
             return _diagram.GetSelectedModels();
         }
 
+        #region OnChange
+
+        public event PropertyChangingEventHandler? PropertyChanging;
+        public event PropertyChangedEventHandler? PropertyChanged;
         public event EventHandler<Diagram>? OnModelSaved;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+        protected void OnPropertyChanging(string propertyName)
+        {
+
+            if (_manager != null)
+            {
+
+                if (!_manager.TransactionInitialized)
+                    throw new InvalidOperationException("Transaction not initialized");
+
+                PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
+
+            }
+
+        }
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void _relayCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            CollectionChanged?.Invoke(sender, e);
+        }
+
+        public void SetCommandManager(ICommandTransactionManager manager)
+        {
+            _manager = manager;
+        }
+
+        private ICommandTransactionManager _manager;
+
+        #endregion OnChange
+
 
         private readonly DynamicDescriptorInstanceContainer _container;
         private readonly DiagramToolbox _toolbox;
         private ToolbarList _list;
         private ICommandMemorizer _command;
         private Action<object, Stream> _memorize;
-        private readonly List<SerializableDiagramNode> _models;
-
-
+        private string _name;
+        private string _descriptions;
+        private DiagramList<Guid, SerializableDiagramNode> _models;
+        private DiagramList<Guid, SerializableRelationship> _relationships;
     }
 
 }
+
+/*
+ 
+            if (_manager != null)
+            {
+
+                if (!_manager.TransactionInitialized)
+                    throw new InvalidOperationException("Transaction not initialized");
+
+            }
+ */

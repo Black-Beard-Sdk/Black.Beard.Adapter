@@ -50,7 +50,7 @@ namespace Bb.Diagrams
                 if (parameters.Length == 1)
                 {
                     var parameterType = parameters[0].ParameterType;
-                    if (typeof(IDiagramNode).IsAssignableFrom(parameterType))
+                    if (typeof(SerializableDiagramNode).IsAssignableFrom(parameterType))
                         this.SourceType = parameterType;
                 }
             }
@@ -63,7 +63,7 @@ namespace Bb.Diagrams
         }
 
         public virtual UIModel? CreateUI<T>(T model, Diagram diagram)
-            where T : IDiagramNode
+            where T : SerializableDiagramNode
         {
                      
             UIModel? result = (UIModel)Activator.CreateInstance(TypeModel, new object[] 
