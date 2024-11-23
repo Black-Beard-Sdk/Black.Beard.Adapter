@@ -29,14 +29,15 @@ namespace Bb.Modules
         /// <returns></returns>
         public Document GeDocument(Guid uuid)
         {
-            Document feature = _store.Load(uuid);
-            if (feature != null)
+
+            Document document = _store.Load(uuid);
+            if (document != null)
             {
-                feature.Parent = this;
-                var s = _referentiel.GetFeature(feature.Specification);
-                feature.Feature = s;
+                document.Parent = this;
+                var s = _referentiel.GetFeature(document.Specification);
+                document.Feature = s;
             }
-            return feature;
+            return document;
         }
 
 
@@ -118,13 +119,10 @@ namespace Bb.Modules
             _store.RemoveKey(module.Uuid);
         }
 
-
         public void Save(Document instance)
         {
             _store.Save(instance);
         }
-
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Initialize()

@@ -15,6 +15,10 @@ namespace Bb
         public static TranslatedKeyLabel GridMode => new TranslatedKeyLabel("Grid mode");
 
 
+        public static TranslatedKeyLabel Undo => new TranslatedKeyLabel("Undo");
+        public static TranslatedKeyLabel Redo => new TranslatedKeyLabel("Redo");
+
+
         public static TranslatedKeyLabel Cancel => new TranslatedKeyLabel("Cancel");
         public static TranslatedKeyLabel Edit => new TranslatedKeyLabel("Edit");
 

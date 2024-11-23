@@ -18,28 +18,35 @@ namespace Bb.Diagrams
 
         public void SetProperty(string name, string? value)
         {
-            var property = this.FirstOrDefault(c => c.Name == name);
-            if (property == null)
+
+            var toChange = ValueAsDifferentOf(name, value);
+            if (toChange)
             {
-                if (!string.IsNullOrEmpty(value))
+
+                var property = this.FirstOrDefault(c => c.Name == name);
+                if (property == null)
                 {
-                    if (SetValue(name, value))
-                        this.Sort((x, y) => x.Name.CompareTo(y.Name));
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        if (SetValue(name, value))
+                            this.Sort((x, y) => x.Name.CompareTo(y.Name));
+                    }
                 }
-            }
-            else
-            {
-                if (!SetValue(name, value))
+                else
                 {
-                    OnPropertyChanging(name);
-                    Remove(property);
-                    OnPropertyChanged(name);
+                    if (!SetValue(name, value))
+                    {
+                        OnPropertyChanging(name);
+                        Remove(property);
+                        OnPropertyChanged(name);
+                    }
                 }
+
             }
         }
 
         private bool SetValue(string name, string? value)
-        {
+        {      
 
             if (!string.IsNullOrEmpty(value))
             {
@@ -71,6 +78,11 @@ namespace Bb.Diagrams
         public bool PropertyExists(string name)
         {
             return this.Any(c => c.Name == name);
+        }
+
+        public bool ValueAsDifferentOf(string name, string? value)
+        {
+            return this.Any(c => c.Name == name && c.Value == value);
         }
 
 

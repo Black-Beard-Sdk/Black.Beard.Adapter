@@ -4,16 +4,11 @@ namespace Bb
 {
 
 
-    //public interface ICommandTransaction
-    //{
-
-    //    void SetCommandManager(ICommandTransactionManager manager);
-
-    //}
-
-
     public interface ICommandMemorizer
     {
+
+
+        MemorizerEnum Mode { get; }
 
         bool CanMemorize { get; }
 
@@ -23,6 +18,12 @@ namespace Bb
 
         ICommandTransactionManager CommandManager { get; }
 
+    }
+
+    public enum MemorizerEnum
+    {
+        Global,
+        Snapshot,
     }
 
 

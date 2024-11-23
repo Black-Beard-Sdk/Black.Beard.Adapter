@@ -93,11 +93,27 @@ namespace Bb.Diagrams
             if (Position != null || Source.Position.Y != Position.Y || Source.Position.X != Position.X)
                 Source.Position = new Position(Position.X, Position.Y);
 
+            var d = this.Source.GetDiagram<Diagram>();
+            if (d.CommandManager != null)
+            {
+                if (d.CommandManager.Status == StatusTransaction.Recoding)
+                {
+                    d.CommandManager.Commit();
+                }
+            }
+
         }
 
         protected virtual void UIModel_Moving(NodeModel model)
         {
-
+            var d = this.Source.GetDiagram<Diagram>();
+            if (d.CommandManager != null)
+            {
+                if (d.CommandManager.Status == StatusTransaction.Waiting)
+                {
+                    d.CommandManager.BeginTransaction($"move {this.Source.Title}");
+                }
+            }
         }
 
         protected virtual void UIModel_SizeChanged(NodeModel obj)

@@ -18,7 +18,6 @@ namespace Bb.Diagrams
     public class SerializableRelationship
         : INotifyPropertyChanging
         , INotifyPropertyChanged
-        , IKey
     {
 
         /// <summary>
@@ -41,7 +40,7 @@ namespace Bb.Diagrams
         /// <summary>
         /// Unique identifier of the link
         /// </summary>
-        [Required]
+        [Required, Key]
         public Guid Uuid
         {
             get => _uid;

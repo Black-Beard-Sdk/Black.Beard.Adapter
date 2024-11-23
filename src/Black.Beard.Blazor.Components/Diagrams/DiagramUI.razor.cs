@@ -102,7 +102,74 @@ namespace Bb.Diagrams
         public IFocusedService<PropertyGridView> PropertyGridFocusedService { get; set; }
 
         [Parameter]
-        public Diagram Diagram { get; set; }
+        public Diagram Diagram
+        {
+            get => _diagram;
+            set
+            {
+
+                if (_diagram != value)
+                {
+                    _diagram = value;
+                    u = Diagram?.CommandManager?.UndoList;
+                    r = Diagram?.CommandManager?.RedoList;
+                    u.CollectionChanged += U_CollectionChanged;
+                    r.CollectionChanged += U_CollectionChanged;
+                }
+            }
+        }
+
+        #region undo / Redo
+
+        public CommandTransationViewList? UndoList => u;
+        public CommandTransationViewList? RedoList => r;
+
+        public string IconUndo
+        {
+            get
+            {
+                if (u.Any())
+                    return Icons.Material.Filled.KeyboardArrowDown;
+                return null;
+            }
+        }
+        public string IconRedo
+        {
+            get
+            {
+                if (r.Any())
+                    return Icons.Material.Filled.KeyboardArrowDown;
+                return null;
+            }
+        }
+
+        public bool DisabledUndo
+        {
+            get
+            {
+                if (u == null)
+                    return true;
+                return !u.Any();
+            }
+        }
+
+        public bool DisabledRedo
+        {
+            get
+            {
+                if (r == null)
+                    return true;
+                return !r.Any();
+            }
+        }
+
+        #endregion undo / Redo
+
+        private void U_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            StateHasChanged();
+        }
+
 
         [EvaluateValidation(false)]
         [Inject]
@@ -127,7 +194,7 @@ namespace Bb.Diagrams
 
         protected override void OnInitialized()
         {
-            
+
         }
 
 
@@ -138,7 +205,7 @@ namespace Bb.Diagrams
             UIDiagram.PointerClick += PointerClick;
             UIDiagram.SelectionChanged += SelectionChanged;
             if (Diagram != null)
-            {                
+            {
                 Diagram.Apply(UIDiagram);
                 _timer = new Timer(_ =>
                 {
@@ -152,7 +219,7 @@ namespace Bb.Diagrams
         }
 
 
-        #region fix the bug of the diagram for shwoing the links when the diagram is loaded
+        #region fix the bug of the diagram for showing the links when the diagram is loaded
 
         private Timer _timer;
         private Timer _timer2;
@@ -167,7 +234,7 @@ namespace Bb.Diagrams
         }
 
         public void RenderFirstLinks2()
-        {         
+        {
             Diagram?.Prepare();
         }
 
@@ -430,7 +497,7 @@ namespace Bb.Diagrams
             }
 
             return result;
-        
+
         }
 
         private IBusyService _busyService;
@@ -439,6 +506,9 @@ namespace Bb.Diagrams
         private bool disposedValue;
         private BusySession _session;
 
+        private Diagram _diagram;
+        private CommandTransationViewList? u;
+        private CommandTransationViewList? r;
 
         private int _zoomValue = 100;
         private int _gridSizeValue = 20;

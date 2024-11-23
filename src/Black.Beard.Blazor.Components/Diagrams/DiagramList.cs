@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bb.Diagrams
 {
@@ -15,21 +16,34 @@ namespace Bb.Diagrams
         , INotifyCollectionChanged
         , INotifyPropertyChanging
         , INotifyPropertyChanged
-        // where T : IKey
         where TKey : IComparable
     {
 
 
         static DiagramList()
         {
+
+            string name = string.Empty;
             var a = typeof(TValue).GetAccessors();
-            var key = a.Where( c => c.Name == "Uuid").FirstOrDefault();
+
+            foreach (var item in a)
+                if (item.ContainsAttribute<KeyAttribute>())
+                {
+                    name = item.Name;
+                    break;
+                }
+
+            if (string.IsNullOrEmpty(name))
+                throw new Exception($"The type {nameof(TValue)} must implement IKey of add an attribute Key on the property that be functional key.");
+
+            var key = a.Where(c => c.Name == name).FirstOrDefault();
             _key = (c) => (TKey)key.GetValue(c);
+
         }
 
         public DiagramList()
         {
-            
+
         }
 
         /// <summary>
@@ -41,28 +55,15 @@ namespace Bb.Diagrams
         {
             get
             {
-                _lock.EnterReadLock();
-                try
-                {
+                using (_lock.LockForRead())
                     return _dic[index];
-                }
-                finally
-                {
-                    _lock.ExitReadLock();
-                }
             }
             set
             {
                 Unsuscribes(_dic[index]);
-                _lock.EnterWriteLock();
-                try
+                using (_lock.LockForWrite(() => Suscribes(value)))
                 {
                     _dic[index] = value;
-                }
-                finally
-                {
-                    _lock.ExitWriteLock();
-                    Suscribes(value);
                 }
             }
         }
@@ -74,15 +75,8 @@ namespace Bb.Diagrams
         {
             get
             {
-                _lock.EnterReadLock();
-                try
-                {
+                using (_lock.LockForRead())
                     return _dic.Count;
-                }
-                finally
-                {
-                    _lock.ExitReadLock();
-                }
             }
         }
 
@@ -100,16 +94,15 @@ namespace Bb.Diagrams
             List<TValue> listAdded = new List<TValue>(newItems.Length);
             List<(TValue, TValue)> listUpdated = new List<(TValue, TValue)>(newItems.Length);
 
-            _lock.EnterUpgradeableReadLock();
-            try
+
+            using (_lock.LockForUpgradeableRead())
             {
                 foreach (var newItem in newItems)
                 {
                     var key = _key(newItem);
                     if (!_dic.TryGetValue(key, out TValue oldValue))
                     {
-                        _lock.EnterWriteLock();
-                        try
+                        using (_lock.LockForWrite())
                         {
                             if (!_dic.TryGetValue(key, out oldValue))
                             {
@@ -117,15 +110,10 @@ namespace Bb.Diagrams
                                 listAdded.Add(newItem);
                             }
                         }
-                        finally
-                        {
-                            _lock.ExitWriteLock();
-                        }
                     }
                     else
                     {
-                        _lock.EnterWriteLock();
-                        try
+                        using (_lock.LockForWrite())
                         {
                             if (_dic.TryGetValue(key, out oldValue))
                             {
@@ -133,16 +121,8 @@ namespace Bb.Diagrams
                                 listUpdated.Add((oldValue, newItem));
                             }
                         }
-                        finally
-                        {
-                            _lock.ExitWriteLock();
-                        }
                     }
                 }
-            }
-            finally
-            {
-                _lock.ExitUpgradeableReadLock();
             }
 
             if (listAdded.Count > 0)
@@ -152,6 +132,7 @@ namespace Bb.Diagrams
                     Suscribes(item);
 
                 OnChangedInCollection(NotifyCollectionChangedAction.Add, listAdded.ToArray());
+
             }
 
             if (listUpdated.Count > 0)
@@ -174,47 +155,8 @@ namespace Bb.Diagrams
             TValue oldValue = default;
             var key = _key(newItem);
 
-            _lock.EnterUpgradeableReadLock();
-            try
+            var dispose = () =>
             {
-                if (!_dic.ContainsKey(key))
-                {
-                    _lock.EnterWriteLock();
-                    try
-                    {
-                        if (!_dic.ContainsKey(key))
-                        {
-                            _dic.Add(key, newItem);
-                            t = true;
-                        }
-                    }
-                    finally
-                    {
-                        _lock.ExitWriteLock();
-
-                    }
-                }
-                else
-                {
-                    _lock.EnterWriteLock();
-                    try
-                    {
-                        if (_dic.TryGetValue(key, out oldValue))
-                        {
-                            t = true;
-                            _dic[key] = newItem;
-                        }
-                    }
-                    finally
-                    {
-                        _lock.ExitWriteLock();
-
-                    }
-                }
-            }
-            finally
-            {
-                _lock.ExitUpgradeableReadLock();
 
                 if (t)
                 {
@@ -225,13 +167,36 @@ namespace Bb.Diagrams
                     }
                 }
                 else
-                {
                     OnChangedInCollection(NotifyCollectionChangedAction.Add, new[] { newItem });
-                }
 
                 Suscribes(newItem);
 
+            };
+
+            using (_lock.LockForUpgradeableRead(dispose))
+            {
+                if (!_dic.ContainsKey(key))
+                    using (_lock.LockForWrite())
+                    {
+                        if (!_dic.ContainsKey(key))
+                        {
+                            _dic.Add(key, newItem);
+                            t = true;
+                        }
+                    }
+                
+                else
+                    using (_lock.LockForWrite())
+                    {
+                        if (_dic.TryGetValue(key, out oldValue))
+                        {
+                            t = true;
+                            _dic[key] = newItem;
+                        }
+                    }
+
             }
+
         }
 
         /// <summary>
@@ -244,15 +209,10 @@ namespace Bb.Diagrams
             foreach (var item in _dic.Values)
                 Unsuscribes(item);
 
-            _lock.EnterWriteLock();
-            try
+            using (_lock.LockForWrite())
             {
                 items = _dic.Values.ToArray();
                 _dic.Clear();
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
             }
 
             if (items != null)
@@ -271,34 +231,24 @@ namespace Bb.Diagrams
 
             var key = _key(item);
 
-            _lock.EnterUpgradeableReadLock();
-            try
+            var dispose = () =>
             {
+                Unsuscribes(item);
+                OnChangedInCollection(NotifyCollectionChangedAction.Remove, [item]);
+            };
+
+            using (_lock.LockForUpgradeableRead(dispose))
                 if (_dic.ContainsKey(key))
-                {
-                    _lock.EnterWriteLock();
-                    try
-                    {
+                    using (_lock.LockForWrite())
                         if (_dic.ContainsKey(key))
                         {
                             _dic.Remove(key);
                             t = true;
                             return true;
                         }
-                    }
-                    finally
-                    {
-                        _lock.ExitWriteLock();
-                    }
-                }
-                return false;
-            }
-            finally
-            {
-                _lock.ExitUpgradeableReadLock();
-                Unsuscribes(item);
-                OnChangedInCollection(NotifyCollectionChangedAction.Remove, new[] { item });
-            }
+
+            return false;
+
         }
 
         /// <summary>
@@ -308,16 +258,8 @@ namespace Bb.Diagrams
         /// <returns>true if the element is found in the collection; otherwise, false.</returns>
         public bool ContainsKey(TValue item)
         {
-
-            _lock.EnterReadLock();
-            try
-            {
+            using (_lock.LockForRead())
                 return _dic.ContainsKey(_key(item));
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
         }
 
         /// <summary>
@@ -327,18 +269,15 @@ namespace Bb.Diagrams
         /// <returns>true if the element is found in the collection; otherwise, false.</returns>
         public bool Contains(TValue item)
         {
+
             var key = _key(item);
-            _lock.EnterReadLock();
-            try
+            using (_lock.LockForRead())
             {
                 if (_dic.TryGetValue(key, out var r))
                     return r.Equals(item);
                 return false;
             }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
+
         }
 
 
@@ -350,16 +289,11 @@ namespace Bb.Diagrams
         public void CopyTo(TValue[] array, int arrayIndex)
         {
 
-            _lock.EnterReadLock();
-            try
+            using (_lock.LockForRead())
             {
                 var o = new List<TValue>(_dic.Values);
                 o.Sort((x, y) => _key(x).CompareTo(_key(y)));
                 o.CopyTo(array, arrayIndex);
-            }
-            finally
-            {
-                _lock.ExitReadLock();
             }
         }
 
@@ -385,15 +319,8 @@ namespace Bb.Diagrams
         /// </example>
         public bool TryGetValue(TKey key, out TValue value)
         {
-            _lock.EnterReadLock();
-            try
-            {
+            using (_lock.LockForRead())
                 return _dic.TryGetValue(key, out value);
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
         }
 
 
@@ -403,32 +330,21 @@ namespace Bb.Diagrams
         /// <returns>An enumerator for the collection.</returns>
         public IEnumerator<TValue> GetEnumerator()
         {
-            _lock.EnterReadLock();
-            try
+            using (_lock.LockForRead())
             {
                 var o = new List<TValue>(_dic.Values);
                 o.Sort((x, y) => _key(x).CompareTo(_key(y)));
                 return o.GetEnumerator();
-            }
-            finally
-            {
-                _lock.ExitReadLock();
             }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-
-            _lock.EnterReadLock();
-            try
+            using (_lock.LockForRead())
             {
                 var o = new List<TValue>(_dic.Values);
                 o.Sort((x, y) => _key(x).CompareTo(_key(y)));
                 return o.GetEnumerator();
-            }
-            finally
-            {
-                _lock.ExitReadLock();
             }
         }
 
@@ -480,7 +396,7 @@ namespace Bb.Diagrams
         private void N_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(sender, e);
-        }
+        }     
 
         /// <summary>
         /// Occurs when the collection changes.
@@ -494,5 +410,6 @@ namespace Bb.Diagrams
         private static readonly Func<TValue, TKey> _key;
 
     }
+
 
 }

@@ -6,15 +6,10 @@ using Blazor.Diagrams.Core.Models;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
-using static MudBlazor.Colors;
+using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
 {
-
-    public interface IKey
-    {
-        Guid Uuid { get; }
-    }
 
     /// <summary>
     /// diagram node object specialized for serialization
@@ -22,7 +17,6 @@ namespace Bb.Diagrams
     public class SerializableDiagramNode
         : INotifyPropertyChanging
         , INotifyPropertyChanged
-        , IKey
     {
 
         #region ctor
@@ -81,7 +75,7 @@ namespace Bb.Diagrams
         /// <summary>
         /// Unique identifier
         /// </summary>
-        [Required]
+        [Required, Key]
         public Guid Uuid
         {
             get => _uid;
@@ -179,7 +173,7 @@ namespace Bb.Diagrams
             get => _position;
             set
             {
-                if (_position != value)
+                if (!object.Equals(_position, value))
                 {
                     OnPropertyChanging(nameof(Position));
                     _position = value;
@@ -202,34 +196,11 @@ namespace Bb.Diagrams
             }
         }
 
-        public bool Locked
-        {
-            get => _Locked;
-            internal set
-            {
-                if (_Locked != value)
-                {
-                    OnPropertyChanging(nameof(Locked));
-                    _Locked = value;
-                    OnPropertyChanged(nameof(Locked));
+        [JsonIgnore, EvaluateValidation(false)]
+        public bool Locked { get; internal set; }
 
-                }
-            }
-        }
-
-        public bool ControlledSize
-        {
-            get => _ControlledSize;
-            internal set
-            {
-                if (_ControlledSize != value)
-                {
-                    OnPropertyChanging(nameof(ControlledSize));
-                    _ControlledSize = value;
-                    OnPropertyChanged(nameof(ControlledSize));
-                }
-            }
-        }
+        [JsonIgnore, EvaluateValidation(false)]
+        public bool ControlledSize { get; internal set; }
 
         private bool _ControlledSize;
         private Position _position;

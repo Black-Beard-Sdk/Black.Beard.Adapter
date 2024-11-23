@@ -15,25 +15,31 @@ namespace Bb.Modules.bpms
         public Documents FeatureInstances { get; set; }
 
 
-        public Document FeatureInstance => _featureInstance
-            ?? (_featureInstance = FeatureInstances.GeDocument(Uuid));
+        public Document FeatureInstance => _featureInstance ?? (_featureInstance = FeatureInstances.GeDocument(Uuid));
 
 
         public Diagrams.Diagram DiagramModel
         {
             get
             {
-                var f = FeatureInstance;
-                if (f != null)
+                if (_diagramModel == null)
                 {
-                    var model = FeatureInstance.Load();
-                    return (Diagrams.Diagram)model;
+
+
+                    var f = FeatureInstance;
+                    if (f != null)
+                    {
+                        var model = FeatureInstance.Load();
+                        _diagramModel = (Diagrams.Diagram)model;
+                    }
                 }
 
-                return null;
+                return _diagramModel;
 
             }
         }
+
+        private Diagrams.Diagram _diagramModel;
 
         private Document _featureInstance;
 

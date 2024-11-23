@@ -40,19 +40,35 @@
 
 
         <MudTooltip Text="@ComponentConstants.ShowGrid.Translate(this)" Color="Color.Default">
-            <MudToggleIconButton 
-                @bind-Toggled="_showGrid"
+            <MudToggleIconButton @bind-Toggled="_showGrid"
                                  Icon="@Icons.Material.Filled.GridOn"
-                ToggledIcon="@Icons.Material.Filled.GridOff"
-                onclick="@_gridShowChanged" />
+                                 ToggledIcon="@Icons.Material.Filled.GridOff"
+                                 onclick="@_gridShowChanged" />
         </MudTooltip>
 
         <MudTooltip Text="@ComponentConstants.GridMode.Translate(this)" Color="Color.Default">
-            <MudToggleIconButton 
-                @bind-Toggled="_showPoint"
+            <MudToggleIconButton @bind-Toggled="_showPoint"
                                  Icon="@Icons.Material.Filled.DragIndicator"
                                  ToggledIcon="@Icons.Material.Filled.Grid4x4"
-                onclick="@_gridModeChanged" />
+                                 onclick="@_gridModeChanged" />
+        </MudTooltip>
+
+        <MudTooltip Text="@ComponentConstants.Undo.Translate(this)" Color="Color.Default">
+            <MudMenu StartIcon="@Icons.Material.Filled.Undo" EndIcon="@IconUndo" Disabled="@DisabledUndo">
+                @foreach (var item in this.UndoList)
+                {
+                    <MudMenuItem Tag="@item">@item.Label</MudMenuItem>
+                }
+            </MudMenu>
+        </MudTooltip>
+
+        <MudTooltip Text="@ComponentConstants.Redo.Translate(this)" Color="Color.Default">
+            <MudMenu StartIcon="@Icons.Material.Filled.Redo" EndIcon="@IconRedo" Disabled="@DisabledRedo">
+                @foreach (var item in this.RedoList)
+                {
+                    <MudMenuItem Tag="@item">@item.Label</MudMenuItem>
+                }
+            </MudMenu>
         </MudTooltip>
 
 

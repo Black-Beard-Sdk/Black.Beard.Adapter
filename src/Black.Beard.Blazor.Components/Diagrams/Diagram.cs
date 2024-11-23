@@ -147,11 +147,18 @@ namespace Bb.Diagrams
             {
 
                 if (_models != null)
+                {
                     _models.CollectionChanged -= _relayCollectionChanged;
-                
+                    _models.PropertyChanging -= N_PropertyChanging;
+                    _models.PropertyChanged -= N_PropertyChanged;
+                }
+
                 _models = value;
+
                 _models.CollectionChanged += _relayCollectionChanged;
-            
+                _models.PropertyChanging += N_PropertyChanging;
+                _models.PropertyChanged += N_PropertyChanged;
+
             }
         }
 
@@ -247,10 +254,16 @@ namespace Bb.Diagrams
             {
 
                 if (_relationships != null)
+                {
                     _relationships.CollectionChanged -= _relayCollectionChanged;
+                    _relationships.PropertyChanging -= N_PropertyChanging;
+                    _relationships.PropertyChanged -= N_PropertyChanged;
+                }
 
                 _relationships = value;
                 _relationships.CollectionChanged += _relayCollectionChanged;
+                _relationships.PropertyChanging += N_PropertyChanging;
+                _relationships.PropertyChanged += N_PropertyChanged;
 
             }
         }
@@ -374,7 +387,9 @@ namespace Bb.Diagrams
 
         public ICommandTransactionManager CommandManager { get; private set; }
 
-        public bool CanMemorize => this._memorize != null;
+        public bool CanMemorize => this._memorize != null && CommandManager != null;
+
+        public MemorizerEnum Mode => MemorizerEnum.Global;
 
         protected void SetMemorize(Action<object, Stream> save)
         {
@@ -382,6 +397,8 @@ namespace Bb.Diagrams
             CommandManager = new CommandTransactionManager(this);
             CommandManager.Pause();
         }
+
+
 
         public virtual void Memorize(Stream stream)
         {
@@ -441,34 +458,50 @@ namespace Bb.Diagrams
         protected void OnPropertyChanging(string propertyName)
         {
 
-            if (_manager != null)
-            {
+            if (CommandManager?.Status == StatusTransaction.Waiting)
+                throw new InvalidOperationException("Transaction not initialized");
 
-                if (!_manager.TransactionInitialized)
-                    throw new InvalidOperationException("Transaction not initialized");
-
-                PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
-
-            }
+            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
 
         }
 
         protected void OnPropertyChanged(string propertyName)
         {
+
+            if (CommandManager?.Status == StatusTransaction.Waiting)
+                throw new InvalidOperationException("Transaction not initialized");
+
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         }
 
         private void _relayCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            if (CommandManager?.Status == StatusTransaction.Waiting)
+                throw new InvalidOperationException("Transaction not initialized");
+
             CollectionChanged?.Invoke(sender, e);
+
         }
 
-        public void SetCommandManager(ICommandTransactionManager manager)
+        private void N_PropertyChanging(object? sender, PropertyChangingEventArgs e)
         {
-            _manager = manager;
+            if (CommandManager?.Status == StatusTransaction.Waiting)
+                throw new InvalidOperationException("Transaction not initialized");
+
+            PropertyChanging?.Invoke(sender, e);
+
         }
 
-        private ICommandTransactionManager _manager;
+        private void N_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+
+            if (CommandManager?.Status == StatusTransaction.Waiting)
+                throw new InvalidOperationException("Transaction not initialized");
+
+            PropertyChanged?.Invoke(sender, e);
+
+        }
 
         #endregion OnChange
 
