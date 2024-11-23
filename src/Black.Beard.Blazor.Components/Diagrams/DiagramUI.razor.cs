@@ -163,6 +163,16 @@ namespace Bb.Diagrams
             }
         }
 
+        public void OnRestoreUndo(MouseEventArgs args, CommandTransactionView cmd)
+        {
+            Diagram.CommandManager.Undo(cmd.Index);
+        }
+
+        public void OnRestoreRedo(MouseEventArgs args, CommandTransactionView cmd)
+        {
+            Diagram.CommandManager.Redo(cmd.Index);
+        }
+
         #endregion undo / Redo
 
         private void U_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

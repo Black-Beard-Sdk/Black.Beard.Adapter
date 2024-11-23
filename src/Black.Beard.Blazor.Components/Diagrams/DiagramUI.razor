@@ -57,7 +57,7 @@
             <MudMenu StartIcon="@Icons.Material.Filled.Undo" EndIcon="@IconUndo" Disabled="@DisabledUndo">
                 @foreach (var item in this.UndoList)
                 {
-                    <MudMenuItem Tag="@item">@item.Label</MudMenuItem>
+                    <MudMenuItem OnClick="@((e) => OnRestoreUndo(e, item))">@item.Label</MudMenuItem>
                 }
             </MudMenu>
         </MudTooltip>
@@ -66,7 +66,7 @@
             <MudMenu StartIcon="@Icons.Material.Filled.Redo" EndIcon="@IconRedo" Disabled="@DisabledRedo">
                 @foreach (var item in this.RedoList)
                 {
-                    <MudMenuItem Tag="@item">@item.Label</MudMenuItem>
+                    <MudMenuItem OnClick="@((e) => OnRestoreRedo(e, item))">@item.Label</MudMenuItem>
                 }
             </MudMenu>
         </MudTooltip>

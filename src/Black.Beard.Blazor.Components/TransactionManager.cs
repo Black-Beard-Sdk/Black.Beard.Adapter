@@ -197,8 +197,8 @@ namespace Bb
         /// <summary>
         /// Restore in specific transaction state and forget all the next transactions
         /// </summary>
-        /// <param name="cmd"></param>
-        public void Undo(CommandTransaction cmd)
+        /// <param name="cmd">index to restore</param>
+        public void Undo(int index)
         {
 
             using (var l1 = _lock.LockForUpgradeableRead())
@@ -219,11 +219,11 @@ namespace Bb
 
                         Status = StatusTransaction.Restoring;
 
-                        while (_forUndo.Peek() != cmd)
+                        while (_forUndo.Peek().Index != index)
                         {
                             var c = _forUndo.Pop();
                             _forUndoView.Pop();
-                            if (this._target.Mode == MemorizerEnum.Snapshot || cmd == c)
+                            if (this._target.Mode == MemorizerEnum.Snapshot || cmd == c.Index)
                                 _target.Restore(c);
                             _forRedo.Push(c);
                             _forRedoView.Add(c.GetView());
@@ -238,10 +238,19 @@ namespace Bb
         }
 
         /// <summary>
+        /// Restore in specific transaction state and forget all the next transactions
+        /// </summary>
+        /// <param name="cmd">backup to restore</param>
+        public void Undo(CommandTransaction cmd)
+        {
+            Undo(cmd.Index);
+        }
+
+        /// <summary>
         /// Restore in specific transaction state and forget all the previous transaction.
         /// </summary>
-        /// <param name="cmd"></param>
-        public void Redo(CommandTransaction cmd)
+        /// <param name="cmd">index to restore</param>
+        public void Redo(int cmd)
         {
 
             using (var l1 = _lock.LockForUpgradeableRead())
@@ -255,11 +264,11 @@ namespace Bb
 
                     try
                     {
-                        while (_forRedo.Peek() != cmd)
+                        while (_forRedo.Peek().Index != cmd)
                         {
                             var c = _forRedo.Pop();
                             _forRedoView.Pop();
-                            if (this._target.Mode == MemorizerEnum.Snapshot || cmd == c)
+                            if (this._target.Mode == MemorizerEnum.Snapshot || cmd == c.Index)
                                 _target.Restore(c);
                             _forUndo.Push(c);
                             _forUndoView.Add(c.GetView());
@@ -272,6 +281,15 @@ namespace Bb
                 }
             }
 
+        }
+
+        /// <summary>
+        /// Restore in specific transaction state and forget all the previous transaction.
+        /// </summary>
+        /// <param name="cmd">backup to restore</param>
+        public void Redo(CommandTransaction cmd)
+        {
+            Redo(cmd.Index);
         }
 
         /// <summary>

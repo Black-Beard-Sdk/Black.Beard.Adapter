@@ -12,7 +12,9 @@
         /// <returns></returns>
         CommandTransaction BeginTransaction(string name);
 
-
+        /// <summary>
+        /// Current status of the manager
+        /// </summary>
         StatusTransaction Status { get; }
 
         /// <summary>
@@ -28,13 +30,25 @@
         /// <summary>
         /// Restore in specific transaction state and forget all the next transactions
         /// </summary>
-        /// <param name="last"></param>
+        /// <param name="cmd">index to restore</param>
+        void Undo(int last);
+
+        /// <summary>
+        /// Restore in specific transaction state and forget all the next transactions
+        /// </summary>
+        /// <param name="cmd">backup to restore</param>
         void Undo(CommandTransaction last);
 
         /// <summary>
         /// Restore in specific transaction state and forget all the previous transaction.
         /// </summary>
-        /// <param name="last"></param>
+        /// <param name="cmd">index to restore</param>
+        void Redo(int last);
+
+        /// <summary>
+        /// Restore in specific transaction state and forget all the previous transaction.
+        /// </summary>
+        /// <param name="cmd">backup to restore</param>
         void Redo(CommandTransaction last);
 
         /// <summary>
