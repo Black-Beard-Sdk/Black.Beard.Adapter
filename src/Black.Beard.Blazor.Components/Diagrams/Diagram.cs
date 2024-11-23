@@ -408,6 +408,17 @@ namespace Bb.Diagrams
         public void Restore(CommandTransaction command)
         {
 
+            // Load the diagram
+            // Compare with current and obtain differences
+
+            // remove new links
+            // Add removed nodes
+            // removed new nodes
+            // Add removed links
+
+            // Restore changed nodes
+            // Restore changed links
+
         }
 
         #region DynamicDescriptorInstance

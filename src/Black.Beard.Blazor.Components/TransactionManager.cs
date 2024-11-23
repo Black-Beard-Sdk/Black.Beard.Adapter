@@ -219,11 +219,11 @@ namespace Bb
 
                         Status = StatusTransaction.Restoring;
 
-                        while (_forUndo.Peek().Index != index)
+                        while (_forUndo.Count > 0 && _forUndo.Peek().Index >= index)
                         {
                             var c = _forUndo.Pop();
                             _forUndoView.Pop();
-                            if (this._target.Mode == MemorizerEnum.Snapshot || cmd == c.Index)
+                            if (this._target.Mode == MemorizerEnum.Snapshot || index == c.Index)
                                 _target.Restore(c);
                             _forRedo.Push(c);
                             _forRedoView.Add(c.GetView());
@@ -249,8 +249,8 @@ namespace Bb
         /// <summary>
         /// Restore in specific transaction state and forget all the previous transaction.
         /// </summary>
-        /// <param name="cmd">index to restore</param>
-        public void Redo(int cmd)
+        /// <param name="index">index to restore</param>
+        public void Redo(int index)
         {
 
             using (var l1 = _lock.LockForUpgradeableRead())
@@ -264,11 +264,11 @@ namespace Bb
 
                     try
                     {
-                        while (_forRedo.Peek().Index != cmd)
+                        while (_forRedo.Count > 0 && _forRedo.Peek().Index >= index)
                         {
                             var c = _forRedo.Pop();
                             _forRedoView.Pop();
-                            if (this._target.Mode == MemorizerEnum.Snapshot || cmd == c.Index)
+                            if (this._target.Mode == MemorizerEnum.Snapshot || index == c.Index)
                                 _target.Restore(c);
                             _forUndo.Push(c);
                             _forUndoView.Add(c.GetView());
