@@ -6,6 +6,7 @@ using Bb.ComponentModel.Attributes;
 using System.ComponentModel;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
+using Bb.Commands;
 
 namespace Bb.Diagrams
 {

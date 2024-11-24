@@ -1,4 +1,4 @@
-﻿namespace Bb
+﻿namespace Bb.Commands
 {
     public interface ICommandTransactionManager
     {
@@ -61,9 +61,9 @@
         /// </summary>
         int UndoCount { get; }
 
-        CommandTransationViewList UndoList { get; }
+        CommandTransactionViewList UndoList { get; }
 
-        CommandTransationViewList RedoList { get; }
+        CommandTransactionViewList RedoList { get; }
 
         /// <summary>
         /// Return a transaction.
@@ -73,7 +73,7 @@
         /// <param name="command">the transaction</param>
         /// <returns></returns>
         bool Scope(string label, out CommandTransaction command);
-        
+
         /// <summary>
         /// If the manager is paused, the transaction is not created.
         /// </summary>

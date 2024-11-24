@@ -13,6 +13,7 @@ using Bb.ComponentModel.Attributes;
 using Bb.Toolbars;
 using Blazor.Diagrams.Components.Widgets;
 using Blazor.Diagrams.Core.Models;
+using Bb.Commands;
 
 namespace Bb.Diagrams
 {
@@ -121,8 +122,8 @@ namespace Bb.Diagrams
 
         #region undo / Redo
 
-        public CommandTransationViewList? UndoList => u;
-        public CommandTransationViewList? RedoList => r;
+        public CommandTransactionViewList? UndoList => u;
+        public CommandTransactionViewList? RedoList => r;
 
         public string IconUndo
         {
@@ -248,7 +249,7 @@ namespace Bb.Diagrams
             Diagram?.Prepare();
         }
 
-        #endregion fix the bug of the diagram for shwoing the links when the diagram is loaded
+        #endregion fix the bug of the diagram for showing the links when the diagram is loaded
 
 
         private void PointerClick(Model? model, Blazor.Diagrams.Core.Events.PointerEventArgs args)
@@ -517,8 +518,8 @@ namespace Bb.Diagrams
         private BusySession _session;
 
         private Diagram _diagram;
-        private CommandTransationViewList? u;
-        private CommandTransationViewList? r;
+        private CommandTransactionViewList? u;
+        private CommandTransactionViewList? r;
 
         private int _zoomValue = 100;
         private int _gridSizeValue = 20;

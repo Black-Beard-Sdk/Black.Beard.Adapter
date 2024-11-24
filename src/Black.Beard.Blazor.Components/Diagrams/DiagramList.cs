@@ -396,7 +396,13 @@ namespace Bb.Diagrams
         private void N_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(sender, e);
-        }     
+        }
+
+        internal void Unsubscribes()
+        {
+            foreach (var item in _dic.Values)
+                Unsuscribes(item);
+        }
 
         /// <summary>
         /// Occurs when the collection changes.

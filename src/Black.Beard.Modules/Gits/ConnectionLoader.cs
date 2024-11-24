@@ -1,13 +1,8 @@
 ﻿using LibGit2Sharp;
-using Bb;
-using System;
 using LibGit2Sharp.Handlers;
-using Microsoft.Extensions.Configuration;
-
 
 namespace Bb.Configuration.Git
 {
-
 
     /// <summary>
     /// 
@@ -81,8 +76,10 @@ namespace Bb.Configuration.Git
                 using (var repo = new Repository(localFolder))
                 {
                     var pullOptions = GetPullOptions();
-                    var signature = new Signature(new Identity(GitConfiguration.GitUserName, GitConfiguration.GitEmail), DateTimeOffset.Now);
-                    Commands.Pull(repo, signature, pullOptions);
+                    var identity = new Identity(GitConfiguration.GitUserName, GitConfiguration.GitEmail);
+                    var signature = new Signature(identity, DateTimeOffset.Now);
+                    LibGit2Sharp.Commands.Pull(repo, signature, pullOptions);
+
                 }
 
                 return true;

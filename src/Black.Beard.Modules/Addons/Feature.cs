@@ -252,6 +252,12 @@ namespace Bb.Addons
             model.SerializeToStream(stream, options);
         }
 
+        public virtual object Restore(Stream stream, Type targetType)
+        {
+            var options = GetJsonSerializerOptions() ?? new JsonSerializerOptions();
+            return stream.Deserialize(targetType, options);
+        }
+
         #endregion In/Out
 
 

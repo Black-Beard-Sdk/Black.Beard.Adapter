@@ -3,6 +3,9 @@
 namespace Bb.Modules
 {
 
+    /// <summary>
+    /// Generic feature for future diagram
+    /// </summary>
     public class FeatureDiagram : Diagrams.Diagram, IFeatureInitializer
     {
 
@@ -17,6 +20,11 @@ namespace Bb.Modules
 
         }
 
+        /// <summary>
+        /// Initialize feature diagram
+        /// </summary>
+        /// <param name="feature"></param>
+        /// <param name="document"></param>
         public virtual void Initialize(Feature feature, Document document)
         {
 
@@ -27,7 +35,7 @@ namespace Bb.Modules
                 document.Parent.Save(document);
             });
 
-            SetMemorize(_feature.Memorize);
+            SetMemorize(_feature.Memorize, _feature.Restore);
 
         }
 

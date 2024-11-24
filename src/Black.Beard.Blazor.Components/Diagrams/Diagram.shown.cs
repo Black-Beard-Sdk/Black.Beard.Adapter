@@ -1,5 +1,4 @@
 ﻿using Blazor.Diagrams;
-using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
@@ -84,7 +83,6 @@ namespace Bb.Diagrams
             }
         }
 
-
         private void ApplyLinks(Dictionary<Guid, PortModel> dicPort)
         {
             foreach (SerializableRelationship item in this.Relationships)
@@ -124,7 +122,6 @@ namespace Bb.Diagrams
             return link;
 
         }
-
 
         private void ApplyNodes(Dictionary<Guid, PortModel> dicPort, Dictionary<Guid, UIModel> dicNodes)
         {
@@ -179,9 +176,7 @@ namespace Bb.Diagrams
                 Relationships.Remove(item);
         }
 
-
         #endregion Load graphicalModel
-
 
         #region add/Remove
 
@@ -299,109 +294,7 @@ namespace Bb.Diagrams
 
         #endregion add/Remove
 
-
-        protected virtual void Diagram_Changed()
-        {
-            // CommandManager?.BeginTransaction("Diagram_Changed");
-        }
-
-        protected virtual void Node_Changed(Model model)
-        {
-            
-        }
-
-        protected virtual void Node_OrderChanged(SelectableModel model)
-        {
-
-        }
-
-        protected virtual void Node_SizeChanged(NodeModel model)
-        {
-
-        }
-
-        protected virtual void Node_Moved(MovableModel obj)
-        {
-            var items = GetUIChildren(new Guid(obj.Id));
-            if (items.Any())
-                foreach (var item in items)
-                    item.TriggerParentMoved(obj);
-
-            if (obj is UIModel ui && ui.Parent.HasValue)
-                 GetUI(ui.Parent.Value)?.UpdateDimensions();
-
-        }
-
-        protected virtual void Node_Moving(NodeModel obj)
-        {
-            var items = GetUIChildren(new Guid(obj.Id));
-            if (items.Any())
-                foreach (var item in items)
-                    item.TriggerParentMoving(obj);
-        }
-
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    if (_diagram != null)
-                    {
-                        _diagram.Nodes.Added -= Nodes_Added;
-                        _diagram.Nodes.Removed -= Nodes_Removed;
-                        _diagram.Links.Added -= Links_Added;
-                        _diagram.Links.Removed -= Links_Removed;
-
-                        foreach (var ui in _diagram.Nodes)
-                        {
-                            ui.Moving -= Node_Moving;
-                            ui.Moved -= Node_Moved;
-                        }
-
-                    }
-
-                }
-                disposedValue = true;
-            }
-        }
-
-
-        public UIGroupModel? GetParentByPosition(INodeModel model)
-        {
-
-            UIGroupModel parent = null;
-
-            var list = _diagram.Nodes
-                .OfType<UIGroupModel>()
-                .Where(c => c.ContainsPoint(model.Position)
-                         && model.CanAcceptLikeParent(c))
-                .ToList();
-
-            if (list.Any())
-                parent = list[0];
-
-            return parent;
-
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-
-        public bool TryGetUIModel(Guid id, out NodeModel? result)
-        {
-            var i = id.ToString().ToUpper();
-            result = this._diagram.Nodes.FirstOrDefault(c => c.Id == i);
-            return result != null;
-        }
-
         private BlazorDiagram _diagram;
-        private bool disposedValue;
         private Dictionary<Guid, LinkProperties> _links;
 
     }

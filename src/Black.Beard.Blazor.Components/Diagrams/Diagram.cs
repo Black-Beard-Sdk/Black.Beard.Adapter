@@ -1,8 +1,10 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb.Commands;
+using Bb.ComponentModel.Attributes;
 using Bb.Toolbars;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams;
 using Blazor.Diagrams.Core.Geometry;
+using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
 using MudBlazor;
 using System.Collections.Specialized;
@@ -212,6 +214,34 @@ namespace Bb.Diagrams
 
         }
 
+
+
+
+        public UIGroupModel? GetParentByPosition(INodeModel model)
+        {
+
+            UIGroupModel parent = null;
+
+            var list = _diagram.Nodes
+                .OfType<UIGroupModel>()
+                .Where(c => c.ContainsPoint(model.Position)
+                         && model.CanAcceptLikeParent(c))
+                .ToList();
+
+            if (list.Any())
+                parent = list[0];
+
+            return parent;
+
+        }
+
+        public bool TryGetUIModel(Guid id, out NodeModel? result)
+        {
+            var i = id.ToString().ToUpper();
+            result = this._diagram.Nodes.FirstOrDefault(c => c.Id == i);
+            return result != null;
+        }
+
         public IEnumerable<UIModel> GetUIChildren(Guid guid)
         {
             return _diagram.Nodes
@@ -319,16 +349,30 @@ namespace Bb.Diagrams
 
         #region propagate toolbox
 
+        /// <summary>
+        /// The toolbox will be dynamically and can change than the diagram is shown
+        /// </summary>
         public bool DynamicToolbox { get; }
 
+        /// <summary>
+        /// Return the toolbox
+        /// </summary>
         public DiagramToolbox Toolbox => _toolbox;
 
 
+        /// <summary>
+        /// Initialize the toolbox
+        /// </summary>
+        /// <param name="toolbox">toolbox to configure</param>
         public virtual void InitializeToolbox(DiagramToolbox toolbox)
         {
 
         }
 
+        /// <summary>
+        /// Return the toolbar
+        /// </summary>
+        /// <returns></returns>
         public Toolbars.ToolbarList GetToolbar()
         {
 
@@ -364,7 +408,10 @@ namespace Bb.Diagrams
 
         #endregion propagate toolbox
 
-
+        /// <summary>
+        /// Save method
+        /// </summary>
+        /// <param name="save"></param>
         protected void SetSave(Action<Diagram> save)
         {
 
@@ -385,42 +432,6 @@ namespace Bb.Diagrams
         }
 
 
-        public ICommandTransactionManager CommandManager { get; private set; }
-
-        public bool CanMemorize => this._memorize != null && CommandManager != null;
-
-        public MemorizerEnum Mode => MemorizerEnum.Global;
-
-        protected void SetMemorize(Action<object, Stream> save)
-        {
-            this._memorize = save;
-            CommandManager = new CommandTransactionManager(this);
-            CommandManager.Pause();
-        }
-
-
-
-        public virtual void Memorize(Stream stream)
-        {
-            this._memorize(this, stream);
-        }
-
-        public void Restore(CommandTransaction command)
-        {
-
-            // Load the diagram
-            // Compare with current and obtain differences
-
-            // remove new links
-            // Add removed nodes
-            // removed new nodes
-            // Add removed links
-
-            // Restore changed nodes
-            // Restore changed links
-
-        }
-
         #region DynamicDescriptorInstance
 
         public object GetProperty(string name)
@@ -437,11 +448,11 @@ namespace Bb.Diagrams
         #endregion DynamicDescriptorInstance
 
 
+
         public Point GetRelativeMousePoint(double clientX, double clientY)
         {
             return _diagram.GetRelativeMousePoint(clientX, clientY);
         }
-
 
         public Point GetRelativePoint(double clientX, double clientY)
         {
@@ -459,69 +470,56 @@ namespace Bb.Diagrams
             return _diagram.GetSelectedModels();
         }
 
-        #region OnChange
-
-        public event PropertyChangingEventHandler? PropertyChanging;
-        public event PropertyChangedEventHandler? PropertyChanged;
-        public event EventHandler<Diagram>? OnModelSaved;
-        public event NotifyCollectionChangedEventHandler? CollectionChanged;
-
-        protected void OnPropertyChanging(string propertyName)
+        /// <summary>
+        /// Dispose the diagram
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
         {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (_diagram != null)
+                    {
+                        _diagram.Nodes.Added -= Nodes_Added;
+                        _diagram.Nodes.Removed -= Nodes_Removed;
+                        _diagram.Links.Added -= Links_Added;
+                        _diagram.Links.Removed -= Links_Removed;
 
-            if (CommandManager?.Status == StatusTransaction.Waiting)
-                throw new InvalidOperationException("Transaction not initialized");
+                        foreach (var ui in _diagram.Nodes)
+                        {
+                            ui.Moving -= Node_Moving;
+                            ui.Moved -= Node_Moved;
+                        }
 
-            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
+                    }
 
+                    _models?.Unsubscribes();
+                    _relationships?.Unsubscribes();
+
+
+                }
+
+                disposedValue = true;
+
+            }
         }
 
-        protected void OnPropertyChanged(string propertyName)
+
+        public void Dispose()
         {
-
-            if (CommandManager?.Status == StatusTransaction.Waiting)
-                throw new InvalidOperationException("Transaction not initialized");
-
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
-        private void _relayCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (CommandManager?.Status == StatusTransaction.Waiting)
-                throw new InvalidOperationException("Transaction not initialized");
-
-            CollectionChanged?.Invoke(sender, e);
-
-        }
-
-        private void N_PropertyChanging(object? sender, PropertyChangingEventArgs e)
-        {
-            if (CommandManager?.Status == StatusTransaction.Waiting)
-                throw new InvalidOperationException("Transaction not initialized");
-
-            PropertyChanging?.Invoke(sender, e);
-
-        }
-
-        private void N_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-
-            if (CommandManager?.Status == StatusTransaction.Waiting)
-                throw new InvalidOperationException("Transaction not initialized");
-
-            PropertyChanged?.Invoke(sender, e);
-
-        }
-
-        #endregion OnChange
-
-
+        private bool disposedValue;
         private readonly DynamicDescriptorInstanceContainer _container;
         private readonly DiagramToolbox _toolbox;
         private ToolbarList _list;
         private ICommandMemorizer _command;
         private Action<object, Stream> _memorize;
+        private Func<Stream, Type, object> _restore;
         private string _name;
         private string _descriptions;
         private DiagramList<Guid, SerializableDiagramNode> _models;

@@ -5,20 +5,30 @@ using Bb.TypeDescriptors;
 namespace Bb.Modules.Bpms.Models
 {
 
+    /// <summary>
+    /// Diagram for bpms
+    /// </summary>
     public class BpmsDiagram : FeatureDiagram
     {
 
         public static Guid Key = new Guid("0E61164D-92C8-4A3E-8BD8-68EF1EAAB2BA");
 
+        /// <summary>
+        /// Initialize diagram
+        /// </summary>
         public BpmsDiagram()
             : base(Key, false)
         {
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="toolbox"></param>
         public override void InitializeToolbox(DiagramToolbox toolbox)
         {
-
+            base.InitializeToolbox(toolbox);
             toolbox
                   .Add(new SwimLaneTool())
                   .Add(new ActionTool())

@@ -1,9 +1,15 @@
-﻿using System;
-using System.Collections;
+﻿
 
-namespace Bb
+using System.Collections.Specialized;
+using System.ComponentModel;
+
+namespace Bb.Commands
 {
 
+
+    /// <summary>
+    /// Manages command transactions, allowing for commit and rollback operations.
+    /// </summary>
     public class CommandTransactionManager : ICommandTransactionManager
     {
 
@@ -13,29 +19,59 @@ namespace Bb
             _targetFolder = Path.GetTempPath();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandTransactionManager"/> class.
+        /// </summary>
+        /// <param name="folder"></param>
         public static void SetFolder(string folder)
         {
             _targetFolder = folder;
         }
 
         /// <summary>
-        /// Initialize a new transaction manager
+        /// Initializes a new instance of the <see cref="CommandTransactionManager"/> class.
         /// </summary>
+        /// <param name="targetFolder">The target folder where transaction data will be stored.</param>
         public CommandTransactionManager(ICommandMemorizer target)
         {
-            this._target = target;
+
+            _target = target;
             _forUndo = new Stack<CommandTransaction>();
-            _forUndoView = new CommandTransationViewList();
+            _forUndoView = new CommandTransactionViewList();
 
             _forRedo = new Stack<CommandTransaction>();
-            _forRedoView = new CommandTransationViewList();
+            _forRedoView = new CommandTransactionViewList();
 
-            this.Sessionid = "_cmd_" + Guid.NewGuid().ToString().Replace("-", "");
-            var folder = _targetFolder.Combine(this.Sessionid).AsDirectory();
+            Sessionid = "_cmd_" + Guid.NewGuid().ToString().Replace("-", "");
+            var folder = _targetFolder.Combine(Sessionid).AsDirectory();
             TargetFolder = folder.FullName;
 
+            if (target is INotifyCollectionChanged n)
+                n.CollectionChanged += N_CollectionChanged;
+
+            if (target is INotifyPropertyChanged p)
+                p.PropertyChanged += P_PropertyChanged;
+           
         }
 
+        private void P_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (Status == StatusTransaction.Waiting)
+                throw new InvalidOperationException("Transaction not initialized");
+        }
+
+        private void N_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (Status == StatusTransaction.Waiting)
+                throw new InvalidOperationException("Transaction not initialized");
+        }
+
+        /// <summary>
+        /// Begin a new transaction. If the result is null, the transaction manager is paused.
+        /// </summary>
+        /// <param name="label">Label to show for describes the updates</param>
+        /// <param name="command"></param>
+        /// <returns></returns>
         public bool Scope(string label, out CommandTransaction command)
         {
             bool resultBool = false;
@@ -54,6 +90,10 @@ namespace Bb
 
         }
 
+        /// <summary>
+        /// Put the transaction manager on pause
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         public void Pause()
         {
 
@@ -72,6 +112,9 @@ namespace Bb
 
         }
 
+        /// <summary>
+        /// Re active the transaction manager
+        /// </summary>
         public void Resume()
         {
 
@@ -81,9 +124,6 @@ namespace Bb
             }
 
         }
-
-        public StatusTransaction Status { get; private set; }
-
 
         /// <summary>
         /// Begin a new transaction. If the result is null, the transaction manager is paused.
@@ -99,13 +139,13 @@ namespace Bb
             using (var l = _lock.LockForUpgradeableRead())
             {
 
-                if (this.Status == StatusTransaction.InPause)
+                if (Status == StatusTransaction.InPause)
                     return null;
 
                 if (_currentTransaction != null)
                     throw new InvalidOperationException("transaction already began");
 
-                var trans = new CommandTransaction(this, name, this._forUndo.Count + 1);
+                var trans = new CommandTransaction(this, name, _forUndo.Count + 1);
                 trans.InitializeValue(_target);
 
                 using (_lock.LockForWrite())
@@ -120,10 +160,6 @@ namespace Bb
 
         }
 
-        public CommandTransationViewList UndoList => _forUndoView;
-
-        public CommandTransationViewList RedoList => _forRedoView;
-
         /// <summary>
         /// Commit current transaction
         /// </summary>
@@ -134,7 +170,7 @@ namespace Bb
             {
                 _currentTransaction?.Commit();
                 _forUndo.Push(_currentTransaction);
-                _forUndoView.Add(_currentTransaction.GetView());
+                _forUndoView.Push(_currentTransaction.GetView());
                 _currentTransaction = null;
                 _forRedo.Clear();
                 Status = StatusTransaction.Waiting;
@@ -223,10 +259,10 @@ namespace Bb
                         {
                             var c = _forUndo.Pop();
                             _forUndoView.Pop();
-                            if (this._target.Mode == MemorizerEnum.Snapshot || index == c.Index)
+                            if (_target.Mode == MemorizerEnum.Snapshot || index == c.Index)
                                 _target.Restore(c);
                             _forRedo.Push(c);
-                            _forRedoView.Add(c.GetView());
+                            _forRedoView.Push(c.GetView());
                         }
 
                     }
@@ -268,10 +304,10 @@ namespace Bb
                         {
                             var c = _forRedo.Pop();
                             _forRedoView.Pop();
-                            if (this._target.Mode == MemorizerEnum.Snapshot || index == c.Index)
+                            if (_target.Mode == MemorizerEnum.Snapshot || index == c.Index)
                                 _target.Restore(c);
                             _forUndo.Push(c);
-                            _forUndoView.Add(c.GetView());
+                            _forUndoView.Push(c.GetView());
                         }
                     }
                     finally
@@ -292,11 +328,6 @@ namespace Bb
             Redo(cmd.Index);
         }
 
-        /// <summary>
-        /// Return number of transaction stored and waiting for undo states.
-        /// </summary>
-        public int UndoCount => _forUndo.Count;
-  
 
         void ICommandTransactionManager.Reset()
         {
@@ -308,18 +339,35 @@ namespace Bb
             _forRedoView.Clear();
         }
 
-        private CommandTransaction _currentTransaction;
 
+        public StatusTransaction Status { get; private set; }
+
+        public CommandTransactionViewList UndoList => _forUndoView;
+
+        public CommandTransactionViewList RedoList => _forRedoView;
+
+        /// <summary>
+        /// Return number of transaction stored and waiting for undo states.
+        /// </summary>
+        public int UndoCount => _forUndo.Count;
+
+        /// <summary>
+        /// Unique session id
+        /// </summary>
         public string Sessionid { get; }
 
-        internal string TargetFolder { get; }
+        /// <summary>
+        /// Gets the target folder where transaction data is stored.
+        /// </summary>
+        public string TargetFolder { get; }
 
+        private CommandTransaction _currentTransaction;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private readonly ICommandMemorizer _target;
         private Stack<CommandTransaction> _forUndo;
-        private readonly CommandTransationViewList _forUndoView;
+        private readonly CommandTransactionViewList _forUndoView;
         private Stack<CommandTransaction> _forRedo;
-        private readonly CommandTransationViewList _forRedoView;
+        private readonly CommandTransactionViewList _forRedoView;
         private int _currentIndex = 0;
         private static string _targetFolder;
 
