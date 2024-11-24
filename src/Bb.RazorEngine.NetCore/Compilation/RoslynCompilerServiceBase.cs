@@ -200,7 +200,7 @@ namespace RazorEngine.Roslyn.CSharp
             var sourceCode = GetCodeCompileUnit(context);
             var assemblyName = GetAssemblyName(context);
 
-            (new PermissionSet(PermissionState.Unrestricted)).Assert();
+            //(new PermissionSet(PermissionState.Unrestricted)).Assert();
             var tempDir = GetTemporaryDirectory();
 
             var sourceCodeFile = Path.Combine(tempDir, String.Format("{0}.{1}", assemblyName, SourceFileExtension));

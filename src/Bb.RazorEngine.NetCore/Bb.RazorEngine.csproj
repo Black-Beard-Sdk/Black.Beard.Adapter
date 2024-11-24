@@ -54,7 +54,7 @@
 
     <PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.2.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="2.2.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.35" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.36" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
 
     <PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.2.0" Condition="'$(TargetFramework)' == 'net461'" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="2.2.0" Condition="'$(TargetFramework)' == 'net461'" />
@@ -66,9 +66,6 @@
 
 		<PackageReference Include="System.Security.Permissions" Version="4.5.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
 		<PackageReference Include="System.Security.Permissions" Version="4.5.0" Condition="'$(TargetFramework)' == 'netcoreapp2.2'" />
-		<PackageReference Include="System.Security.Permissions" Version="4.7.0" Condition="'$(TargetFramework)' == 'netcoreapp3.1'" />
-		<PackageReference Include="System.Security.Permissions" Version="4.7.0" Condition="'$(TargetFramework)' == 'net5.0'" />
-		<PackageReference Include="System.Security.Permissions" Version="6.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
 		<PackageReference Include="System.Security.Permissions" Version="4.5.0" Condition="'$(TargetFramework)' == 'net461'" />
 
 

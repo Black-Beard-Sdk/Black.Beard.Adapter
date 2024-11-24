@@ -65,7 +65,7 @@ namespace RazorEngine.Compilation
         [SecurityCritical]
         private void MessagePumpWithoutExecutionContext()
         {
-            (new PermissionSet(PermissionState.Unrestricted)).Assert();
+            //(new PermissionSet(PermissionState.Unrestricted)).Assert();
             try
             {
                 Thread.CurrentPrincipal = null;
@@ -223,7 +223,7 @@ namespace RazorEngine.Compilation
         [SecuritySafeCritical]
         public void Dispose()
         {
-            (new PermissionSet(PermissionState.Unrestricted)).Assert();
+            //(new PermissionSet(PermissionState.Unrestricted)).Assert();
             if (t.IsAlive)
             {
                 t.Abort();

@@ -20,7 +20,7 @@
     <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.123" />
     <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.123" />
     <PackageReference Include="Black.Beard.Helpers" Version="2.0.43" />
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.7.8" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
     <PackageReference Include="MudBlazor" Version="7.10.0" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />

@@ -51,7 +51,7 @@ namespace RazorEngine.Compilation
         [SecuritySafeCritical]
         public void DeleteAll()
         {
-            (new PermissionSet(PermissionState.Unrestricted)).Assert();
+            //(new PermissionSet(PermissionState.Unrestricted)).Assert();
             if (tmpFolder != null)
             {
                 try

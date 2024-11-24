@@ -115,7 +115,7 @@
             [SecuritySafeCritical]
             public object GetResult(Invocation invocation)
             {
-                (new PermissionSet(PermissionState.Unrestricted)).Assert();
+                //(new PermissionSet(PermissionState.Unrestricted)).Assert();
                 object result = null;
                 string name = invocation.Name.Name;
                 object[] args = invocation.Args;
