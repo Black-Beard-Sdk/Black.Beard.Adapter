@@ -73,6 +73,7 @@ namespace Bb.Diagrams
 
             if (result != null)
             {
+                model.SetUI(result);
                 result.SetAvailableParents(_parentTypes, false);
                 result.Source.SetDiagram(diagram);
                 diagram.AddNode(result);
@@ -87,7 +88,7 @@ namespace Bb.Diagrams
 
             SerializableDiagramNode model = Create();            
             model.Uuid = uuid.HasValue ? uuid.Value : Guid.NewGuid();
-            model.Title = name;
+            model.Label = name;
             model.Position = new Position(x, y);
             model.Initialize(this, true);
         

@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.123" />
     <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.123" />
-    <PackageReference Include="Black.Beard.Helpers" Version="2.0.43" />
+    <PackageReference Include="Black.Beard.Helpers" Version="2.0.46" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
   </ItemGroup>

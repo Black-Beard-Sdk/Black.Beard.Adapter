@@ -22,7 +22,7 @@ namespace Bb.PropertyGrid
 
         public PropertyGridView()
         {
-
+            _dynamicProperties = new Dictionary<string, Func<object>>();
         }
 
         [Inject]
@@ -68,7 +68,15 @@ namespace Bb.PropertyGrid
             };
 
             this.Descriptor.PropertyHasChanged = this.SubPropertyHasChanged;
-            StateHasChanged();
+
+            try
+            {
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+
+            }
 
         }
 
@@ -89,6 +97,22 @@ namespace Bb.PropertyGrid
                 _selectedObject = value;
                 Update();
             }
+        }
+
+
+
+        public void AddDynamicProperty(string key, Func<object> func)
+        {
+            if (_dynamicProperties.ContainsKey(key))
+                _dynamicProperties[key] = func;
+            else
+                _dynamicProperties.Add(key, func);
+        }
+
+        internal void BuildDynamicParameter(Dictionary<string, object> result)
+        {
+            foreach (var item in _dynamicProperties)
+                result.Add(item.Key, item.Value());
         }
 
 
@@ -145,6 +169,7 @@ namespace Bb.PropertyGrid
         MudForm form;
         private object _selectedObject;
         private Func<PropertyObjectDescriptor, bool> _propertyFilter = c => true;
+        private Dictionary<string, Func<object>> _dynamicProperties;
 
     }
 

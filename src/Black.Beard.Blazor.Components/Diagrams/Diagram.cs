@@ -16,7 +16,8 @@ namespace Bb.Diagrams
 
     public partial class Diagram
         : IValidationService
-        , ICommandMemorizer
+        , IMemorizer
+        , IRestorableModel
         , IDynamicDescriptorInstance
         , IDiagramToolBoxProvider
         , INotifyPropertyChanging
@@ -31,10 +32,10 @@ namespace Bb.Diagrams
             {
 
                 c.RemoveProperties
-               (
+                (
 
 
-               );
+                );
 
                 c.Property(u => u.SuspendRefresh, i =>
                 {
@@ -84,7 +85,7 @@ namespace Bb.Diagrams
 
                 c.RemoveProperties
                 (
-                    "DynamicToolbox"
+                    nameof(Diagram.DynamicToolbox)
                 );
 
             });
@@ -101,8 +102,6 @@ namespace Bb.Diagrams
             this.TypeModelId = typeModelId;
             Models = new DiagramList<Guid, SerializableDiagramNode>();
             Relationships = new DiagramList<Guid, SerializableRelationship>();
-            _links = new Dictionary<Guid, LinkProperties>();
-
         }
 
         /// <summary>
@@ -192,32 +191,37 @@ namespace Bb.Diagrams
 
             if (string.IsNullOrEmpty(name))
             {
-                var currentNames = new HashSet<string>(Models.Select(c => c.Title));
+                var currentNames = new HashSet<string>(Models.Select(c => c.Label));
                 int count = 1;
                 while (currentNames.Contains(name = $"{specification.GetDefaultName()}{count}"))
                     count++;
             }
 
-            var result = specification.CreateModel(this, x, y, name, uuid);
-            _models.Add(result);
-
-            if (_diagram != null)
+            using (var trans = this.CommandManager.BeginTransaction(Mode.Recording, $"Add {name}".Trim()))
             {
-                var ui = specification.CreateUI(result, this);
-                var parent = this.GetParentByPosition(ui);
-                if (parent != null)
-                    parent.AddChildren(ui);
+
+                var result = specification.CreateModel(this, x, y, name, uuid);
+                _models.Add(result);
+
+                if (_diagram != null)
+                {
+                    var ui = specification.CreateUI(result, this);
+                    var parent = this.GetParentByPosition(ui);
+                    if (parent != null)
+                        parent.AddChildren(ui);
+
+                }
+
+                trans.Commit();
+
+                return result;
 
             }
-
-            return result;
 
         }
 
 
-
-
-        public UIGroupModel? GetParentByPosition(INodeModel model)
+        public UIGroupModel? GetParentByPosition(UIModel model)
         {
 
             UIGroupModel parent = null;
@@ -234,14 +238,7 @@ namespace Bb.Diagrams
             return parent;
 
         }
-
-        public bool TryGetUIModel(Guid id, out NodeModel? result)
-        {
-            var i = id.ToString().ToUpper();
-            result = this._diagram.Nodes.FirstOrDefault(c => c.Id == i);
-            return result != null;
-        }
-
+     
         public IEnumerable<UIModel> GetUIChildren(Guid guid)
         {
             return _diagram.Nodes
@@ -517,9 +514,9 @@ namespace Bb.Diagrams
         private readonly DynamicDescriptorInstanceContainer _container;
         private readonly DiagramToolbox _toolbox;
         private ToolbarList _list;
-        private ICommandMemorizer _command;
+        private IMemorizer _command;
         private Action<object, Stream> _memorize;
-        private Func<Stream, Type, object> _restore;
+        private Func<Stream, Type, object> _load;
         private string _name;
         private string _descriptions;
         private DiagramList<Guid, SerializableDiagramNode> _models;

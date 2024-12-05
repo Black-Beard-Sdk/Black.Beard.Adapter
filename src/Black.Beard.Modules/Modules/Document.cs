@@ -50,7 +50,7 @@ namespace Bb.Modules
                 if (Feature.LoadDocument(this, out var result))
                 {
 
-                    if (result is ICommandMemorizer m)
+                    if (result is IMemorizer m)
                         m.CommandManager?.Reset();
 
                     return result;

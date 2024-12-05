@@ -1,15 +1,28 @@
-﻿using Bb.TypeDescriptors;
+﻿using Bb.Commands;
+using Bb.TypeDescriptors;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.ComponentModel;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
 {
 
 
-    public class Properties : List<Property>
+    public class Properties
+        : List<Property>
+        , IRestorableModel
         , INotifyPropertyChanging
         , INotifyPropertyChanged
     {
+
+        [JsonIgnore]
+        public Guid Uuid { get; private set; }
+
+        internal void SetUuid(Guid value)
+        {
+            Uuid = value;
+        }
 
         public Properties()
         {
@@ -46,7 +59,7 @@ namespace Bb.Diagrams
         }
 
         private bool SetValue(string name, string? value)
-        {      
+        {
 
             if (!string.IsNullOrEmpty(value))
             {
@@ -65,7 +78,6 @@ namespace Bb.Diagrams
             SetProperty(item.Name, item.Value);
         }
 
-
         public string? GetProperty(string name)
         {
             var property = this.FirstOrDefault(c => c.Name == name);
@@ -74,17 +86,21 @@ namespace Bb.Diagrams
             return null;
         }
 
-
         public bool PropertyExists(string name)
         {
             return this.Any(c => c.Name == name);
+        }
+
+        public bool TryGetValue(string name, out Property? property)
+        {
+            property = this.FirstOrDefault(c => c.Name == name);
+            return property != null;
         }
 
         public bool ValueAsDifferentOf(string name, string? value)
         {
             return this.Any(c => c.Name == name && c.Value == value);
         }
-
 
         public void CopyFrom(DynamicDescriptorInstanceContainer container)
         {
@@ -120,6 +136,53 @@ namespace Bb.Diagrams
 
         }
 
+        public bool Restore(object model, RefreshContext context, RefreshStrategy strategy = RefreshStrategy.All)
+        {
+
+            bool result = false;
+
+            var m = model as Properties;
+
+            if (strategy.HasFlag(RefreshStrategy.Remove))
+            {
+                var l = this.ToList();
+                foreach (var item in l)
+                    if (!m.PropertyExists(item.Name))
+                    {
+                        OnPropertyChanging(item.Name);
+                        Remove(item);
+                        OnPropertyChanged(item.Name);
+                        result = true;
+                    }
+            }
+
+            if (strategy.HasFlag(RefreshStrategy.Update))
+                foreach (var item in m)
+                    if (TryGetValue(item.Name, out var value))
+                        if (item.Value != value.Value)
+                        {
+                            OnPropertyChanging(item.Name);
+                            SetProperty(item);
+                            OnPropertyChanged(item.Name);
+                            result = true;
+                        }
+
+            if (strategy.HasFlag(RefreshStrategy.Add))
+                foreach (var item in m)
+                    if (!this.PropertyExists(item.Name))
+                    {
+                        OnPropertyChanging(item.Name);
+                        Add(item);
+                        OnPropertyChanged(item.Name);
+                        result = true;
+                    }
+
+            if (result)
+                context.Add(this.Uuid, null, RefreshStrategy.Update);
+
+            return result;
+
+        }
 
         #region OnChange
 
@@ -145,6 +208,26 @@ namespace Bb.Diagrams
 
         #endregion OnChange
 
+        public override bool Equals(object? obj)
+        {
+
+            if (obj is Properties p)
+            {
+                if (p.Count == this.Count)
+                {
+                    foreach (var item in this)
+                    {
+                        if (!p.PropertyExists(item.Name))
+                            return false;
+                        if (p.GetProperty(item.Name) != item.Value)
+                            return false;
+                    }
+                    return true;
+                }
+            }
+
+            return base.Equals(obj);
+        }
 
     }
 

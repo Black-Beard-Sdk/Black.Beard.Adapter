@@ -1,4 +1,5 @@
-﻿using Bb.ComponentDescriptors;
+﻿using Bb.Commands;
+using Bb.ComponentDescriptors;
 using Bb.ComponentModel.Translations;
 using Bb.PropertyGrid;
 using Microsoft.AspNetCore.Components;
@@ -10,13 +11,17 @@ namespace Bb.Editors
     public partial class EditorComponent : ComponentBase, ITranslateHost, IDisposable
     {
 
+        public EditorComponent()
+        {
+            
+        }
 
         [CascadingParameter]
         MudDialogInstance MudDialog { get; set; }
 
 
         [Parameter]
-        public EditorResultComponent Actions { get; set;}
+        public EditorResultComponent Actions { get; set; }
 
         public string Title { get => MudDialog.Title; }
 
@@ -26,8 +31,8 @@ namespace Bb.Editors
 
 
         [Parameter]
-        public object SelectedObject 
-        { 
+        public object SelectedObject
+        {
             get
             {
                 return _selectedObject;

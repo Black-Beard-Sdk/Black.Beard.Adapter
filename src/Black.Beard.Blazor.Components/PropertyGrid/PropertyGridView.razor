@@ -18,10 +18,11 @@
                         <MudExpansionPanel Text="@TranslateService.Translate(category)" IsExpanded="true">
                             @foreach (PropertyObjectDescriptor property in Descriptor.ItemsByCategories(category))
                             {
-                                <DynamicPropertyComponent Property="@property"
-                                                          Model="@SelectedObject"
-                                                          CurrentVariant="@CurrentVariant"
-                                                          CurrentMargin="@CurrentMargin" />
+                                <DynamicPropertyComponent Parent="@this"
+                                    Property="@property"
+                                    Model="@SelectedObject"
+                                    CurrentVariant="@CurrentVariant"
+                                    CurrentMargin="@CurrentMargin" />
                             }
                         </MudExpansionPanel>
 
@@ -31,10 +32,12 @@
                 {
                     @foreach (PropertyObjectDescriptor property in Descriptor.Items)
                     {
-                        <DynamicPropertyComponent Property="@property"
-                                                  Model="@SelectedObject"
-                                                  CurrentVariant="@CurrentVariant"
-                                                  CurrentMargin="@CurrentMargin" />
+                        <DynamicPropertyComponent 
+                            Parent="@this"
+                            Property="@property"
+                            Model="@SelectedObject"
+                            CurrentVariant="@CurrentVariant"
+                            CurrentMargin="@CurrentMargin" />
                     }
                 }
 

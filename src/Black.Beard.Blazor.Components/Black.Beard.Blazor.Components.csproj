@@ -9,17 +9,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AsyncLockSlim\**" />
     <Compile Remove="CustomComponents\**" />
+    <Compile Remove="Diagnostics\**" />
     <Compile Remove="Folders\**" />
+    <Content Remove="AsyncLockSlim\**" />
     <Content Remove="CustomComponents\**" />
+    <Content Remove="Diagnostics\**" />
     <Content Remove="Folders\**" />
+    <EmbeddedResource Remove="AsyncLockSlim\**" />
     <EmbeddedResource Remove="CustomComponents\**" />
+    <EmbeddedResource Remove="Diagnostics\**" />
     <EmbeddedResource Remove="Folders\**" />
+    <None Remove="AsyncLockSlim\**" />
     <None Remove="CustomComponents\**" />
+    <None Remove="Diagnostics\**" />
     <None Remove="Folders\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Commands\AsyncReaderWriterLockSlim.cs" />
+    <Compile Remove="Commands\AsyncReaderWriterLockSlimExtension.cs" />
+    <Compile Remove="Commands\TimeUtils.cs" />
     <Compile Remove="Diagrams\InstanceJsonConverter.cs" />
     <Compile Remove="Diagrams\Toolbox.razor.cs" />
     <Compile Remove="Diagrams\ToolboxList.cs" />
@@ -40,10 +51,10 @@
   <ItemGroup>
     <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.123" />
     <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.123" />
-    <PackageReference Include="Black.Beard.Helpers" Version="2.0.43" />
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.43" />
+    <PackageReference Include="Black.Beard.Helpers" Version="2.0.46" />
+    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.46" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
-    <PackageReference Include="MudBlazor" Version="7.10.0" />
+    <PackageReference Include="MudBlazor" Version="7.15.0" />
     <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.2" />
   </ItemGroup>
 	

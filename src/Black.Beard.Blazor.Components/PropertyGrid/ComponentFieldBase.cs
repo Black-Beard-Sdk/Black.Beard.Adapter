@@ -1,4 +1,5 @@
-﻿using Bb.ComponentDescriptors;
+﻿using Bb.Commands;
+using Bb.ComponentDescriptors;
 using Bb.ComponentModel.Translations;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -27,6 +28,11 @@ namespace Bb.PropertyGrid
             }
         }
 
+
+        [Parameter]
+        public ITransactionManager TransactionManager { get; set; }
+
+
         public virtual string? ValueString { get; set; }
 
 
@@ -50,6 +56,7 @@ namespace Bb.PropertyGrid
 
 
         public InputType InputType { get; set; }
+
 
         protected virtual void PropertyChange()
         {

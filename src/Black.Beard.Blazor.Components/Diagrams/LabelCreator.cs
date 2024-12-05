@@ -36,7 +36,7 @@ namespace Bb.Diagrams
 
         internal LinkLabelModel Create(LinkModel link)
         {
-            return new CustomizedLinkLabelModel(link, this);
+            return new UILinkLabelModel(link, this);
         }
 
         private Func<string> _function;

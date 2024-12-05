@@ -4,10 +4,10 @@ using Blazor.Diagrams.Core.Models.Base;
 namespace Bb.Diagrams
 {
 
-    public class CustomizedLinkLabelModel : LinkLabelModel
+    public class UILinkLabelModel : LinkLabelModel
     {
 
-        public CustomizedLinkLabelModel(BaseLinkModel parent, LabelCreator creator)
+        public UILinkLabelModel(BaseLinkModel parent, LabelCreator creator)
             : this(parent, creator.Id, creator.Refresh(), creator.Distance, creator.Point) 
         {
          
@@ -17,7 +17,7 @@ namespace Bb.Diagrams
             this.Offset = creator.Point;
         }
 
-        public CustomizedLinkLabelModel(BaseLinkModel parent, Guid id, string content, double? distance = null, Blazor.Diagrams.Core.Geometry.Point? offset = null) 
+        public UILinkLabelModel(BaseLinkModel parent, Guid id, string content, double? distance = null, Blazor.Diagrams.Core.Geometry.Point? offset = null) 
             : base(parent, id.ToString(), content, distance, offset)
         {
 

@@ -254,8 +254,18 @@ namespace Bb.Addons
 
         public virtual object Restore(Stream stream, Type targetType)
         {
-            var options = GetJsonSerializerOptions() ?? new JsonSerializerOptions();
-            return stream.Deserialize(targetType, options);
+
+            try
+            {
+                var options = GetJsonSerializerOptions() ?? new JsonSerializerOptions();
+                return stream.Deserialize(targetType, options);
+            }
+            finally
+            {
+                stream.Close();
+                stream.Dispose();
+            }
+        
         }
 
         #endregion In/Out

@@ -87,6 +87,8 @@ namespace Bb.Diagrams
             var m = new LinkProperties(relationship, link);
             link.PathGenerator = GetPathGenerator();
             link.Router = GetRouter();
+            relationship.SetUI(link);
+            relationship.SetProperties(m);
             return m;
         }
 
@@ -112,7 +114,7 @@ namespace Bb.Diagrams
         }
 
 
-        internal protected virtual void Customize(LinkProperties link)
+        internal protected virtual LinkProperties Customize(LinkProperties link)
         {
 
             if (_sourceMarker != null)
@@ -122,6 +124,8 @@ namespace Bb.Diagrams
                 link.UILink.TargetMarker = _targetMarker;
 
             link.SetLabels(_models);
+
+            return link;
 
         }
 

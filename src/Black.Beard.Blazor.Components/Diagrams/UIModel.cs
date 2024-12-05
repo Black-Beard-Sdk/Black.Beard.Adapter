@@ -4,7 +4,6 @@ using Blazor.Diagrams.Core.Models.Base;
 using Bb.TypeDescriptors;
 using Bb.ComponentModel.Attributes;
 using System.ComponentModel;
-using Microsoft.Extensions.Options;
 using System.Text.Json;
 using Bb.Commands;
 
@@ -23,6 +22,13 @@ namespace Bb.Diagrams
 
         static UIModel()
         {
+
+            //DynamicTypeDescriptionProvider.Configure<UIModel>(c =>
+            //{
+
+            //});
+
+
             _typeToExcludes = new List<Type>()
             {
                 typeof(Model),
@@ -58,7 +64,7 @@ namespace Bb.Diagrams
                 this.Position = new Point(source.Position.X, source.Position.Y);
             if (source.Size != null)
                 this.Size = new Size(source.Size.Width, source.Size.Height);
-            this.Title = Source.Title;
+            this.Title = Source.Label;
 
             CreatePort();
 
@@ -91,38 +97,51 @@ namespace Bb.Diagrams
         protected virtual void UIModel_Moved(MovableModel model)
         {
 
-            if (Position != null || Source.Position.Y != Position.Y || Source.Position.X != Position.X)
-                Source.Position = new Position(Position.X, Position.Y);
-
+            
             var d = this.Source.GetDiagram<Diagram>();
             if (d.CommandManager != null)
             {
-                if (d.CommandManager.Status == StatusTransaction.Recoding)
+
+                using (var trans = d.CommandManager.BeginTransaction(Mode.Recording, $"{model.GetLabel()}"))
                 {
-                    d.CommandManager.Commit();
+
+                    if (Position != null || Source.Position.Y != Position.Y || Source.Position.X != Position.X)
+                        Source.Position = new Position(Position.X, Position.Y);
+
+                    trans.Commit();
+
                 }
+
             }
 
         }
 
         protected virtual void UIModel_Moving(NodeModel model)
         {
-            var d = this.Source.GetDiagram<Diagram>();
-            if (d.CommandManager != null)
-            {
-                if (d.CommandManager.Status == StatusTransaction.Waiting)
-                {
-                    d.CommandManager.BeginTransaction($"move {this.Source.Title}");
-                }
-            }
+            //var d = this.Source.GetDiagram<Diagram>();
+            //if (d.CommandManager != null)
+            //{
+            //    if (d.CommandManager.Status == StatusTransaction.Waiting)
+            //    {
+            //        d.CommandManager.BeginTransaction($"move {this.Source.Title}");
+            //    }
+            //}
         }
 
         protected virtual void UIModel_SizeChanged(NodeModel obj)
         {
             if (Size != null || Source.Size.Height != Size.Height || Source.Size.Width != Size.Width)
-                Source.Size = new Size(Size.Width, Size.Height);
-        }
+            {
+                using (var trans = this.Source.GetDiagram<Diagram>().CommandManager.BeginTransaction(Mode.Recording, $"{obj.Title} has resized".Trim()))
+                {
+                    Source.Size = new Size(Size.Width, Size.Height);
+                    trans.Commit();
+                }
 
+            }
+
+        }
+            
         public virtual void InitializeFirst(DiagramToolNode diagramToolNodeBase)
         {
 
@@ -180,6 +199,20 @@ namespace Bb.Diagrams
 
 
         #region Parent
+
+
+        public string Label
+        {
+            get => Source.Label;
+            set
+            {
+                if (Source.Label != value)
+                {
+                    Source.Label = value;
+                    OnPropertyChanged(nameof(Label));
+                }
+            }
+        }
 
         public Guid? Parent => this.Source.UuidParent;
 

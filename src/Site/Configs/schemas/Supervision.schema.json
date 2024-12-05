@@ -1,0 +1,15 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://black.beard.com/schema/Supervision",
+  "type": "object",
+  "properties": {
+    "Supervision": {
+      "type": "object",
+      "properties": {
+        "WithTelemetry": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

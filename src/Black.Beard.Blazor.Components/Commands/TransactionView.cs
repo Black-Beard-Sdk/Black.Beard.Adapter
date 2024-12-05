@@ -4,13 +4,13 @@
     /// <summary>
     /// Represents a view of a command transaction.
     /// </summary>
-    public class CommandTransactionView
+    public class TransactionView
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandTransactionView"/> class.
+        /// Initializes a new instance of the <see cref="TransactionView"/> class.
         /// </summary>
         /// <param name="transaction">The command transaction to create a view for.</param>
-        public CommandTransactionView(CommandTransaction transaction)
+        public TransactionView(Transaction transaction)
         {
             Index = transaction.Index;
             Label = transaction.Label;

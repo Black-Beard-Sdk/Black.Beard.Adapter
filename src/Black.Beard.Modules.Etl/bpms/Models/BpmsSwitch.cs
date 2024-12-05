@@ -15,16 +15,14 @@ namespace Bb.Modules.Bpms.Models
 
                 c.RemoveProperties
                 (
-                    "ControlledSize",
-                    "Parent",
-                    "CanBeOrphaned",
-                    "Selected",
-                    "Uuid",
-                    "Id",
-                    "Locked",
-                    "Visible",
-                    "DynamicToolbox"
-
+                    nameof(BpmsSwitch.ControlledSize),
+                    nameof(BpmsSwitch.Parent),
+                    nameof(BpmsSwitch.CanBeOrphaned),
+                    nameof(BpmsSwitch.Selected),
+                    nameof(BpmsSwitch.Id),
+                    nameof(BpmsSwitch.Locked),
+                    nameof(BpmsSwitch.Visible),
+                    nameof(BpmsSwitch.Title)
                 );
             });
 

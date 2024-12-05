@@ -3,7 +3,6 @@ using Blazor.Diagrams.Core.Models.Base;
 using Bb.TypeDescriptors;
 using Bb.ComponentModel.Attributes;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace Bb.Diagrams
@@ -80,7 +79,7 @@ namespace Bb.Diagrams
         {
 
             bool hasChanged = false;
-            foreach (CustomizedLinkLabelModel item in this.UILink.Labels)
+            foreach (UILinkLabelModel item in this.UILink.Labels)
             {
                 if (item.Update())
                     hasChanged = true;
@@ -105,12 +104,6 @@ namespace Bb.Diagrams
         public SerializableRelationship Source { get; }
 
         public LinkModel UILink { get; }
-
-
-        [JsonIgnore]
-        public Blazor.Diagrams.Core.Diagram Diagram { get; internal set; }
-
-        public Diagram Model { get; internal set; }
 
         [JsonIgnore]
         public Guid Uuid => Source.Uuid;

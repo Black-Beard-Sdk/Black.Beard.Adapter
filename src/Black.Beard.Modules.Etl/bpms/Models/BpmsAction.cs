@@ -1,5 +1,6 @@
 ﻿using Bb.Diagrams;
 using Bb.TypeDescriptors;
+using Blazor.Diagrams.Core.Models;
 
 namespace Bb.Modules.Bpms.Models
 {
@@ -14,15 +15,14 @@ namespace Bb.Modules.Bpms.Models
 
                 c.RemoveProperties
                 (
-                    "ControlledSize",
-                    "Parent",
-                    "CanBeOrphaned",
-                    "Selected",
-                    "Uuid",
-                    "Id",
-                    "Locked",
-                    "Visible",
-                    "DynamicToolbox"
+                    nameof(BpmsAction.ControlledSize),
+                    nameof(BpmsAction.Parent),
+                    nameof(BpmsAction.CanBeOrphaned),
+                    nameof(BpmsAction.Selected),
+                    nameof(BpmsAction.Id),
+                    nameof(BpmsAction.Locked),
+                    nameof(BpmsAction.Visible),
+                    nameof(BpmsAction.Title)
 
                 );
             });

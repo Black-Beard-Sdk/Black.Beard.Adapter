@@ -1,4 +1,5 @@
-﻿using Bb.ComponentDescriptors;
+﻿using Bb.Commands;
+using Bb.ComponentDescriptors;
 using Bb.ComponentModel.Translations;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -13,6 +14,9 @@ namespace Bb.PropertyGrid
         {
 
         }
+
+        [Parameter]
+        public PropertyGridView Parent { get; set; }
 
         [Parameter]
         public object Model 
@@ -55,12 +59,15 @@ namespace Bb.PropertyGrid
         {
             get
             {
+                
                 var result = new Dictionary<string, object>()
                 {
                     { "CurrentVariant", CurrentVariant },
                     { "CurrentMargin", CurrentMargin },
                     { "Property", Property },
                 };
+
+                Parent?.BuildDynamicParameter(result);
 
                 return result;
 

@@ -1,4 +1,5 @@
-﻿using Bb.ComponentDescriptors;
+﻿using Bb.Commands;
+using Bb.ComponentDescriptors;
 using Bb.Expressions;
 
 namespace Bb.PropertyGrid
@@ -39,8 +40,9 @@ namespace Bb.PropertyGrid
             {
 
                 if (value == null)
+                {
                     this.Value = default(T);
-
+                }
                 else
                 {
                     if (ConvertFromString(value, out var result))
@@ -58,63 +60,6 @@ namespace Bb.PropertyGrid
                     }
                 }
             }
-        }
-
-        protected virtual bool ConvertToString(T? value, out string? valueResult)
-        {
-
-            valueResult = null;
-
-            if (value == null)
-            {
-                valueResult = null;
-                return true;
-            }
-
-            if (value is string vv)
-            {
-                valueResult = vv;
-                return true;
-            }
-
-            try
-            {
-                valueResult = value.ToObject<string>();
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            return true;
-
-        }
-
-        protected virtual bool ConvertFromString(string value, out T valueResult)
-        {
-
-            valueResult = default(T);
-
-            if (string.IsNullOrEmpty(value))
-                return true;
-
-            if (value is T vv)
-            {
-                valueResult = vv;
-                return true;
-            }
-
-            try
-            {
-                valueResult = value.ToObject<T>();
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            return true;
-
         }
 
         public T? Value
@@ -138,8 +83,22 @@ namespace Bb.PropertyGrid
                 if (Property != null)
                     if (!object.Equals(Property.Value, value))
                     {
-                        Property.Value = Save(value);
-                        PropertyChange();
+
+                        Transaction? transaction = null;
+                        if (TransactionManager != null)
+                            transaction = TransactionManager
+                                .BeginTransaction(Mode.Recording, $"update {Property.Name}");
+
+                        try
+                        {
+                            Property.Value = Save(value);
+                            PropertyChange();
+                            transaction?.Commit();
+                        }
+                        finally
+                        {
+                            transaction?.Dispose();
+                        }
                     }
 
             }
@@ -272,6 +231,64 @@ namespace Bb.PropertyGrid
             }
 
             return _value;
+
+        }
+
+
+        protected virtual bool ConvertToString(T? value, out string? valueResult)
+        {
+
+            valueResult = null;
+
+            if (value == null)
+            {
+                valueResult = null;
+                return true;
+            }
+
+            if (value is string vv)
+            {
+                valueResult = vv;
+                return true;
+            }
+
+            try
+            {
+                valueResult = value.ToObject<string>();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+
+        protected virtual bool ConvertFromString(string value, out T valueResult)
+        {
+
+            valueResult = default(T);
+
+            if (string.IsNullOrEmpty(value))
+                return true;
+
+            if (value is T vv)
+            {
+                valueResult = vv;
+                return true;
+            }
+
+            try
+            {
+                valueResult = value.ToObject<T>();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
 
         }
 

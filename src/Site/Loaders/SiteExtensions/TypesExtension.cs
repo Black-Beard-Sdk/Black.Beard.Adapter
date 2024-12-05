@@ -2,6 +2,7 @@
 
 namespace Site.Loaders.SiteExtensions
 {
+
     public static class TypesExtension
     {
 
@@ -28,8 +29,8 @@ namespace Site.Loaders.SiteExtensions
 
                 });
 
-
         }
 
     }
+
 }

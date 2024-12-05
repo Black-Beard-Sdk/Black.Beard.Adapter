@@ -1,9 +1,7 @@
-﻿using Bb.Diagrams;
-using Bb.Generators;
-using Bb.Modules.Sgbd.DiagramTools;
+﻿using Bb.Generators;
+using Bb.Modules.Bpms.Models;
 using Bb.TypeDescriptors;
-using Blazor.Diagrams;
-using System.Linq;
+using Blazor.Diagrams.Core.Models;
 
 namespace Bb.Modules.Sgbd.Models
 {
@@ -18,7 +16,17 @@ namespace Bb.Modules.Sgbd.Models
             DynamicTypeDescriptionProvider.Configure<Table>(c =>
             {
 
-                c.RemoveProperties("ControlledSize", "Title", "Selected", "Id", "Locked", "Visible");
+                c.RemoveProperties
+                (
+                    nameof(BpmsAction.ControlledSize),
+                    nameof(BpmsAction.Parent),
+                    nameof(BpmsAction.CanBeOrphaned),
+                    nameof(BpmsAction.Selected),
+                    nameof(BpmsAction.Id),
+                    nameof(BpmsAction.Locked),
+                    nameof(BpmsAction.Visible),
+                    nameof(Table.Title)
+                );
 
                 c.Property(c => c.Name, i =>
                 {

@@ -2,18 +2,11 @@
 namespace Bb.Commands
 {
 
-
     /// <summary>
     /// Interface for a command memorizer.
     /// </summary>
-    public interface ICommandMemorizer
+    public interface IMemorizer
     {
-
-
-        /// <summary>
-        /// Gets the mode of the memorizer.
-        /// </summary>
-        MemorizerEnum Mode { get; }
 
         /// <summary>
         /// Gets a value indicating whether the memorizer can memorize commands.
@@ -30,22 +23,14 @@ namespace Bb.Commands
         /// Restores the commands from the specified transaction.
         /// </summary>
         /// <param name="transaction">The transaction to restore the commands from.</param>
-        void Restore(CommandTransaction transaction);
+        /// <param name="context">List of object that has been changed.</param>
+        void Restore(RefreshContext context);
 
         /// <summary>
         /// Gets the command transaction manager associated with the memorizer.
         /// </summary>
-        ICommandTransactionManager CommandManager { get; }
+        ITransactionManager CommandManager { get; }
 
-    }
-
-    /// <summary>
-    /// Enumeration for the mode of the memorizer.
-    /// </summary>
-    public enum MemorizerEnum
-    {
-        Global,
-        Snapshot,
     }
 
 

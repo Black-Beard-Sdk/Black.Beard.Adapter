@@ -1,0 +1,12 @@
+{
+
+  "$schema": ".\\schemas\\Supervision.schema.json",
+
+  "Supervision": {
+
+    "WithTelemetry": "true"
+
+  }
+
+
+}

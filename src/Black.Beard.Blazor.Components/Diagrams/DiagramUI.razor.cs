@@ -14,6 +14,7 @@ using Bb.Toolbars;
 using Blazor.Diagrams.Components.Widgets;
 using Blazor.Diagrams.Core.Models;
 using Bb.Commands;
+using System.Transactions;
 
 namespace Bb.Diagrams
 {
@@ -100,6 +101,10 @@ namespace Bb.Diagrams
 
         [EvaluateValidation(false)]
         [Inject]
+        public IFocusedService<ITransactionManager> TransactionManager { get; set; }
+
+        [EvaluateValidation(false)]
+        [Inject]
         public IFocusedService<PropertyGridView> PropertyGridFocusedService { get; set; }
 
         [Parameter]
@@ -112,8 +117,12 @@ namespace Bb.Diagrams
                 if (_diagram != value)
                 {
                     _diagram = value;
-                    u = Diagram?.CommandManager?.UndoList;
-                    r = Diagram?.CommandManager?.RedoList;
+                    if (Diagram?.CommandManager != null)
+                    {
+                        u = Diagram.CommandManager.UndoList;
+                        r = Diagram.CommandManager.RedoList;
+                        TransactionManager.FocusChange(_diagram.CommandManager);
+                    }
                     u.CollectionChanged += U_CollectionChanged;
                     r.CollectionChanged += U_CollectionChanged;
                 }
@@ -122,8 +131,8 @@ namespace Bb.Diagrams
 
         #region undo / Redo
 
-        public CommandTransactionViewList? UndoList => u;
-        public CommandTransactionViewList? RedoList => r;
+        public TransactionViewList? UndoList => u;
+        public TransactionViewList? RedoList => r;
 
         public string IconUndo
         {
@@ -164,12 +173,12 @@ namespace Bb.Diagrams
             }
         }
 
-        public void OnRestoreUndo(MouseEventArgs args, CommandTransactionView cmd)
+        public void OnRestoreUndo(MouseEventArgs args, TransactionView cmd)
         {
             Diagram.CommandManager.Undo(cmd.Index);
         }
 
-        public void OnRestoreRedo(MouseEventArgs args, CommandTransactionView cmd)
+        public void OnRestoreRedo(MouseEventArgs args, TransactionView cmd)
         {
             Diagram.CommandManager.Redo(cmd.Index);
         }
@@ -217,6 +226,7 @@ namespace Bb.Diagrams
             UIDiagram.SelectionChanged += SelectionChanged;
             if (Diagram != null)
             {
+
                 Diagram.Apply(UIDiagram);
                 _timer = new Timer(_ =>
                 {
@@ -247,6 +257,7 @@ namespace Bb.Diagrams
         public void RenderFirstLinks2()
         {
             Diagram?.Prepare();
+            Diagram.SubscribesUIChanges();
         }
 
         #endregion fix the bug of the diagram for showing the links when the diagram is loaded
@@ -491,7 +502,7 @@ namespace Bb.Diagrams
                         var diagram = (Diagram)b;
                         a.ApplyChange(diagram.GetToolbar());
                     });
-                }
+                }                
 
             }
 
@@ -500,12 +511,7 @@ namespace Bb.Diagrams
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
 
-            var result = base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                Diagram.CommandManager.Resume();
-            }
+            var result = base.OnAfterRenderAsync(firstRender);            
 
             return result;
 
@@ -518,8 +524,8 @@ namespace Bb.Diagrams
         private BusySession _session;
 
         private Diagram _diagram;
-        private CommandTransactionViewList? u;
-        private CommandTransactionViewList? r;
+        private TransactionViewList? u;
+        private TransactionViewList? r;
 
         private int _zoomValue = 100;
         private int _gridSizeValue = 20;

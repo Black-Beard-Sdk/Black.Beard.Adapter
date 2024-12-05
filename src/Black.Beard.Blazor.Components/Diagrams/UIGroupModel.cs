@@ -39,7 +39,7 @@ namespace Bb.Diagrams
         }
 
 
-        internal bool Attach(NodeModel child)
+        public bool Attach(NodeModel child)
         {
             if (child != null)
                 if (_children.Add(child))

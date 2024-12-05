@@ -51,7 +51,7 @@ namespace Bb.Modules.bpms.Components
 
         public double Height
         {
-            get => Item?.Size?.Height - 2d ?? 10d;
+            get => Item?.Size?.Height ?? 10d;
         }
 
         public int GetDecaleY(int w)

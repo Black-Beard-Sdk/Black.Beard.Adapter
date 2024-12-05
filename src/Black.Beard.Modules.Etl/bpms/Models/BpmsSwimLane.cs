@@ -16,15 +16,14 @@ namespace Bb.Modules.Bpms.Models
 
                 c.RemoveProperties
                 (
-                    "ControlledSize",
-                    "Parent",
-                    "CanBeOrphaned",
-                    "Selected",
-                    "Uuid",
-                    "Id",
-                    "Locked",
-                    "Visible",
-                    "DynamicToolbox"
+                    nameof(BpmsSwimLane.ControlledSize),
+                    nameof(BpmsSwimLane.Parent),
+                    nameof(BpmsSwimLane.CanBeOrphaned),
+                    nameof(BpmsSwimLane.Selected),
+                    nameof(BpmsSwimLane.Id),
+                    nameof(BpmsSwimLane.Locked),
+                    nameof(BpmsSwimLane.Visible),
+                    nameof(BpmsSwimLane.Title)
 
                 );
             });
@@ -34,7 +33,7 @@ namespace Bb.Modules.Bpms.Models
         public BpmsSwimLane(SerializableDiagramGroupNode source)
             : base(source)
         {
-
+            
         }
 
     }

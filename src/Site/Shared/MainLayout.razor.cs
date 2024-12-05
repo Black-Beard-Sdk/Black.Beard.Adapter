@@ -1,4 +1,5 @@
 ﻿using Bb;
+using Bb.Commands;
 using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Translations;
 using Bb.PropertyGrid;
@@ -47,6 +48,10 @@ namespace Site.Shared
         [Inject]
         public IFocusedService<PropertyGridView> PropertyGridFocusedService { get; set; }
 
+        [EvaluateValidation(false)]
+        [Inject]
+        public IFocusedService<ITransactionManager> TransactionManager { get; set; }
+
 
         [Inject]
         public IDialogService DialogService { get; set; }
@@ -56,6 +61,7 @@ namespace Site.Shared
             var result = base.OnInitializedAsync();
             PropertyGridFocusedService.FocusChanged += FocusedService_FocusChanged;
             RefreshService.RefreshRequested += RefreshService_RefreshRequested;
+            TransactionManager.FocusChanged += _transactionManager_FocusChanged;
 
             return result;
         }
@@ -123,8 +129,15 @@ namespace Site.Shared
                 if (e.Evaluate == null || e.Evaluate(this.PropertyGrid, sender))
                 {
                     this.PropertyGrid.SelectedObject = sender;
+                    this.PropertyGrid.AddDynamicProperty("TransactionManager", () => _transactionManager);
                 }
         }
+
+        private void _transactionManager_FocusChanged(object? sender, EvaluatorEventArgs<ITransactionManager> e)
+        {
+            _transactionManager = (ITransactionManager)sender;
+        }
+
 
         private bool _busyVisible = false;
 
@@ -175,7 +188,7 @@ namespace Site.Shared
 
         private PropertyGridView PropertyGrid;
         private MudBlazorAdminDashboard _theme = new();
-
+        private ITransactionManager? _transactionManager;
     }
 
 }

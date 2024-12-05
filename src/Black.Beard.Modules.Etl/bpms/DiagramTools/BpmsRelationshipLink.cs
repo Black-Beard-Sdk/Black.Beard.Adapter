@@ -26,12 +26,9 @@ namespace Bb.Modules.Bpms
 
         }
 
-
-        protected override void Customize(LinkProperties link)
+        protected override LinkProperties Customize(LinkProperties link)
         {
-
-            base.Customize(link);
-
+            return base.Customize(link);
         }
 
         public static Guid Key = new Guid("76B74FC3-6F7C-4327-86F3-1D5310DE27F0");

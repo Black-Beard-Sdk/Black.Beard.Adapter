@@ -14,16 +14,14 @@ namespace Bb.Modules.Bpms.Models
 
                 c.RemoveProperties
                 (
-                    "ControlledSize",
-                    "Parent",
-                    "CanBeOrphaned",
-                    "Selected",
-                    "Uuid",
-                    "Id",
-                    "Locked",
-                    "Visible",
-                    "DynamicToolbox"
-
+                    nameof(BpmsStartingEvent.ControlledSize),
+                    nameof(BpmsStartingEvent.Parent),
+                    nameof(BpmsStartingEvent.CanBeOrphaned),
+                    nameof(BpmsStartingEvent.Selected),
+                    nameof(BpmsStartingEvent.Id),
+                    nameof(BpmsStartingEvent.Locked),
+                    nameof(BpmsStartingEvent.Visible),
+                    nameof(BpmsStartingEvent.Title)
                 );
             });
 

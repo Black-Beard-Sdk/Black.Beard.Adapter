@@ -53,7 +53,7 @@
                                  onclick="@_gridModeChanged" />
         </MudTooltip>
 
-        <MudTooltip Text="@ComponentConstants.Undo.Translate(this)" Color="Color.Default">
+        <MudTooltip Style="font-size: x-small;" Text="@ComponentConstants.Undo.Translate(this)" Color="Color.Default">
             <MudMenu StartIcon="@Icons.Material.Filled.Undo" EndIcon="@IconUndo" Disabled="@DisabledUndo">
                 @foreach (var item in this.UndoList)
                 {
@@ -62,7 +62,7 @@
             </MudMenu>
         </MudTooltip>
 
-        <MudTooltip Text="@ComponentConstants.Redo.Translate(this)" Color="Color.Default">
+        <MudTooltip Style="font-size: x-small;" Text="@ComponentConstants.Redo.Translate(this)" Color="Color.Default">
             <MudMenu StartIcon="@Icons.Material.Filled.Redo" EndIcon="@IconRedo" Disabled="@DisabledRedo">
                 @foreach (var item in this.RedoList)
                 {

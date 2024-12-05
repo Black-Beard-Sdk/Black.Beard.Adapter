@@ -2,6 +2,7 @@
 
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Transactions;
 
 namespace Bb.Commands
 {
@@ -10,119 +11,75 @@ namespace Bb.Commands
     /// <summary>
     /// Manages command transactions, allowing for commit and rollback operations.
     /// </summary>
-    public class CommandTransactionManager : ICommandTransactionManager
+    public class CommandTransactionManager : IInternalTransaction, ITransactionManager
     {
-
 
         static CommandTransactionManager()
         {
-            _targetFolder = Path.GetTempPath();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommandTransactionManager"/> class.
-        /// </summary>
-        /// <param name="folder"></param>
-        public static void SetFolder(string folder)
-        {
-            _targetFolder = folder;
+            _targetGlobalFolder = Path.GetTempPath();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandTransactionManager"/> class.
         /// </summary>
         /// <param name="targetFolder">The target folder where transaction data will be stored.</param>
-        public CommandTransactionManager(ICommandMemorizer target)
+        public CommandTransactionManager(IMemorizer target)
         {
 
             _target = target;
-            _forUndo = new Stack<CommandTransaction>();
-            _forUndoView = new CommandTransactionViewList();
+            _transactions = new Stack<Transaction>();
+            _forUndo = new Stack<Transaction>();
+            _forUndoView = new TransactionViewList();
+            _forRedo = new Stack<Transaction>();
+            _forRedoView = new TransactionViewList();
 
-            _forRedo = new Stack<CommandTransaction>();
-            _forRedoView = new CommandTransactionViewList();
 
-            Sessionid = "_cmd_" + Guid.NewGuid().ToString().Replace("-", "");
-            var folder = _targetFolder.Combine(Sessionid).AsDirectory();
-            TargetFolder = folder.FullName;
+            Sessionid = Guid.NewGuid().ToString();
+            var folder = "_cmd_".Combine(_targetGlobalFolder, Sessionid.Replace("-", "")).AsDirectory();
+            if (!folder.Exists)
+                folder.Create();
+            _targetFolder = folder.FullName;
+
 
             if (target is INotifyCollectionChanged n)
-                n.CollectionChanged += N_CollectionChanged;
+                n.CollectionChanged += CollectionChanged;
 
             if (target is INotifyPropertyChanged p)
-                p.PropertyChanged += P_PropertyChanged;
-           
+                p.PropertyChanged += PropertyChanged;
+
         }
 
-        private void P_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (Status == StatusTransaction.Waiting)
-                throw new InvalidOperationException("Transaction not initialized");
-        }
 
-        private void N_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (Status == StatusTransaction.Waiting)
-                throw new InvalidOperationException("Transaction not initialized");
-        }
 
         /// <summary>
-        /// Begin a new transaction. If the result is null, the transaction manager is paused.
+        /// Create a new transaction
         /// </summary>
-        /// <param name="label">Label to show for describes the updates</param>
-        /// <param name="command"></param>
+        /// <param name="mode">transaction mode</param>
+        /// <param name="name">label transaction</param>
+        /// <param name="autocommit">the transaction need a commit for validate</param>
         /// <returns></returns>
-        public bool Scope(string label, out CommandTransaction command)
-        {
-            bool resultBool = false;
-            command = null;
-
-            if (_currentTransaction != null)
-                command = _currentTransaction;
-
-            else
-            {
-                command = BeginTransaction(label);
-                resultBool = true;
-            }
-
-            return resultBool;
-
-        }
-
-        /// <summary>
-        /// Put the transaction manager on pause
-        /// </summary>
-        /// <exception cref="InvalidOperationException"></exception>
-        public void Pause()
+        /// <exception cref="NotSupportedException"></exception>
+        public Transaction? BeginTransaction(Mode mode, string name, bool autocommit = false)
         {
 
-            using (var l = _lock.LockForWrite())
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
+            switch (mode)
             {
-                Status = StatusTransaction.InPause;
+                case Mode.Recording:
+                    return BeginTransaction_Iml(name, autocommit);
+
+                case Mode.Restoring:
+                    return BeginRestoreTransaction_Iml();
+
+                case Mode.Paused:
+                    return BeginHiddenTransaction_Iml();
+
+                default:
+                    throw new NotSupportedException();
+
             }
-
-            if (_currentTransaction != null)
-                throw new InvalidOperationException("transaction already began. Please wait the transaction is closed.");
-
-            using (var l = _lock.LockForWrite())
-            {
-                Status = StatusTransaction.InPause;
-            }
-
-        }
-
-        /// <summary>
-        /// Re active the transaction manager
-        /// </summary>
-        public void Resume()
-        {
-
-            using (var l = _lock.LockForWrite())
-            {
-                Status = StatusTransaction.Waiting;
-            }
-
         }
 
         /// <summary>
@@ -132,9 +89,8 @@ namespace Bb.Commands
         /// <param name="command"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        public CommandTransaction? BeginTransaction(string name = "update model")
+        private Transaction? BeginTransaction_Iml(string name, bool autocommit)
         {
-
 
             using (var l = _lock.LockForUpgradeableRead())
             {
@@ -142,144 +98,155 @@ namespace Bb.Commands
                 if (Status == StatusTransaction.InPause)
                     return null;
 
-                if (_currentTransaction != null)
-                    throw new InvalidOperationException("transaction already began");
+                Transaction trans = new Transaction(this, name, _forUndo.Count + 1, autocommit);
+                using (_lock.LockForWrite())
+                {
+                    if (Status == StatusTransaction.Waiting)
+                        Status = StatusTransaction.Recording;
+                    _transactions.Push(trans);
 
-                var trans = new CommandTransaction(this, name, _forUndo.Count + 1);
-                trans.InitializeValue(_target);
+                }
+
+                return trans;
+
+            }
+
+        }
+
+        private Transaction? BeginRestoreTransaction_Iml()
+        {
+
+            using (var l = _lock.LockForUpgradeableRead())
+            {
+
+                if (Status == StatusTransaction.Restoring)
+                    throw new InvalidOperationException("restore already began");
+
+                if (Status == StatusTransaction.InPause)
+                    return null;
+
+                var trans = new Transaction(this, "Restoring", _forUndo.Count + 1, true)
+                {
+                    ResumeToEnd = true,
+                };
 
                 using (_lock.LockForWrite())
                 {
-                    Status = StatusTransaction.Recoding;
-                    _currentTransaction = trans;
+                    Status = StatusTransaction.Restoring;
+                    _transactions.Push(trans);
                 }
 
-            }
+                return trans;
 
-            return _currentTransaction;
-
-        }
-
-        /// <summary>
-        /// Commit current transaction
-        /// </summary>
-        public void Commit()
-        {
-
-            using (var l = _lock.LockForWrite())
-            {
-                _currentTransaction?.Commit();
-                _forUndo.Push(_currentTransaction);
-                _forUndoView.Push(_currentTransaction.GetView());
-                _currentTransaction = null;
-                _forRedo.Clear();
-                Status = StatusTransaction.Waiting;
             }
 
         }
 
-        /// <summary>
-        /// Reset the transaction manager
-        /// </summary>
-        internal void Reset()
+        private Transaction BeginHiddenTransaction_Iml()
         {
 
-            if (_forUndo.Count > 0 || _forRedo.Count > 0)
-                using (var l = _lock.LockForWrite())
-                {
-
-                    if (_forUndo.Count > 0)
-                    {
-                        _forUndo.Clear();
-                        _forUndoView.Clear();
-                    }
-
-                    if (_forRedo.Count > 0)
-                        _forRedo.Clear();
-
-                }
-
-        }
-
-        /// <summary>
-        /// Aboard the current transaction
-        /// </summary>
-        public void Rollback()
-        {
-
-            using (var l1 = _lock.LockForUpgradeableRead())
+            using (var l = _lock.LockForUpgradeableRead())
             {
 
-                if (_currentTransaction != null)
+                if (Status == StatusTransaction.InPause)
+                    return null;
+
+                if (_transactions.Count > 0)
+                    throw new InvalidOperationException("transaction already began");
+
+                bool p = Status != StatusTransaction.InPause;
+
+                var trans = new Transaction(this, string.Empty, _forUndo.Count + 1, true)
                 {
+                    ResumeToEnd = p
+                };
 
-                    var act = () =>
-                    {
-                        Status = StatusTransaction.Waiting;
-                        _currentTransaction = null;
-                    };
-
-                    using (var l2 = _lock.LockForWrite(act))
-                    {
-                        _target.Restore(_currentTransaction);
-                    }
+                using (_lock.LockForWrite())
+                {
+                    _transactions.Push(trans);
+                    Status = StatusTransaction.InPause;
 
                 }
 
+                return trans;
+
             }
 
+        }
+
+
+
+
+        /// <summary>
+        /// Restore in specific transaction state and forget all the next transactions
+        /// </summary>
+        /// <param name="cmd">backup to restore</param>
+        public void Undo(Transaction cmd)
+        {
+            Undo(cmd.Index);
         }
 
         /// <summary>
         /// Restore in specific transaction state and forget all the next transactions
         /// </summary>
         /// <param name="cmd">index to restore</param>
-        public void Undo(int index)
+        public void Undo(int ind)
         {
 
-            using (var l1 = _lock.LockForUpgradeableRead())
+            RefreshContext context = null;
+            var index = ind - 1;
+            Transaction transaction = null;
+
+            var act = () =>
+            {
+                Status = StatusTransaction.Waiting;
+                if (transaction != null)
+                {
+                    context = new RefreshContext(this.Sessionid, transaction);
+                    _target.Restore(context);
+                }
+            };
+
+            using (var l1 = _lock.LockForUpgradeableRead(act))
             {
 
-                _currentTransaction = null;
+                if (_transactions.Count > 0)
+                    throw new InvalidOperationException("transaction already began");
 
-                if (_forUndo.Count > 0)
-                {
-
-                    var act = () =>
-                    {
-                        Status = StatusTransaction.Waiting;
-                    };
-
-                    using (var l2 = _lock.LockForWrite(act))
-                    {
-
-                        Status = StatusTransaction.Restoring;
-
+                using (var l2 = _lock.LockForWrite())
+                    if (index > 0 && _forUndo.Count > 0)
                         while (_forUndo.Count > 0 && _forUndo.Peek().Index >= index)
                         {
-                            var c = _forUndo.Pop();
+
+                            transaction = _forUndo.Pop();
                             _forUndoView.Pop();
-                            if (_target.Mode == MemorizerEnum.Snapshot || index == c.Index)
-                                _target.Restore(c);
-                            _forRedo.Push(c);
-                            _forRedoView.Push(c.GetView());
+                            _forRedo.Push(transaction);
+                            _forRedoView.Push(transaction.GetView());
+
+                            if (index == transaction.Index)
+                                break;
+                            else
+                                transaction = null;
+
                         }
+
+                    else
+                    {
+
+                        while (_forUndo.Count > 0)
+                        {
+                            transaction = _forUndo.Pop();
+                            _forUndoView.Pop();
+                            _forRedo.Push(transaction);
+                            _forRedoView.Push(transaction.GetView());
+                        }
+
+                        transaction = _initialState;
 
                     }
 
-                }
-
             }
 
-        }
-
-        /// <summary>
-        /// Restore in specific transaction state and forget all the next transactions
-        /// </summary>
-        /// <param name="cmd">backup to restore</param>
-        public void Undo(CommandTransaction cmd)
-        {
-            Undo(cmd.Index);
         }
 
         /// <summary>
@@ -289,33 +256,44 @@ namespace Bb.Commands
         public void Redo(int index)
         {
 
-            using (var l1 = _lock.LockForUpgradeableRead())
-            {
-                _currentTransaction = null;
+            RefreshContext context = null;
 
+            Transaction transaction = null;
+            var act = () =>
+            {
+                Status = StatusTransaction.Waiting;
+                if (transaction != null)
+                {
+                    context = new RefreshContext(this.Sessionid, transaction);
+                    _target.Restore(context);
+                }
+            };
+
+            using (var l1 = _lock.LockForUpgradeableRead(act))
                 if (_forRedo.Count > 0)
                 {
 
-                    Status = StatusTransaction.Restoring;
+                    if (_transactions.Count > 0)
+                        throw new InvalidOperationException("transaction already began");
 
-                    try
-                    {
-                        while (_forRedo.Count > 0 && _forRedo.Peek().Index >= index)
+                    using (var l2 = _lock.LockForWrite())
+                        while (_forRedo.Count > 0 && _forRedo.Peek().Index <= index)
                         {
-                            var c = _forRedo.Pop();
+
+                            transaction = _forRedo.Pop();
                             _forRedoView.Pop();
-                            if (_target.Mode == MemorizerEnum.Snapshot || index == c.Index)
-                                _target.Restore(c);
-                            _forUndo.Push(c);
-                            _forUndoView.Push(c.GetView());
+                            _forUndo.Push(transaction);
+                            _forUndoView.Push(transaction.GetView());
+
+                            if (index == transaction.Index)
+                                break;
+                            else
+                                transaction = null;
+
+
                         }
-                    }
-                    finally
-                    {
-                        Status = StatusTransaction.Waiting;
-                    }
+
                 }
-            }
 
         }
 
@@ -323,33 +301,66 @@ namespace Bb.Commands
         /// Restore in specific transaction state and forget all the previous transaction.
         /// </summary>
         /// <param name="cmd">backup to restore</param>
-        public void Redo(CommandTransaction cmd)
+        public void Redo(Transaction cmd)
         {
             Redo(cmd.Index);
         }
 
 
-        void ICommandTransactionManager.Reset()
+
+        /// <summary>
+        /// Reset the transaction manager
+        /// </summary>
+        public void Reset()
         {
-            _currentTransaction = null;
-            Status = StatusTransaction.Waiting;
-            _forUndo.Clear();
-            _forUndoView.Clear();
-            _forRedo.Clear();
-            _forRedoView.Clear();
+
+            using (_lock.LockForUpgradeableRead())
+                if (_forUndo.Count > 0 || _forRedo.Count > 0 || _transactions.Count > 0)
+                    using (_lock.LockForWrite())
+                        ResetImpl();
+
+        }
+
+        public void Initialize()
+        {
+
+            using (_lock.LockForUpgradeableRead())
+            using (_lock.LockForWrite())
+            {
+
+                ResetImpl();
+
+                this._initialState = new Transaction(this, "Initialize", 0, true);
+                this._initialState.Save(_target);
+
+            }
+
         }
 
 
+
+        /// <summary>
+        /// Return the status of the transaction manager
+        /// </summary>
         public StatusTransaction Status { get; private set; }
 
-        public CommandTransactionViewList UndoList => _forUndoView;
+        /// <summary>
+        /// Return the list of transaction stored and waiting for undo states.
+        /// </summary>
+        public TransactionViewList UndoList => _forUndoView;
 
-        public CommandTransactionViewList RedoList => _forRedoView;
+        /// <summary>
+        /// Return the list of transaction stored and waiting for redo states.
+        /// </summary>
+        public TransactionViewList RedoList => _forRedoView;
 
         /// <summary>
         /// Return number of transaction stored and waiting for undo states.
         /// </summary>
         public int UndoCount => _forUndo.Count;
+
+
+
 
         /// <summary>
         /// Unique session id
@@ -357,20 +368,237 @@ namespace Bb.Commands
         public string Sessionid { get; }
 
         /// <summary>
-        /// Gets the target folder where transaction data is stored.
+        /// Return the count of current transaction
         /// </summary>
-        public string TargetFolder { get; }
+        public int Count => _transactions.Count;
 
-        private CommandTransaction _currentTransaction;
+
+        #region ITransactionManagerBase
+
+        /// <summary>
+        /// Commit current transaction
+        /// </summary>
+        void IInternalTransaction.Commit()
+        {
+
+            Transaction currentTransaction = null;
+
+            var act = () =>
+            {
+                if (currentTransaction != null)
+                {
+                    Status = currentTransaction.LastStatus;
+                }
+            };
+
+            using (_lock.LockForUpgradeableRead(act))
+            {
+
+                if (_transactions.Count == 0 || Status == StatusTransaction.Waiting)
+                    throw new InvalidOperationException("transaction not began");
+
+                using (_lock.LockForWrite())
+                {
+                    currentTransaction = _transactions.Pop();
+                    if (Status == StatusTransaction.Recording)
+                    {
+                        uint? currentCrc = currentTransaction.GetCrc();
+                        if (haschangedAfterLastChange(currentCrc))
+                        {
+                            currentTransaction.Save(_target);
+                            _forUndo.Push(currentTransaction);
+                            _forUndoView.Push(currentTransaction.GetView());
+                        }
+                        _forRedo.Clear();
+                    }
+
+                }
+
+            }
+
+        }
+
+        private bool haschangedAfterLastChange(uint? currentCrc)
+        {
+            bool toStore = true;
+            if (GetLastTransactionCrc() == currentCrc)
+                toStore = false;
+            return toStore;
+        }
+
+        private uint GetLastTransactionCrc()
+        {
+            if (_forUndo.Count > 0)
+                return _forUndo.Peek().GetCrc().Value;
+            return _initialState.GetCrc().Value;
+        }
+
+        /// <summary>
+        /// Aboard the current transaction
+        /// </summary>
+        void IInternalTransaction.Rollback()
+        {
+
+            RefreshContext context = null;
+            Transaction transaction = null;
+            bool delete = _transactions.Count > 0;
+            var act = () =>
+            {
+                if (transaction != null)
+                {
+                    context = new RefreshContext(this.Sessionid, transaction);
+                    _target.Restore(context);
+                    Status = transaction.LastStatus;
+                    if (delete)
+                        this.Delete(transaction);
+                }
+            };
+
+            using (var l2 = _lock.LockForWrite())
+                transaction = delete ? _transactions.Pop() : _initialState;
+
+        }
+
+        Stream IInternalTransaction.GetStreamForWriting(Transaction transaction)
+        {
+            return GetStreamForWriting_Iml(transaction);
+        }
+
+        /// <summary>
+        /// Get the stream associated with the transaction.
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        public virtual Stream GetStreamForWriting_Iml(Transaction transaction)
+        {
+
+            FileInfo f = GetFile(transaction);
+            if (f.Exists)
+                f.Delete();
+
+            f.Refresh();
+
+            return f.OpenWrite();
+
+        }
+
+        Stream IInternalTransaction.GetStreamForReading(Transaction transaction)
+        {
+            return GetStreamForReading_Impl(transaction);
+        }
+
+        /// <summary>
+        /// Get the stream associated with the transaction.
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        public virtual Stream GetStreamForReading_Impl(Transaction transaction)
+        {
+
+            FileInfo f = GetFile(transaction);
+            if (f.Exists)
+                return f.OpenRead();
+
+            throw new FileNotFoundException(f.FullName);
+
+        }
+
+        protected virtual void Delete(Transaction transaction)
+        {
+
+            FileInfo f = GetFile(transaction);
+            if (f.Exists)
+                f.Delete();
+
+            f.Refresh();
+        }
+
+        protected virtual FileInfo GetFile(Transaction transaction)
+        {
+            var _path = _targetFolder.Combine(transaction.Index.ToString() + ".json");
+            var f = _path.AsFile();
+            f.Refresh();
+            return f;
+        }
+
+
+        #endregion ITransactionManagerBase
+
+
+
+
+
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandTransactionManager"/> class.
+        /// </summary>
+        /// <param name="folder"></param>
+        public static void SetFolder(string folder)
+        {
+            _targetGlobalFolder = folder;
+        }
+
+        private void ResetImpl()
+        {
+
+            if (_transactions.Count > 0)
+                _transactions.Clear();
+
+            if (_forUndo.Count > 0)
+            {
+
+                foreach (var item in _forUndo)
+                {
+                    Delete(item);
+                }
+
+                _forUndo.Clear();
+                _forUndoView.Clear();
+            }
+
+            if (_forRedo.Count > 0)
+            {
+
+                foreach (var item in _forUndo)
+                {
+                    Delete(item);
+                }
+
+                _forRedo.Clear();
+                _forRedoView.Clear();
+
+            }
+
+            Status = StatusTransaction.Waiting;
+
+        }
+
+        protected virtual void PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (Status == StatusTransaction.Waiting)
+                throw new InvalidOperationException("Transaction not initialized");
+        }
+
+        protected virtual void CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (Status == StatusTransaction.Waiting)
+                throw new InvalidOperationException("Transaction not initialized");
+        }
+
+        private Transaction _initialState;
+        private Stack<Transaction> _transactions;
+        private string _targetFolder;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
-        private readonly ICommandMemorizer _target;
-        private Stack<CommandTransaction> _forUndo;
-        private readonly CommandTransactionViewList _forUndoView;
-        private Stack<CommandTransaction> _forRedo;
-        private readonly CommandTransactionViewList _forRedoView;
-        private int _currentIndex = 0;
-        private static string _targetFolder;
+        private readonly IMemorizer _target;
+        private Stack<Transaction> _forUndo;
+        private readonly TransactionViewList _forUndoView;
+        private Stack<Transaction> _forRedo;
+        private readonly TransactionViewList _forRedoView;
+        //private int _currentIndex = 0;
+        private static string _targetGlobalFolder;
 
     }
 
 }
+
+

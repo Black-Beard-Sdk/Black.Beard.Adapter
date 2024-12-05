@@ -1,6 +1,7 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿using Bb;
+using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Factories;
-using NLog;
+using Site.Services;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -31,6 +32,7 @@ namespace Site.Loaders.SiteExtensions
 
         public static IServiceCollection UseTypeExposedByAttribute(this IServiceCollection services, IConfiguration configuration, string contextKey, Action<Type> action = null)
         {
+
             foreach (var type in GetExposedTypes(contextKey))
             {
 
@@ -50,6 +52,11 @@ namespace Site.Loaders.SiteExtensions
         {
 
             var type = typeof(TOptions);
+
+            SchemaGenerator.GenerateSchema(type);
+
+            var id = new Uri("http://example.com/schema/TestGeneratedSchema");
+            var schema = type.GenerateSchemaForConfiguration(id);
 
             var attribute = type.GetCustomAttribute<ExposeClassAttribute>();
             var sectionName = !string.IsNullOrEmpty(attribute?.Name) ? attribute.Name : typeof(TOptions).Name;

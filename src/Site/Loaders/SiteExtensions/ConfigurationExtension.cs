@@ -72,13 +72,8 @@ namespace Site.Loaders.SiteExtensions
         /// </code>
         /// </example>
         /// <returns></returns>
-        public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder)
+        public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder, IEnumerable<string> paths)
         {
-
-            var paths = new List<string>
-            {
-                "Configs"
-            };
 
             builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
             {

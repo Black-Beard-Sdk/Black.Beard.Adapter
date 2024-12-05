@@ -1,4 +1,5 @@
-﻿using Bb.ComponentModel.Accessors;
+﻿using Bb.Commands;
+using Bb.ComponentModel.Accessors;
 using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -20,6 +21,12 @@ namespace Bb.Diagrams
     {
 
 
+        #region ctors
+
+        /// <summary>
+        /// Initializes the static fields of the DiagramList class.
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         static DiagramList()
         {
 
@@ -41,56 +48,50 @@ namespace Bb.Diagrams
 
         }
 
+        /// <summary>
+        /// Constructs a List. The list is initially empty and has a capacity
+        /// of zero. Upon adding the first element to the list the capacity is
+        /// increased to DefaultCapacity, and then increased in multiples of two
+        /// as required.
+        /// </summary>
         public DiagramList()
         {
-
+            _dic = new Dictionary<TKey, TValue>();
         }
 
         /// <summary>
-        /// Gets or sets the element with the specified key.
+        /// Constructs a List with a given initial capacity. The list is
+        /// initially empty, but will have room for the given number of elements
+        /// before any reallocations are required.
         /// </summary>
-        /// <param name="index">The key of the element to get or set.</param>
-        /// <returns>The element with the specified key.</returns>
-        public TValue this[TKey index]
+        /// <param name="capacity"></param>
+        public DiagramList(int capacity)
         {
-            get
-            {
-                using (_lock.LockForRead())
-                    return _dic[index];
-            }
-            set
-            {
-                Unsuscribes(_dic[index]);
-                using (_lock.LockForWrite(() => Suscribes(value)))
-                {
-                    _dic[index] = value;
-                }
-            }
+            _dic = new Dictionary<TKey, TValue>(capacity);
         }
 
         /// <summary>
-        /// Gets the number of elements contained in the collection.
+        /// Constructs a List, copying the contents of the given collection. The
+        /// size and capacity of the new list will both be equal to the size of the
+        /// given collection.
         /// </summary>
-        public int Count
+        /// <param name="collection"></param>
+        public DiagramList(IEnumerable<TValue> collection)
         {
-            get
-            {
-                using (_lock.LockForRead())
-                    return _dic.Count;
-            }
+            _dic = collection.ToDictionary(c => _key(c));
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the collection is read-only.
-        /// </summary>
-        public bool IsReadOnly => false;
+        #endregion ctors
+
+
 
         /// <summary>
-        /// Adds a range of elements to the collection.
+        /// Try to add a range of elements to the collection or replace them if the keys already exists.
         /// </summary>
         /// <param name="newItems">The elements to add to the collection.</param>
         public void AddRange(params TValue[] newItems)
         {
+
             List<TValue> listAdded = new List<TValue>(newItems.Length);
             List<(TValue, TValue)> listUpdated = new List<(TValue, TValue)>(newItems.Length);
 
@@ -145,7 +146,7 @@ namespace Bb.Diagrams
         }
 
         /// <summary>
-        /// Adds an element to the collection.
+        /// Try to add element to the collection or replace it if the keys already exists.
         /// </summary>
         /// <param name="newItem">The element to add to the collection.</param>
         public void Add(TValue newItem)
@@ -165,11 +166,12 @@ namespace Bb.Diagrams
                         Unsuscribes(oldValue);
                         OnReplacedInCollection(oldValue, newItem);
                     }
-                }
-                else
-                    OnChangedInCollection(NotifyCollectionChangedAction.Add, new[] { newItem });
+                    else
+                        OnChangedInCollection(NotifyCollectionChangedAction.Add, new[] { newItem });
 
-                Suscribes(newItem);
+                    Suscribes(newItem);
+
+                }
 
             };
 
@@ -184,7 +186,7 @@ namespace Bb.Diagrams
                             t = true;
                         }
                     }
-                
+
                 else
                     using (_lock.LockForWrite())
                     {
@@ -198,6 +200,8 @@ namespace Bb.Diagrams
             }
 
         }
+
+
 
         /// <summary>
         /// Removes all elements from the collection.
@@ -252,6 +256,99 @@ namespace Bb.Diagrams
         }
 
         /// <summary>
+        /// Removes the first occurrence of a specific element from the collection.
+        /// </summary>
+        /// <param name="items"></param>
+        public void RemoveRange(params TValue[] items)
+        {
+            RemoveRange((IEnumerable<TValue>)items);
+        }
+
+        /// <summary>
+        /// Try to remove a range of elements to the collection.
+        /// </summary>
+        /// <param name="items">items to add</param>
+        public void RemoveRange(IEnumerable<TValue> items)
+        {
+
+            List<TValue> listRemoved = new List<TValue>(items.Count());
+
+            var dispose = () =>
+            {
+                var a = listRemoved.ToArray();
+                Unsuscribes(a);
+                OnChangedInCollection(NotifyCollectionChangedAction.Remove, a);
+            };
+
+            using (_lock.LockForUpgradeableRead(dispose))
+                foreach (var item in items)
+                {
+                    var key = _key(item);
+                    if (_dic.ContainsKey(key))
+                        using (_lock.LockForWrite())
+                            if (_dic.ContainsKey(key))
+                            {
+                                _dic.Remove(key);
+                                listRemoved.Add(item);
+                            }
+                }
+
+        }
+
+        /// <summary>
+        /// Try to removes the element with the specified key from the collection.
+        /// </summary>
+        /// <param name="key">key of the item to remove</param>
+        /// <returns></returns>
+        public bool TryRemove(TKey key)
+        {
+
+            TValue item = default;
+            using (_lock.LockForRead())
+                if (!_dic.TryGetValue(key, out item))
+                    return false;
+
+            return Remove(item);
+
+        }
+
+
+
+
+        /// <summary>
+        /// Gets or sets the element with the specified key.
+        /// </summary>
+        /// <param name="index">The key of the element to get or set.</param>
+        /// <returns>The element with the specified key.</returns>
+        public TValue this[TKey index]
+        {
+            get
+            {
+                using (_lock.LockForRead())
+                    return _dic[index];
+            }
+            set
+            {
+                Unsuscribes(_dic[index]);
+                using (_lock.LockForWrite(() => Suscribes(value)))
+                {
+                    _dic[index] = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Return true if the collection contains the specified key.
+        /// </summary>
+        /// <param name="key">key to evaluate</param>
+        /// <returns></returns>
+        public bool ContainsKey(TKey key)
+        {
+            using (_lock.LockForRead())
+                return _dic.ContainsKey(key);
+        }
+
+        /// <summary>
         /// Determines whether the collection contains an element with the specified key.
         /// </summary>
         /// <param name="item">The element to locate in the collection.</param>
@@ -279,7 +376,6 @@ namespace Bb.Diagrams
             }
 
         }
-
 
         /// <summary>
         /// Copies the elements of the collection to an array, starting at a particular array index.
@@ -322,6 +418,26 @@ namespace Bb.Diagrams
             using (_lock.LockForRead())
                 return _dic.TryGetValue(key, out value);
         }
+
+
+
+        /// <summary>
+        /// Gets the number of elements contained in the collection.
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                using (_lock.LockForRead())
+                    return _dic.Count;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the collection is read-only.
+        /// </summary>
+        public bool IsReadOnly => false;
+
 
 
         /// <summary>
@@ -369,24 +485,36 @@ namespace Bb.Diagrams
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(impact, newitems));
         }
 
-        private void Unsuscribes(TValue item)
+        private void Unsuscribes(params TValue[] items)
         {
-            if (item is INotifyPropertyChanged n1)
-                n1.PropertyChanged -= N_PropertyChanged;
 
-            if (item is INotifyPropertyChanging n2)
-                n2.PropertyChanging -= N_PropertyChanging;
+            foreach (var item in items)
+            {
+
+                if (item is INotifyPropertyChanged n1)
+                    n1.PropertyChanged -= N_PropertyChanged;
+
+                if (item is INotifyPropertyChanging n2)
+                    n2.PropertyChanging -= N_PropertyChanging;
+
+            }
         }
 
-        private void Suscribes(TValue item)
+        private void Suscribes(params TValue[] items)
         {
-            if (item is INotifyPropertyChanged n1)
-                n1.PropertyChanged += N_PropertyChanged;
 
-            if (item is INotifyPropertyChanging n2)
-                n2.PropertyChanging += N_PropertyChanging;
+            foreach (var item in items)
+            {
+
+                if (item is INotifyPropertyChanged n1)
+                    n1.PropertyChanged += N_PropertyChanged;
+
+                if (item is INotifyPropertyChanging n2)
+                    n2.PropertyChanging += N_PropertyChanging;
+
+            }
+
         }
-
 
         private void N_PropertyChanging(object? sender, PropertyChangingEventArgs e)
         {
@@ -405,6 +533,44 @@ namespace Bb.Diagrams
         }
 
         /// <summary>
+        /// Return the elements that are in the model but not in the current collection.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public IEnumerable<TValue> FindMissingFrom(DiagramList<TKey, TValue> model)
+        {
+
+            foreach (var item in model)
+                if (!ContainsKey(item))
+                    yield return item;
+        }
+
+        public IEnumerable<TValue> FindMissingFrom(IEnumerable<TKey> model)
+        {
+
+            foreach (var item in model)
+                if (!ContainsKey(item))
+                    if (TryGetValue(item, out var value))
+                        yield return value;
+        }
+
+        public IEnumerable<TValue> Find(IEnumerable<TKey> model)
+        {
+
+            foreach (var item in model)
+                if (ContainsKey(item))
+                    if (TryGetValue(item, out var value))
+                        yield return value;
+        }
+
+        public IEnumerable<TValue> Find(DiagramList<TKey, TValue> model)
+        {
+            foreach (var item in model)
+                if (TryGetValue(_key(item), out var value))
+                    yield return value;
+        }
+
+        /// <summary>
         /// Occurs when the collection changes.
         /// </summary>
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
@@ -412,7 +578,7 @@ namespace Bb.Diagrams
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
-        private readonly Dictionary<TKey, TValue> _dic = new Dictionary<TKey, TValue>();
+        private readonly Dictionary<TKey, TValue> _dic;
         private static readonly Func<TValue, TKey> _key;
 
     }

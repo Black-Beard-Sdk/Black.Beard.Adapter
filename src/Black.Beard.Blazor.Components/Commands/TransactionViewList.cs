@@ -6,17 +6,17 @@ namespace Bb.Commands
 
     
     /// <summary>
-    /// Represents a collection of <see cref="CommandTransactionView"/> objects that supports push, pop, and clear operations.
+    /// Represents a collection of <see cref="TransactionView"/> objects that supports push, pop, and clear operations.
     /// </summary>
-    public class CommandTransactionViewList : INotifyCollectionChanged, IEnumerable<CommandTransactionView>
+    public class TransactionViewList : INotifyCollectionChanged, IEnumerable<TransactionView>
     {
-        private Stack<CommandTransactionView> _list = new Stack<CommandTransactionView>();
+        private Stack<TransactionView> _list = new Stack<TransactionView>();
 
         /// <summary>
         /// Adds an item to the top of the collection.
         /// </summary>
         /// <param name="item">The item to add.</param>
-        public void Push(CommandTransactionView item)
+        public void Push(TransactionView item)
         {
             _list.Push(item);
             var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item);
@@ -44,7 +44,7 @@ namespace Bb.Commands
         }
 
         /// <inheritdoc/>
-        public IEnumerator<CommandTransactionView> GetEnumerator()
+        public IEnumerator<TransactionView> GetEnumerator()
         {
             return _list.GetEnumerator();
         }

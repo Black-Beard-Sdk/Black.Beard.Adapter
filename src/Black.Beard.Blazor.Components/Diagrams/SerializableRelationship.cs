@@ -1,12 +1,16 @@
 ﻿using Bb.ComponentModel.Accessors;
 using Bb.ComponentModel.Attributes;
 using Bb.TypeDescriptors;
+using Blazor.Diagrams.Core;
+using Blazor.Diagrams;
 using ICSharpCode.Decompiler.Metadata;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml.Linq;
+using Blazor.Diagrams.Core.Models;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
@@ -216,7 +220,69 @@ namespace Bb.Diagrams
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        internal bool Apply(SerializableRelationship n)
+        {
+
+            bool result = false;
+
+            var accessorSource = n.GetType().GetAccessors(AccessorStrategyEnum.Direct);
+            var accessorTarget = GetType().GetAccessors(AccessorStrategyEnum.Direct);
+
+            foreach (var item in accessorSource)
+            {
+
+                var p = accessorTarget.Get(item.Name);
+                if (p != null)
+                {
+
+                    var newValue = item.GetValue(n);
+                    var oldValue = p.GetValue(this);
+
+                    if (!object.Equals(oldValue, newValue))
+                    {
+                        p.SetValue(this, newValue);
+                        result = true;
+                    }
+
+                }
+            }
+
+            return result;
+
+        }
+
         #endregion OnChange
+
+
+        #region UI
+
+        public LinkModel SetUI(LinkModel ui)
+        {
+            _ui = ui;
+            return _ui;
+        }
+        public LinkModel GetUI()
+        {
+            return _ui;
+        }
+        private LinkModel _ui;
+
+        #endregion UI
+
+        #region properties
+
+        public LinkProperties SetProperties(LinkProperties properties)
+        {
+            _linkProperties = properties;
+            return _linkProperties;
+        }
+        public LinkProperties GetProperties()
+        {
+            return _linkProperties;
+        }
+        private LinkProperties _linkProperties;
+
+        #endregion properties
 
 
         private readonly AccessorList _realProperties;
