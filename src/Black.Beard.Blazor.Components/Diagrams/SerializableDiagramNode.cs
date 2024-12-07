@@ -84,7 +84,7 @@ namespace Bb.Diagrams
                 {
                     OnPropertyChanging(nameof(Uuid));
                     _uid = value;
-                    this.Properties.SetUuid( value);
+                    this.Properties.SetUuid(value);
                     OnPropertyChanged(nameof(Uuid));
                 }
             }
@@ -383,80 +383,80 @@ namespace Bb.Diagrams
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        internal void Apply(SerializableDiagramNode n, RefreshContext context)
-        {
+        //internal void Apply(SerializableDiagramNode n, RefreshContext context)
+        //{
 
-            bool result = false;
+        //    bool result = false;
 
-            var accessorSource = n.GetType().GetAccessors(AccessorStrategyEnum.Direct);
-            var accessorTarget = GetType().GetAccessors(AccessorStrategyEnum.Direct);
+        //    var accessorSource = n.GetType().GetAccessors(AccessorStrategyEnum.Direct);
+        //    var accessorTarget = GetType().GetAccessors(AccessorStrategyEnum.Direct);
 
-            foreach (var item in accessorSource)
-            {
+        //    foreach (var item in accessorSource)
+        //    {
 
-                var p = accessorTarget.Get(item.Name);
-                if (p != null)
-                {
-                    if (p.CanWrite && p.Member.MemberType == System.Reflection.MemberTypes.Property)
-                    {
-                        if (p.Type == item.Type)
-                        {
+        //        var p = accessorTarget.Get(item.Name);
+        //        if (p != null)
+        //        {
+        //            if (p.CanWrite && p.Member.MemberType == System.Reflection.MemberTypes.Property)
+        //            {
+        //                if (p.Type == item.Type)
+        //                {
 
-                            var newValue = item.GetValue(n);
-                            var oldValue = p.GetValue(this);
+        //                    var newValue = item.GetValue(n);
+        //                    var oldValue = p.GetValue(this);
 
-                            if (!Compare(oldValue, newValue))
-                            {
+        //                    if (!Compare(oldValue, newValue))
+        //                    {
 
-                                if (item.Type.IsValueType || item.Type == typeof(string))
-                                {
-                                    p.SetValue(this, newValue);
-                                    result = true;
-                                }
+        //                        if (item.Type.IsValueType || item.Type == typeof(string))
+        //                        {
+        //                            p.SetValue(this, newValue);
+        //                            result = true;
+        //                        }
 
-                                else if (newValue is IRestorableModel r)
-                                {
-                                    r.Restore(oldValue, context, RefreshStrategy.All);
-                                }
-                                else if (!TryApply(oldValue, newValue))
-                                {
-                                    p.SetValue(this, newValue);
-                                    result = true;
-                                }
+        //                        else if (newValue is IRestorableModel r)
+        //                        {
+        //                            r.Restore(oldValue, context, RefreshStrategy.All);
+        //                        }
+        //                        else if (!TryApply(oldValue, newValue))
+        //                        {
+        //                            p.SetValue(this, newValue);
+        //                            result = true;
+        //                        }
 
-                            }
+        //                    }
 
-                        }
+        //                }
 
-                        else
-                        {
+        //                else
+        //                {
 
-                        }
-                    }
-                }
-            }
+        //                }
+        //            }
+        //        }
+        //    }
 
-            if (result)
-                context.Add( n.Uuid, n, RefreshStrategy.Update);
+        //    if (result)
+        //        context.Add(n.Uuid, n, RefreshStrategy.Update);
 
-        }
+        //}
 
-        private bool TryApply(object oldValue, object newValue)
-        {
+        //private bool TryApply(object oldValue, object newValue)
+        //{
 
-            return false;
+        //    return false;
 
-        }
+        //}
 
-        private bool Compare(object oldValue, object newValue)
-        {
+        //private bool Compare(object oldValue, object newValue)
+        //{
 
-            if (object.Equals(oldValue, newValue))
-                return true;
+        //    if (object.Equals(oldValue, newValue))
+        //        return true;
 
-            return false;
+        //    return false;
 
-        }
+        //}
 
         #endregion OnChange
 
@@ -524,7 +524,7 @@ namespace Bb.Diagrams
 
             foreach (var item in this.OrderBy(c => c.Uuid))
                 result ^= item.GetHashCode();
-           
+
             return result;
 
         }

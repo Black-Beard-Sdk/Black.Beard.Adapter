@@ -15,6 +15,7 @@ using Blazor.Diagrams.Components.Widgets;
 using Blazor.Diagrams.Core.Models;
 using Bb.Commands;
 using System.Transactions;
+using Microsoft.JSInterop;
 
 namespace Bb.Diagrams
 {
@@ -90,6 +91,11 @@ namespace Bb.Diagrams
 
         [EvaluateValidation(false)]
         public DiagramDiagnostics Diagnostics { get; set; }
+
+
+        //[EvaluateValidation(false)]
+        //[Inject]
+        //public IJSRuntime JS { get; set; }
 
         [EvaluateValidation(false)]
         [Inject]
@@ -175,7 +181,7 @@ namespace Bb.Diagrams
 
         public void OnRestoreUndo(MouseEventArgs args, TransactionView cmd)
         {
-            Diagram.CommandManager.Undo(cmd.Index);
+            Diagram.CommandManager.Undo(cmd.BeforeIndex);
         }
 
         public void OnRestoreRedo(MouseEventArgs args, TransactionView cmd)
@@ -334,7 +340,12 @@ namespace Bb.Diagrams
 
                         var toolLink = ToolBar?.GetLink(source);
                         if (toolLink != null)
-                            link = this.Diagram.CreateLink(toolLink, source, targetAnchor);
+                        {
+                            using (var transaction = this.Diagram.CommandManager.BeginTransaction(Mode.Recording, "", Behavior.RemoveLastTransaction | Behavior.AutoCommit))
+                            {
+                                link = this.Diagram.CreateLink(toolLink, source, targetAnchor);
+                            }
+                        }
 
                         return link?.UILink;
 
@@ -368,13 +379,49 @@ namespace Bb.Diagrams
             var diagram = new BlazorDiagram(options);
 
             var ksb = diagram.GetBehavior<KeyboardShortcutsBehavior>();
-            ksb.SetShortcut("s", ctrl: false, shift: true, alt: false, Save);
+            ksb.SetShortcut("s", ctrl: false, shift: false, alt: true, Save);
+            
+            ksb.SetShortcut("z", ctrl: false, shift: false, alt: true, Cancel);
+            ksb.SetShortcut("r", ctrl: false, shift: false, alt: true, Redo);
+
+            //ksb.SetShortcut("c", ctrl: true, shift: false, alt: false, Copy);
+            //ksb.SetShortcut("x", ctrl: true, shift: false, alt: false, Cut);
+            //ksb.SetShortcut("v", ctrl: true, shift: false, alt: false, Past);
 
             diagram.ZoomChanged += ZoomChanged;
 
             return diagram;
 
         }
+
+        private async ValueTask Cancel(Blazor.Diagrams.Core.Diagram diagram)
+        {
+            var lastCommand = Diagram.CommandManager.UndoList.LastOrDefault();
+            if (lastCommand != null)
+                Diagram.CommandManager.Undo(lastCommand.BeforeIndex);
+        }
+
+        private async ValueTask Redo(Blazor.Diagrams.Core.Diagram diagram)
+        {
+            var lastCommand = Diagram.CommandManager.RedoList.LastOrDefault();
+            if (lastCommand != null)
+                Diagram.CommandManager.Redo(lastCommand.Index);
+        }
+
+        //private async ValueTask Copy(Blazor.Diagrams.Core.Diagram diagram)
+        //{
+
+        //}
+
+        //private async ValueTask Cut(Blazor.Diagrams.Core.Diagram diagram)
+        //{
+
+        //}
+
+        //private async ValueTask Past(Blazor.Diagrams.Core.Diagram diagram)
+        //{
+
+        //}
 
         public void Save()
         {
@@ -384,7 +431,12 @@ namespace Bb.Diagrams
         private async ValueTask Save(Blazor.Diagrams.Core.Diagram diagram)
         {
 
+
             if (_session == null)
+            {
+
+                var startTime = DateTime.Now.AddSeconds(1);
+
                 _session = BusyService.IsBusyFor(this, "Save", (a) =>
                 {
 
@@ -404,7 +456,14 @@ namespace Bb.Diagrams
                     Diagram.LastDiagnostics = diagnostic;
                     Diagram?.Save(Diagram);
 
+                }).Add((a) =>
+                {
+
+                    while(DateTime.Now < startTime)
+                        Task.Yield();
+
                 });
+            }
 
         }
 
@@ -502,7 +561,7 @@ namespace Bb.Diagrams
                         var diagram = (Diagram)b;
                         a.ApplyChange(diagram.GetToolbar());
                     });
-                }                
+                }
 
             }
 
@@ -511,7 +570,7 @@ namespace Bb.Diagrams
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
 
-            var result = base.OnAfterRenderAsync(firstRender);            
+            var result = base.OnAfterRenderAsync(firstRender);
 
             return result;
 

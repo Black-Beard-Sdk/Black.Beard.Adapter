@@ -3,6 +3,8 @@ using Bb.ComponentModel.Translations;
 using Bb.Diagrams;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Bb.PropertyGrid
 {
@@ -94,12 +96,51 @@ namespace Bb.PropertyGrid
             get => _selectedObject;
             set
             {
+
+                if (_selectedObject != value)
+                {
+                    if (_selectedObject is INotifyPropertyChanged old1)
+                        old1.PropertyChanged -= PropertyChanged;
+
+                    if (_selectedObject is INotifyCollectionChanged old2)
+                        old2.CollectionChanged -= CollectionChanged;
+                }
+
                 _selectedObject = value;
                 Update();
+
+                if (_selectedObject is INotifyPropertyChanged old3)
+                    old3.PropertyChanged += PropertyChanged;
+
+                if (_selectedObject is INotifyCollectionChanged old4)
+                    old4.CollectionChanged += CollectionChanged;
+            }
+
+        }
+
+        private void CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            try
+            {
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+
             }
         }
 
+        private void PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            try
+            {
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
 
+            }
+        }
 
         public void AddDynamicProperty(string key, Func<object> func)
         {

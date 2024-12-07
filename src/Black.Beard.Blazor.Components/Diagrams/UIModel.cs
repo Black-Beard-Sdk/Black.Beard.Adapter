@@ -18,6 +18,7 @@ namespace Bb.Diagrams
         : NodeModel
         , INodeModel
         , IDisposable
+        //, INotifyPropertyChanged
     {
 
         static UIModel()
@@ -58,6 +59,7 @@ namespace Bb.Diagrams
             this._parents = new HashSet<Type>();
             this._container = new DynamicDescriptorInstanceContainer(this);
             this.Source = source;
+            this.Source.PropertyChanged += Source_PropertyChanged;
 
 
             if (source.Position != null)
@@ -74,11 +76,28 @@ namespace Bb.Diagrams
 
 
             base.SizeChanged += UIModel_SizeChanged;
-            base.Moving += UIModel_Moving;
+            //base.Moving += UIModel_Moving;
             base.Moved += UIModel_Moved;
             base.OrderChanged += UIModel_OrderChanged;
 
 
+        }
+
+        protected virtual void Source_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+
+            if (e.PropertyName == nameof(Position))
+            {
+                this.SetPosition(Source.Position.X, Source.Position.Y);
+            }
+
+            if (e.PropertyName == nameof(Size))
+            {
+                this.Size = new Size(Source.Size.Width, Source.Size.Height);
+            }
+
+
+            this.PropertyChanged?.Invoke(this, e);
         }
 
         public virtual bool UpdateDimensions()
@@ -116,17 +135,17 @@ namespace Bb.Diagrams
 
         }
 
-        protected virtual void UIModel_Moving(NodeModel model)
-        {
-            //var d = this.Source.GetDiagram<Diagram>();
-            //if (d.CommandManager != null)
-            //{
-            //    if (d.CommandManager.Status == StatusTransaction.Waiting)
-            //    {
-            //        d.CommandManager.BeginTransaction($"move {this.Source.Title}");
-            //    }
-            //}
-        }
+        //protected virtual void UIModel_Moving(NodeModel model)
+        //{
+        //    //var d = this.Source.GetDiagram<Diagram>();
+        //    //if (d.CommandManager != null)
+        //    //{
+        //    //    if (d.CommandManager.Status == StatusTransaction.Waiting)
+        //    //    {
+        //    //        d.CommandManager.BeginTransaction($"move {this.Source.Title}");
+        //    //    }
+        //    //}
+        //}
 
         protected virtual void UIModel_SizeChanged(NodeModel obj)
         {
@@ -288,7 +307,7 @@ namespace Bb.Diagrams
                 if (disposing)
                 {
                     base.SizeChanged -= UIModel_SizeChanged;
-                    base.Moving -= UIModel_Moving;
+                    //base.Moving -= UIModel_Moving;
                     base.Moved -= UIModel_Moved;
                     base.OrderChanged -= UIModel_OrderChanged;
                 }

@@ -14,10 +14,10 @@ namespace Bb.Commands
         /// <summary>
         /// Create a new transaction
         /// </summary>
-        /// <param name="description">label description</param>
-        /// <param name="autocommit">dispose with auto commit</param>
+        /// <param name="description">label description. Can only be null if the behavior ask to remove last action. the description will take last transaction description.</param>
+        /// <param name="behavior">ask a specific behavior</param>
         /// <returns></returns>
-        Transaction BeginTransaction(Mode mode, string description, bool autocommit = false);
+        Transaction? BeginTransaction(Mode mode, string description, Behavior behavior = Behavior.None);
 
         /// <summary>
         /// Restore in specific transaction state and forget all the next transactions
@@ -50,7 +50,6 @@ namespace Bb.Commands
         /// </summary>
         void Reset();
 
-
         /// <summary>
         /// Return count of stored transaction
         /// </summary>
@@ -76,6 +75,14 @@ namespace Bb.Commands
         /// </summary>
         public int Count { get; }
 
+    }
+
+    [Flags]
+    public enum Behavior
+    {
+        None = 0,
+        AutoCommit = 1,
+        RemoveLastTransaction = 2,
     }
 
     public enum StatusTransaction

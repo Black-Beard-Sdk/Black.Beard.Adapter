@@ -28,7 +28,14 @@ namespace Bb.Commands
         /// <returns></returns>
         Stream GetStreamForReading(Transaction commandTransaction);
 
-        Transaction? BeginTransaction(Mode mode, string name, bool autocommit = false);
+        /// <summary>
+        /// Return the index of the last transaction
+        /// </summary>
+        /// <returns></returns>
+        int GetIndex();
+
+
+
     }
 
 }

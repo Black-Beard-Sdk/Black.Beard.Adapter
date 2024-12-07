@@ -220,37 +220,6 @@ namespace Bb.Diagrams
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        internal bool Apply(SerializableRelationship n)
-        {
-
-            bool result = false;
-
-            var accessorSource = n.GetType().GetAccessors(AccessorStrategyEnum.Direct);
-            var accessorTarget = GetType().GetAccessors(AccessorStrategyEnum.Direct);
-
-            foreach (var item in accessorSource)
-            {
-
-                var p = accessorTarget.Get(item.Name);
-                if (p != null)
-                {
-
-                    var newValue = item.GetValue(n);
-                    var oldValue = p.GetValue(this);
-
-                    if (!object.Equals(oldValue, newValue))
-                    {
-                        p.SetValue(this, newValue);
-                        result = true;
-                    }
-
-                }
-            }
-
-            return result;
-
-        }
-
         #endregion OnChange
 
 

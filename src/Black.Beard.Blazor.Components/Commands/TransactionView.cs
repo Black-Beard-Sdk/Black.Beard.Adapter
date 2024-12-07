@@ -6,6 +6,7 @@
     /// </summary>
     public class TransactionView
     {
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionView"/> class.
         /// </summary>
@@ -13,6 +14,7 @@
         public TransactionView(Transaction transaction)
         {
             Index = transaction.Index;
+            BeforeIndex = transaction.Precedent;
             Label = transaction.Label;
         }
 
@@ -21,10 +23,13 @@
         /// </summary>
         public int Index { get; set; }
 
+        public int BeforeIndex { get; }
+
         /// <summary>
         /// Gets or sets the label of the transaction.
         /// </summary>
         public string Label { get; set; }
+
     }
 
 }

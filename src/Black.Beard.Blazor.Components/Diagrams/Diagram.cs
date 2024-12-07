@@ -295,26 +295,6 @@ namespace Bb.Diagrams
             }
         }
 
-        public SerializableRelationship AddLink(Guid specification, Port left, Port right, string name, Guid? uuid = null)
-        {
-            var spec = Toolbox.OfType<DiagramToolRelationshipBase>().Where(c => c.Uuid == specification).FirstOrDefault();
-            return AddLink(spec, left, right, name, uuid);
-        }
-
-        public SerializableRelationship AddLink(DiagramToolRelationshipBase specification, Port left, Port right, string name, Guid? uuid = null)
-        {
-            var link = new SerializableRelationship()
-            {
-                Uuid = uuid.HasValue ? uuid.Value : Guid.NewGuid(),
-                Name = name,
-                Type = specification.Uuid,
-                Source = left.Uuid,
-                Target = right.Uuid
-            };
-            this.Relationships.Add(link);
-            return link;
-        }
-
         #endregion links 
 
 

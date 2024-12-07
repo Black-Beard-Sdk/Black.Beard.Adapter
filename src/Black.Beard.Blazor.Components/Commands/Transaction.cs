@@ -16,16 +16,18 @@ namespace Bb.Commands
         /// <param name="manager">The manager responsible for handling the transaction.</param>
         /// <param name="name">The name of the transaction.</param>
         /// <param name="index">The index of the transaction.</param>
-        internal Transaction(ITransactionManager manager, string name, int index, bool autocommit)
+        internal Transaction(ITransactionManager manager, string name, Behavior behavior)
         {
 
-            _activity = ActivityProvider.CreateActivity($"Transaction[{name}]", ActivityKind.Internal);
+            Index = manager.GetIndex();
+
+            _activity = ActivityProvider.CreateActivity($"Transaction command", ActivityKind.Internal);
             if (_activity != null)
             {
                 _activity.AddTag("Transaction", name);
-                _activity.AddBaggage("Transaction", name);
-                _activity.AddBaggage("index", index.ToString());
-                _activity.AddBaggage("autocommit", autocommit ? "true" : "false");
+                //_activity.AddBaggage("Transaction", name);
+                _activity.AddBaggage("index", Index.ToString());
+                _activity.AddBaggage("behavior", behavior.ToString());
                 _activity.Start();
             }
 
@@ -53,9 +55,8 @@ namespace Bb.Commands
                 this.Count = manager.Count;
             }
 
-            Index = index;
             Label = name;
-            this._autocommit = autocommit;
+            Behavior = behavior;
 
         }
 
@@ -90,8 +91,8 @@ namespace Bb.Commands
 
         public bool ResumeToEnd { get; internal set; }
 
-
-
+        public Behavior Behavior { get; }
+        public int Precedent { get; internal set; }
 
         /// <summary>
         /// Commits the transaction.
@@ -112,7 +113,7 @@ namespace Bb.Commands
             try
             {
 
-                if (this._commited || _autocommit)
+                if (this._commited || Behavior.HasFlag( Behavior.AutoCommit))
                     _manager.Commit();
 
                 else
@@ -167,7 +168,6 @@ namespace Bb.Commands
         }
 
         private uint? _crc32;
-        private bool _autocommit;
         private bool _saved;
         private string _path;
         private bool _commited;

@@ -142,6 +142,9 @@ namespace Bb.Diagrams
             link.Source.Diagram = this;
             link.UILink.TargetAttached += Links_TargetMapped;
             toolLink.Customize(link);
+
+            this.Relationships.Add(link.Source);
+
             return link;
         }
 

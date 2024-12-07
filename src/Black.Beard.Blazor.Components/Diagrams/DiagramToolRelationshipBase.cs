@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 
 namespace Bb.Diagrams
 {
+
     public class DiagramToolRelationshipBase : DiagramToolBase
     {
         private LinkMarker _targetMarker;
@@ -48,8 +49,6 @@ namespace Bb.Diagrams
         {
             return new SinglePortAnchor(model);
         }
-
-
 
         public virtual LinkProperties CreateLink(Guid uuid, PortModel source, PortModel target)
         {

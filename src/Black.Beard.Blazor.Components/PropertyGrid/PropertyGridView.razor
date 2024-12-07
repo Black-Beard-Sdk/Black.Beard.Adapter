@@ -15,7 +15,7 @@
                     @foreach (TranslatedKeyLabel category in Descriptor.Categories())
                     {
 
-                        <MudExpansionPanel Text="@TranslateService.Translate(category)" IsExpanded="true">
+                        <MudExpansionPanel Text="@TranslateService?.Translate(category)" IsExpanded="true">
                             @foreach (PropertyObjectDescriptor property in Descriptor.ItemsByCategories(category))
                             {
                                 <DynamicPropertyComponent Parent="@this"

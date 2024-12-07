@@ -4,6 +4,7 @@ using Bb.TypeDescriptors;
 using Bb.ComponentModel.Attributes;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.ComponentModel;
 
 namespace Bb.Diagrams
 {
@@ -11,6 +12,8 @@ namespace Bb.Diagrams
     public class LinkProperties
     : IDynamicDescriptorInstance
     , IValidationService
+    , INotifyPropertyChanged
+
     {
 
 
@@ -50,6 +53,8 @@ namespace Bb.Diagrams
             this.Source = relationship;
             this.UILink = link;
 
+            this.Source.PropertyChanged += Source_PropertyChanged;
+
             var properties2 = this._container
                 .Properties()
                 .Where(c => !c.IsReadOnly && !_excludes.Contains(c.Name))
@@ -58,6 +63,11 @@ namespace Bb.Diagrams
             foreach (var item in properties2)
                 item.Map(this, relationship.Properties.PropertyExists(item.Name), relationship.GetProperty(item.Name), _options);
 
+        }
+
+        protected virtual void Source_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            this.PropertyChanged?.Invoke(this, e);
         }
 
         public void SynchronizeSource()
@@ -113,6 +123,16 @@ namespace Bb.Diagrams
             foreach (var item in models)
                 this.UILink.Labels.Add(item.Create(this.UILink));
         }
+
+
+        #region INotifyPropertyChanged
+
+        public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        #endregion INotifyPropertyChanged
+
 
         private static List<Type> _typeToExcludes;
         private static readonly HashSet<string> _excludes;

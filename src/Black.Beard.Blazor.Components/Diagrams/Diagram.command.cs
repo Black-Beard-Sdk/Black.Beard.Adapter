@@ -369,7 +369,7 @@ namespace Bb.Diagrams
 
             if (items.Any())
                 foreach (var model in items)
-                    model.Apply(models[model.Uuid], context);
+                    model.Apply(models[model.Uuid], nameof(SerializableDiagramNode.Uuid), context);
 
 
         }
@@ -409,8 +409,7 @@ namespace Bb.Diagrams
             {
                 foreach (var link in items)
                 {
-                    if (link.Apply(links[link.Uuid]))
-                        result = true;
+                    link.Apply(links[link.Uuid], nameof(SerializableRelationship.Uuid), context);
                 }
             }
 

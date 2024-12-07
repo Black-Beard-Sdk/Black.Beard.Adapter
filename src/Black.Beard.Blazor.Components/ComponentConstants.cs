@@ -8,15 +8,15 @@ namespace Bb
 
         public static TranslatedKeyLabel Properties => new TranslatedKeyLabel("Properties");
 
-        public static TranslatedKeyLabel Save => new TranslatedKeyLabel("Save");
+        public static TranslatedKeyLabel Save => new TranslatedKeyLabel("Save Alt+s");
         public static TranslatedKeyLabel Zoom => new TranslatedKeyLabel("Zoom");
         public static TranslatedKeyLabel GridSize => new TranslatedKeyLabel("Grid size");
         public static TranslatedKeyLabel ShowGrid => new TranslatedKeyLabel("Show grid");
         public static TranslatedKeyLabel GridMode => new TranslatedKeyLabel("Grid mode");
 
 
-        public static TranslatedKeyLabel Undo => new TranslatedKeyLabel("Undo");
-        public static TranslatedKeyLabel Redo => new TranslatedKeyLabel("Redo");
+        public static TranslatedKeyLabel Undo => new TranslatedKeyLabel("Undo Alt+z");
+        public static TranslatedKeyLabel Redo => new TranslatedKeyLabel("Redo Alt+r");
 
 
         public static TranslatedKeyLabel Cancel => new TranslatedKeyLabel("Cancel");
