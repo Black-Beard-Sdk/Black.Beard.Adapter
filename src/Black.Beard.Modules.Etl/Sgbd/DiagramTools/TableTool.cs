@@ -18,7 +18,7 @@ namespace Bb.Modules.Sgbd.DiagramTools
                   "Add a new table",
                   GlyphFilled.TableRows)
         {
-            this.SetTypeModel<Table>();
+            this.WithModel<Table>();
             this.SetTypeUI<TableNode>();
         }
 

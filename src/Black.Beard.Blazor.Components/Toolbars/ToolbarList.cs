@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Bb.ComponentModel.Translations;
+using System.Collections;
 using System.Collections.Specialized;
 
 namespace Bb.Toolbars
@@ -22,6 +23,17 @@ namespace Bb.Toolbars
         public int Count => _items.Count;
 
         public bool IsReadOnly => false;
+
+        public Guid Id { get; }
+
+        public string Name { get; private set; }
+
+        public void Add(Guid idGroup, TranslatedKeyLabel name, Action<ToolbarGroup> initializer)
+        {
+            var g = new ToolbarGroup(idGroup, name);
+            initializer?.Invoke(g);
+            Add(g);
+        }
 
         public void Add(params ToolbarGroup[] items)
         {
@@ -171,10 +183,6 @@ namespace Bb.Toolbars
         {
             return this._selected == toolbarGroup;
         }
-
-        public Guid Id { get; }
-
-        public string Name { get; private set; }
 
         public Microsoft.AspNetCore.Components.ComponentBase Component { get; internal set; }
 

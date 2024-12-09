@@ -41,6 +41,9 @@ namespace Bb.PropertyGrid
         }
 
         [Parameter]
+        public Action<PropertyObjectDescriptor> AfterPropertyHaschanged { get; set; }
+
+        [Parameter]
         public Variant CurrentVariant { get; set; } = Variant.Text;
 
         [Parameter]
@@ -181,6 +184,7 @@ namespace Bb.PropertyGrid
 
         public event EventHandler<PropertyObjectDescriptorEventArgs> PropertyHasChanged;
 
+
         internal void PropertyHasChanged_Impl(PropertyObjectDescriptor obj, object instance)
         {
             PropertyHasChanged?.Invoke(this, new PropertyObjectDescriptorEventArgs(obj, instance));
@@ -190,6 +194,7 @@ namespace Bb.PropertyGrid
         {
             Update();
             PropertyHasChanged_Impl(obj, instance);
+            AfterPropertyHaschanged?.Invoke(obj);
         }
 
         #endregion events

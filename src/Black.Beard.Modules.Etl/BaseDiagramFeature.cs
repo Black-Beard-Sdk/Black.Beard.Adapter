@@ -1,5 +1,4 @@
 ﻿using Bb.Addons;
-using Bb.ComponentModel.Loaders;
 using Bb.Diagrams;
 using Bb.TypeDescriptors;
 using System.Text.Json;
@@ -32,7 +31,7 @@ namespace Bb.Modules
                     var toolbox = d.Toolbox;
 
                     foreach (var item in d.Models)
-                        if (toolbox.TryGetNodeTool(item.Type, out var tool))
+                        if (toolbox.TryGetNodeTool(item.ToolType, out var tool))
                             item.Initialize(tool, false);
 
                     //foreach (var item in d.Relationships)

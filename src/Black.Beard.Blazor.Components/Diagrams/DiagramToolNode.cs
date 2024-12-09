@@ -38,7 +38,7 @@ namespace Bb.Diagrams
             return this;
         }
 
-        public override void SetTypeModel<T>()
+        public override void WithModel<T>(Action<Initializer<T>> initializer = null)
         {
 
             var type = typeof(T);
@@ -58,7 +58,7 @@ namespace Bb.Diagrams
             if (this.SourceType == null)
                 throw new System.Exception($"The type {type.Name} must have a constructor with a single parameter of type DiagramNode");
 
-            base.SetTypeModel<T>();
+            base.WithModel<T>(initializer);
 
         }
 
@@ -71,6 +71,8 @@ namespace Bb.Diagrams
                 model 
             });
 
+            Initialize(result);
+
             if (result != null)
             {
                 model.SetUI(result);
@@ -78,6 +80,8 @@ namespace Bb.Diagrams
                 result.Source.SetDiagram(diagram);
                 diagram.AddNode(result);
                 result.InitializeFirst(this);
+                InitializeAfterAdded(result);
+
             }
 
             return result;

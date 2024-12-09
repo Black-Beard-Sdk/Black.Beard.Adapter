@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Bb.ComponentModel.Translations;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 
-namespace Bb.Modules.bpms
+namespace Bb.Modules
 {
 
-    public partial class BpmsDiagramPage : ComponentBase
+    public partial class DiagramPage : ComponentBase, ITranslateHost
     {
 
         [Parameter]
@@ -14,6 +16,12 @@ namespace Bb.Modules.bpms
         [Inject]
         public Documents FeatureInstances { get; set; }
 
+
+        [Inject]
+        public ITranslateService TranslationService { get; set; }
+
+        [Inject]
+        public IDialogService DialogService { get; set; }
 
         public Document FeatureInstance => _featureInstance ?? (_featureInstance = FeatureInstances.GeDocument(Uuid));
 

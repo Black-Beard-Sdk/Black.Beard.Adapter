@@ -1,6 +1,5 @@
 ﻿using Bb.Addons;
 using Bb.ComponentModel.Attributes;
-using Bb.Diagrams;
 using Bb.Modules.Sgbd.Models;
 
 namespace Bb.Modules.Sgbd
@@ -17,7 +16,7 @@ namespace Bb.Modules.Sgbd
                 new Guid(ModuleDatas.Filter)
             )
         {
-            Page = typeof(SgbdDiagramPage);
+            Page = typeof(DiagramPage);
         }
 
         public const string Filter = "487E5B0F-C9E8-47A2-B72C-11DABCAE9C00";

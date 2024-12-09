@@ -17,7 +17,7 @@ namespace Bb.Modules.Bpms
                   "Append a new swimlane",
                   GlyphFilled.AccountTree)
         {
-            this.SetTypeModel<BpmsSwimLane>();
+            this.WithModel<BpmsSwimLane>();
             this.SetTypeUI<SwimLaneComponent>();
             this.IsControlled(true);
             this.IsLocked(true);
@@ -31,7 +31,7 @@ namespace Bb.Modules.Bpms
 
             SerializableDiagramNode last = null;
 
-            foreach (var item in diagram.Models.Where(c => c.Type == Key))
+            foreach (var item in diagram.Models.Where(c => c.ToolType == Key))
                 if (item != node)
                     if (item.Position.Y >= y)
                     {

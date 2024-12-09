@@ -1,9 +1,11 @@
 ﻿using Bb.ComponentModel.Translations;
+using Bb.UIComponents;
 using System.Collections;
 using System.Collections.Specialized;
 
 namespace Bb.Toolbars
 {
+
 
     public class ToolbarGroup : ICollection<Tool>, INotifyCollectionChanged
     {
@@ -11,17 +13,23 @@ namespace Bb.Toolbars
         /// <summary>
         /// Initializes a new instance of the <see cref="ToolbarGroup"/> class.
         /// </summary>
-        public ToolbarGroup(Guid? id, TranslatedKeyLabel name) 
+        public ToolbarGroup(Guid? id, TranslatedKeyLabel name)
             : this(id, name, new List<Tool>() { })
         {
-            
+
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ToolbarGroup"/> class.
         /// </summary>
         /// <param name="items"></param>
-        public ToolbarGroup(Guid? id, TranslatedKeyLabel name, params Tool[] items) 
+        public ToolbarGroup(Guid? id, TranslatedKeyLabel name, params Tool[] items)
+            : this(id, name, items.ToList())
+        {
+
+        }
+
+        public ToolbarGroup(Guid? id, TranslatedKeyLabel name, params ExtendedTool[] items)
             : this(id, name, items.ToList())
         {
 
@@ -39,6 +47,15 @@ namespace Bb.Toolbars
             this.Show = _items.Any(c => c.Show);
         }
 
+        public ToolbarGroup(Guid? id, TranslatedKeyLabel name, IEnumerable<ExtendedTool> items)
+        {
+            this.Id = id.HasValue ? id.Value : Guid.NewGuid();
+            this.Name = name ?? throw new NullReferenceException(nameof(name));
+            _items = new List<Tool>(items ?? new ExtendedTool[] { });
+            this.Show = _items.Any(c => c.Show);
+        }
+
+
         /// <summary>
         /// Select the group
         /// </summary>
@@ -53,7 +70,7 @@ namespace Bb.Toolbars
         /// <summary>
         /// Return true if the group is selected
         /// </summary>
-        public bool IsSelected => Parent?.IsSelected(this) ?? false; 
+        public bool IsSelected => Parent?.IsSelected(this) ?? false;
 
         /// <summary>
         /// Return the <see cref="ToolbarList"/> parent
@@ -118,6 +135,42 @@ namespace Bb.Toolbars
 
         }
 
+
+        public ToolbarGroup Add(TranslatedKeyLabel name, TranslatedKeyLabel description, Glyph icon, object tag, bool withToggle, bool draggable, bool show)
+        {
+            var item = new Tool(name, description, icon, tag, withToggle, draggable, show);
+            Add(item);
+            return this;
+        }
+
+        public ToolbarGroup Add(TranslatedKeyLabel name, TranslatedKeyLabel description, Glyph icon, bool withToggle, bool draggable, bool show)
+        {
+            var item = new Tool(name, description, icon, null, withToggle, draggable, show);
+            Add(item);
+            return this;
+        }
+
+        public ToolbarGroup Add(TranslatedKeyLabel name, TranslatedKeyLabel description, Glyph icon)
+        {
+            var item = new Tool(name, description, icon, null, false, false, true);
+            Add(item);
+            return this;
+        }
+
+        public ToolbarGroup Add(TranslatedKeyLabel name, TranslatedKeyLabel description, Glyph icon, Action<ExtendedTool, object> command)
+        {
+            var item = new ExtendedTool(name, description, icon, null, true, command);
+            Add(item);
+            return this;
+        }
+
+        public ToolbarGroup Add<T>(TranslatedKeyLabel name, TranslatedKeyLabel description, Glyph icon, Action<ExtendedTool, T> command)
+        {
+            var item = new ExtendedTool(name, description, icon, null, true, (c, d) => command(c, (T)d));
+            Add(item);
+            return this;
+        }
+
         /// <summary>
         /// Add new tool
         /// </summary>
@@ -136,7 +189,7 @@ namespace Bb.Toolbars
 
                 this.Show = _items.Any(c => c.Show);
             }
-                      
+
         }
 
         /// <summary>
@@ -243,6 +296,11 @@ namespace Bb.Toolbars
             return _items.GetEnumerator();
         }
 
+        public void Add(string v1, string v2, Glyph save, object manageParcels)
+        {
+            throw new NotImplementedException();
+        }
+
         public Guid Id { get; }
         public TranslatedKeyLabel Name { get; }
 
@@ -253,86 +311,5 @@ namespace Bb.Toolbars
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
     }
-
-    //    public class ToolbarList
-    //    {
-
-    //        public ToolbarList(IEnumerable<ToolItemBase> items)
-    //        {
-
-    //            if (items != null)
-    //            {
-
-    //                var i = items.ToLookup(i => i.Category).ToList();
-    //                Items = new List<ToolboxCategory>(i.Count());
-    //                foreach (var item in i)
-    //                {
-    //                    var display = item.Key.DefaultDisplay;
-    //                    var category = new ToolbarCategory(this, display, item);
-    //                    Items.Add(category);
-    //                }
-
-    //                var links = items.OfType<DiagramToolRelationshipBase>().ToList();
-    //                if (links.Count == 1)
-    //                    CurrentLink = links[0];
-    //                else
-    //                    CurrentLink = links.FirstOrDefault(c => c.IsDefaultLink);
-
-    //            }
-
-    //        }
-
-    //        public List<ToolboxCategory> Items { get; }
-
-    //        public string Current { get; internal set; }
-
-    //        public DiagramToolRelationshipBase CurrentLink { get; set; }
-
-
-    //        public void EnsureCategoryIsShown(DiagramToolBase item)
-    //        {
-
-    //            foreach (var category in Items)
-    //                if (category.Items.Contains(item))
-    //                {
-    //                    category.Toggle();
-    //                    return;
-    //                }
-
-    //        }
-
-
-    //    }
-
-    //    public class ToolbarCategory
-    //    {
-
-    //        public ToolbarCategory(ToolbarList parent, string name, IEnumerable<ToolItemBase> items)
-    //        {
-    //            _parent = parent;
-    //            Name = name;
-    //            Items = new List<ToolItemBase>(items);
-    //        }
-
-
-    //        public bool IsExpanded
-    //        {
-    //            get => _parent.Current == this.Name;
-    //        }
-
-
-    //        public string Name { get; set; }
-
-    //        public List<ToolItemBase> Items { get; }
-
-    //        //public void Toggle()
-    //        //{
-    //        //    _parent.Current = this.Name;
-    //        //}
-
-    //        private readonly ToolboxList _parent;
-
-    //    }
-
 
 }

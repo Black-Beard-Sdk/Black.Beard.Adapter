@@ -1,14 +1,11 @@
 ﻿using Bb.ComponentDescriptors;
 using Bb.ComponentModel.Translations;
-using Bb.Configuration.Git;
 using Bb.Editors;
 using Bb.Modules;
 using Bb.UIComponents;
 using Bb.Wizards;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using System.Dynamic;
-using System.Reflection;
 
 
 namespace Bb.Pages
@@ -84,11 +81,7 @@ namespace Bb.Pages
         {
 
             var act = new EditorResultComponent()
-            {
-                Cancel = ctx =>
-                {
-                    return true;
-                },
+            {                
                 Validate = ctx =>
                 {
 
@@ -116,8 +109,7 @@ namespace Bb.Pages
             var b = new DialogParameters
             {
                 { "SelectedObject",  Module.Sources },
-                { "Actions", act
-                }
+                { "Actions", act }
             };
 
             var options = new DialogOptions()

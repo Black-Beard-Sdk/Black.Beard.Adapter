@@ -1,4 +1,5 @@
-﻿@using Blazor.Diagrams.Components
+﻿@using Bb.Toolbars
+@using Blazor.Diagrams.Components
 @using Blazor.Diagrams.Components.Widgets
 @using Microsoft.AspNetCore.Components.Web
 @using MudBlazor
@@ -55,22 +56,44 @@
 
         <MudTooltip Style="font-size: x-small;" Text="@ComponentConstants.Undo.Translate(this)" Color="Color.Default">
             <MudMenu StartIcon="@Icons.Material.Filled.Undo" EndIcon="@IconUndo" Disabled="@DisabledUndo">
-                @foreach (var item in this.UndoList)
+                @if (this.UndoList != null)
                 {
-                    <MudMenuItem OnClick="@((e) => OnRestoreUndo(e, item))">@item.Label</MudMenuItem>
+                    @foreach (var item in this.UndoList)
+                    {
+                        <MudMenuItem OnClick="@((e) => OnRestoreUndo(e, item))">@item.Label</MudMenuItem>
+                    }
                 }
             </MudMenu>
         </MudTooltip>
 
         <MudTooltip Style="font-size: x-small;" Text="@ComponentConstants.Redo.Translate(this)" Color="Color.Default">
             <MudMenu StartIcon="@Icons.Material.Filled.Redo" EndIcon="@IconRedo" Disabled="@DisabledRedo">
-                @foreach (var item in this.RedoList)
+                @if (this.UndoList != null)
                 {
-                    <MudMenuItem OnClick="@((e) => OnRestoreRedo(e, item))">@item.Label</MudMenuItem>
+                    @foreach (var item in this.RedoList)
+                    {
+                        <MudMenuItem OnClick="@((e) => OnRestoreRedo(e, item))">@item.Label</MudMenuItem>
+                    }
                 }
             </MudMenu>
         </MudTooltip>
 
+        @if (this.Diagram != null)
+        {
+            @foreach (ToolbarGroup group in this.Diagram.GetExtendedToolbar())
+            {
+                @foreach (ExtendedTool item in group)
+                {
+                    <MudTooltip Text="@item.ToolTip.Translate(this)" Color="Color.Default">
+                        <MudIconButton Size="Size.Small"
+                                       Class="mr-5"
+                                       Icon="@item.Icon"
+                                       Color="MudBlazor.Color.Inherit"
+                                       OnClick="@((e) => item.Execute(e, this.Diagram))" />
+                    </MudTooltip>
+                }
+            }
+        }
 
     </MudToolBar>
 </MudPaper>

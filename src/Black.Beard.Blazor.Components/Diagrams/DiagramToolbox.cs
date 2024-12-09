@@ -77,6 +77,7 @@ namespace Bb.Diagrams
 
             if (instance != null && !_tools.ContainsKey(instance.Uuid))
             {
+
                 if (initializer != null)
                     initializer.Invoke(instance);
 

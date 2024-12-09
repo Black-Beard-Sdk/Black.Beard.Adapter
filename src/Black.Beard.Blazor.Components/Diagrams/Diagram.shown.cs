@@ -46,7 +46,13 @@ namespace Bb.Diagrams
                         _diagram.RegisterComponent(specModel.TypeModel, specModel.TypeUI, true);
 
             // Create nodes
-            CreateNodes(this.Models);
+            var toRemove = CreateNodes(this.Models);
+
+            foreach (var item in toRemove)
+            {
+                Models.RemoveRange(Models.Where(c => c.UuidParent == item.Uuid));
+                Models.Remove(item);
+            }
 
             // Create links
             CreateLinks(this.Relationships);
@@ -99,8 +105,15 @@ namespace Bb.Diagrams
             foreach (var model in this.Models)
             {
                 var ui = model.GetUI();
-                foreach (var port in ui.Ports)
-                    dicPort.Add(new Guid(port.Id), port);
+                if (ui != null) // if the ui is null, it is because the tool had not been resolved.
+                {
+                    foreach (var port in ui.Ports)
+                        dicPort.Add(new Guid(port.Id), port);
+                }
+                else
+                {
+
+                }
             }
 
             var l = i.ToList();
@@ -148,8 +161,10 @@ namespace Bb.Diagrams
             return link;
         }
 
-        private void CreateNodes(IEnumerable<SerializableDiagramNode> i)
+        private IEnumerable<SerializableDiagramNode> CreateNodes(IEnumerable<SerializableDiagramNode> i)
         {
+
+            List<SerializableDiagramNode> toRemove = new List<SerializableDiagramNode>(i.Count());
 
             List<SerializableDiagramNode> items = i.ToList();
             var dicNodes = this._diagram.Nodes.ToDictionary(c => new Guid(c.Id));
@@ -178,30 +193,36 @@ namespace Bb.Diagrams
                     }
 
                     if (item.GetUI() == null)
+                    {
                         if (CreateNodes(item, out var ui))
                             dicNodes.Add(new Guid(ui.Id), ui);
+                        
+                        else
+                            toRemove.Add(item);
+                    }
 
                 }
-
 
                 foreach (var item in items2)
                     items.Remove(item);
 
             }
 
+            return toRemove;
+
         }
 
 
         private bool CreateNodes(SerializableDiagramNode? item, out UIModel result)
         {
+
             result = null;
 
-            if (this.Toolbox.TryGetNodeTool(item.Type, out DiagramToolNode? specModel))
-            {
-                result = specModel.CreateUI(item, this);
-            }
+            if (this.Toolbox.TryGetNodeTool(item.ToolType, out DiagramToolNode? specModel)) // Try to resolve the tool to use for create the ui node
+                result = specModel.CreateUI(item, this);          
 
             return result != null;
+
         }
 
         private void RemoveLinks(SerializableRelationship[] list)

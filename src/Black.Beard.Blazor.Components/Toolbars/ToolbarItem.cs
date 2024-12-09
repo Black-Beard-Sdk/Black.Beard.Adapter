@@ -1,7 +1,26 @@
 ﻿using Bb.ComponentModel.Translations;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Bb.Toolbars
 {
+
+    public partial class ExtendedTool : Tool
+    {
+
+        public ExtendedTool(TranslatedKeyLabel name, TranslatedKeyLabel description, string icon, object? tag, bool show, Action<ExtendedTool, object> command)
+            : base(name, description, icon, tag, false, false, show)
+        {
+            this._command = command;
+        }
+
+        public void Execute(MouseEventArgs args, object target)
+        {
+            _command.Invoke(this, target);
+        }
+
+        private Action<ExtendedTool, object> _command;
+
+    }
 
     public partial class Tool
     {
@@ -11,14 +30,14 @@ namespace Bb.Toolbars
             TranslatedKeyLabel name,
             TranslatedKeyLabel description,
             string icon,
-            object? tag, 
+            object? tag,
             bool withToggle,
             bool draggable,
             bool show
         )
         {
             this.Name = name;
-            
+
             this.Icon = icon;
             this.ToolTip = description;
             Tag = tag;
@@ -48,7 +67,7 @@ namespace Bb.Toolbars
 
         public string Draggable { get; }
 
-        public bool Show { get;  }
+        public bool Show { get; }
 
         public ToolbarGroup? Group { get; internal set; }
 

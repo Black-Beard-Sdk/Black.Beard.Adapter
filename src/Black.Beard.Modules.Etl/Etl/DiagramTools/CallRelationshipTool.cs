@@ -10,7 +10,7 @@ namespace Bb.Modules.Etl
 
         public ConstraintRelationship()
             : base(Key,
-                  Bb.ComponentConstants.Relationships,
+                  Bb.ComponentConstants.Relationship,
                    "Call",
                    "Call a WebService",
                    GlyphFilled.ArrowUpward)

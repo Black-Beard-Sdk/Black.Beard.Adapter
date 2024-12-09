@@ -36,7 +36,7 @@ namespace Bb.Diagrams
                 typeof(NodeModel),
                 typeof(SelectableModel),
                 typeof(MovableModel),
-                typeof(UIModel)
+                typeof(UIModel),
             };
 
 

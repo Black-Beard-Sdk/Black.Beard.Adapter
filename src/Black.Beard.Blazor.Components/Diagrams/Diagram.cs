@@ -4,7 +4,6 @@ using Bb.Toolbars;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams;
 using Blazor.Diagrams.Core.Geometry;
-using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
 using MudBlazor;
 using System.Collections.Specialized;
@@ -85,7 +84,8 @@ namespace Bb.Diagrams
 
                 c.RemoveProperties
                 (
-                    nameof(Diagram.DynamicToolbox)
+                    nameof(Diagram.DynamicToolbox), 
+                    nameof(Diagram.CanMemorize)
                 );
 
             });
@@ -97,6 +97,7 @@ namespace Bb.Diagrams
         public Diagram(Guid typeModelId, bool dynamicToolbox)
         {
             _toolbox = new DiagramToolbox().AppendInitializer(this);
+            InitializeExtendedToolbox(GetExtendedToolbar());
             this.DynamicToolbox = dynamicToolbox;
             this._container = new DynamicDescriptorInstanceContainer(this);
             this.TypeModelId = typeModelId;
@@ -347,6 +348,32 @@ namespace Bb.Diagrams
         }
 
         /// <summary>
+        /// Initialize the extended toolbox for showing tool in the toolbar on the top of the diagram.
+        /// </summary>
+        /// <param name="toolbar">the tool bar to customize</param>
+        /// <example lang="C#">
+        /// public override void InitializeExtendedToolbox(ToolbarList toolbar)
+        /// {
+        ///     toolbar.Add(Guid.NewGuid(), "Tools", c =>
+        ///     {
+        ///         c.Add("Label", "description", GlyphFilled.AddBox, MyMethod);
+        ///     });
+        /// }
+        /// 
+        /// protected void MyMethod(ExtendedTool tool, object target)
+        /// {
+        ///     if (target is Diagram diagram)
+        ///     {
+        /// 
+        ///     }
+        /// }
+        /// </example>
+        public virtual void InitializeExtendedToolbox(ToolbarList toolbar)
+        {
+
+        }
+
+        /// <summary>
         /// Return the toolbar
         /// </summary>
         /// <returns></returns>
@@ -380,6 +407,20 @@ namespace Bb.Diagrams
             }
 
             return _list;
+
+        }
+
+
+        public Toolbars.ToolbarList GetExtendedToolbar()
+        {
+
+            if (_list2 == null)
+            {
+                Dictionary<string, ToolbarGroup> groups = new Dictionary<string, ToolbarGroup>();              
+                _list2 = new ToolbarList(Guid.NewGuid(), this.Name, groups.Values);
+            }
+
+            return _list2;
 
         }
 
@@ -494,6 +535,7 @@ namespace Bb.Diagrams
         private readonly DynamicDescriptorInstanceContainer _container;
         private readonly DiagramToolbox _toolbox;
         private ToolbarList _list;
+        private ToolbarList _list2;
         private IMemorizer _command;
         private Action<object, Stream> _memorize;
         private Func<Stream, Type, object> _load;

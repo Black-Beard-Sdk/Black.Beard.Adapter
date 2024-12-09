@@ -16,7 +16,7 @@ namespace Bb.Modules.Bpms
                   GlyphFilled.SwipeRightAlt)
         {
             this.AddParentType<BpmsSwimLane>();
-            this.SetTypeModel<BpmsStartingEvent>();
+            this.WithModel<BpmsStartingEvent>();
             //this.SetTypeUI<SwimLaneComponent>();
             //this.IsControlled(true);
             //this.IsLocked(false);

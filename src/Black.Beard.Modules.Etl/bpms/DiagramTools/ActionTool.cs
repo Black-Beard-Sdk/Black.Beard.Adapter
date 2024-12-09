@@ -17,7 +17,7 @@ namespace Bb.Modules.Bpms
                   GlyphFilled.CropSquare)
         {
             this.AddParentType<BpmsSwimLane>();
-            this.SetTypeModel<BpmsAction>();
+            this.WithModel<BpmsAction>();
             //this.SetTypeUI<SwimLaneComponent>();
             //this.IsControlled(true);
             //this.IsLocked(false);

@@ -17,8 +17,6 @@ namespace Bb.Modules.Sgbd.Models
             this._container = new DynamicDescriptorInstanceContainer(this);
         }
 
-        public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
         [JsonIgnore]
         [Browsable(false)]
         public Table Table { get; set; }
@@ -77,10 +75,6 @@ namespace Bb.Modules.Sgbd.Models
 
         public string DefaultValue { get; set; }
 
-        public object GetProperty(string name) => this._container.GetProperty(name);
-
-        public void SetProperty(string name, object value) => this._container.SetProperty(name, value);
-
 
         public SgbdDiagram? Diagram() => Table?.Source.GetDiagram<SgbdDiagram>();
 
@@ -93,7 +87,26 @@ namespace Bb.Modules.Sgbd.Models
             return result;
         }
 
+
+
+        #region IDynamicDescriptorInstance
+
+        public object GetProperty(string name) => this._container.GetProperty(name);
+
+        public void SetProperty(string name, object value) => this._container.SetProperty(name, value);
+
+        #endregion IDynamicDescriptorInstance
+
+
+        #region INotifyPropertyChanged
+
+        public void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion INotifyPropertyChanged
+
+
 
         private bool isPrimary;
         private string _name;

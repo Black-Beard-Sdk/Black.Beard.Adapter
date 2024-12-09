@@ -11,7 +11,7 @@ namespace Bb.Modules.Bpms
 
         public BpmsRelationshipLink()
             : base(Key,
-                   Bb.ComponentConstants.Relationships,
+                   Bb.ComponentConstants.Relationship,
                    "Relation",
                    "bpms relation",
                    GlyphFilled.ArrowUpward)

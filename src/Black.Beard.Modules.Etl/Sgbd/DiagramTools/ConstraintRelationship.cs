@@ -9,7 +9,7 @@ namespace Bb.Modules.Sgbd.DiagramTools
 
         public ConstraintRelationship()
             : base(Key,
-                   Bb.ComponentConstants.Relationships,
+                   Bb.ComponentConstants.Relationship,
                    "Constraint",
                    "Create a constraint",
                    GlyphFilled.ArrowUpward)

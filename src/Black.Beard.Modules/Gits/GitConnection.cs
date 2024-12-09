@@ -89,6 +89,16 @@ namespace Bb.Configuration.Git
             if (!uri.IsWellFormedOriginalString())
                 return false;
 
+            //try
+            //{
+            //    var file = new DirectoryInfo(this.Path);
+            //    file.CreateFolderIfNotExists();
+            //}
+            //catch (Exception)
+            //{
+            //    return false;
+            //}
+
             return true;
 
         }
@@ -121,6 +131,10 @@ namespace Bb.Configuration.Git
             return GitStatus.NotInitialized;
 
         }
+
+
+        //public string Path { get; set; }
+
 
     }
 

@@ -1,6 +1,5 @@
 ﻿using Bb.Addons;
 using Bb.ComponentModel.Attributes;
-using Bb.Modules.bpms;
 
 namespace Bb.Modules.Bpms.Models
 {
@@ -16,7 +15,7 @@ namespace Bb.Modules.Bpms.Models
                 new Guid(ModuleDatas.Filter)
             )
         {
-            this.Page = typeof(BpmsDiagramPage);
+            this.Page = typeof(DiagramPage);
         }
 
 

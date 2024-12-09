@@ -1,7 +1,10 @@
 ﻿using Bb.ComponentModel.Translations;
+using Bb.UIComponents;
 
 namespace Bb.Diagrams
 {
+
+    
 
 
     public class DiagramToolBase
@@ -54,11 +57,36 @@ namespace Bb.Diagrams
         /// </summary>
         public Guid Uuid { get; }
 
-        public virtual void SetTypeModel<T>()
-            where T : INodeModel
-        {
+        public virtual void WithModel<T>(Action<Initializer<T>> initializer = null)
+            where T : UIModel
+        {            
             TypeModel = typeof(T);
+
+            var i = new Initializer<T>()
+            {
+
+            };
+
+            if (initializer != null)
+                initializer(i);
+
+            this._Initializer = i;
+
         }
+
+        protected void Initialize(UIModel model)
+        {
+            if (_Initializer != null)
+                _Initializer.ExecuteInitialize(model);
+        }
+    
+        protected void InitializeAfterAdded(UIModel model)
+        {
+            if (_Initializer != null)
+                _Initializer.ExecuteInitializeAfterAdded(model);
+        }
+
+        private Initializer _Initializer;
 
         public Type TypeModel { get; private set; } = typeof(UIModel);
 
@@ -66,6 +94,13 @@ namespace Bb.Diagrams
             where T : Microsoft.AspNetCore.Components.IComponent
         {
             TypeUI = typeof(T);
+        }
+
+        public static Glyph Evaluate(Glyph left, Glyph right)
+        {
+            if (left.IsEmpty)
+                return right;
+            return left;
         }
 
         public Type TypeUI { get; private set; }

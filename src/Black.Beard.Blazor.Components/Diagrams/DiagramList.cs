@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
@@ -92,57 +93,63 @@ namespace Bb.Diagrams
         public void AddRange(params TValue[] newItems)
         {
 
-            List<TValue> listAdded = new List<TValue>(newItems.Length);
-            List<(TValue, TValue)> listUpdated = new List<(TValue, TValue)>(newItems.Length);
-
-
-            using (_lock.LockForUpgradeableRead())
+            if (newItems.Any())
             {
-                foreach (var newItem in newItems)
+
+                List<TValue> listAdded = new List<TValue>(newItems.Length);
+                List<(TValue, TValue)> listUpdated = new List<(TValue, TValue)>(newItems.Length);
+
+
+                using (_lock.LockForUpgradeableRead())
                 {
-                    var key = _key(newItem);
-                    if (!_dic.TryGetValue(key, out TValue oldValue))
+                    foreach (var newItem in newItems)
                     {
-                        using (_lock.LockForWrite())
+                        var key = _key(newItem);
+                        if (!_dic.TryGetValue(key, out TValue oldValue))
                         {
-                            if (!_dic.TryGetValue(key, out oldValue))
+                            using (_lock.LockForWrite())
                             {
-                                _dic.Add(key, newItem);
-                                listAdded.Add(newItem);
+                                if (!_dic.TryGetValue(key, out oldValue))
+                                {
+                                    _dic.Add(key, newItem);
+                                    listAdded.Add(newItem);
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        using (_lock.LockForWrite())
+                        else
                         {
-                            if (_dic.TryGetValue(key, out oldValue))
+                            using (_lock.LockForWrite())
                             {
-                                _dic[key] = newItem;
-                                listUpdated.Add((oldValue, newItem));
+                                if (_dic.TryGetValue(key, out oldValue))
+                                {
+                                    _dic[key] = newItem;
+                                    listUpdated.Add((oldValue, newItem));
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if (listAdded.Count > 0)
-            {
-
-                foreach (var item in listAdded)
-                    Suscribes(item);
-
-                OnChangedInCollection(NotifyCollectionChangedAction.Add, listAdded.ToArray());
-
-            }
-
-            if (listUpdated.Count > 0)
-                foreach (var (oldValue, newItem) in listUpdated)
+                if (listAdded.Count > 0)
                 {
-                    Unsuscribes(oldValue);
-                    Suscribes(newItem);
-                    OnReplacedInCollection(oldValue, newItem);
+
+                    foreach (var item in listAdded)
+                        Suscribes(item);
+
+                    OnChangedInCollection(NotifyCollectionChangedAction.Add, listAdded.ToArray());
+
                 }
+
+                if (listUpdated.Count > 0)
+                    foreach (var (oldValue, newItem) in listUpdated)
+                    {
+                        Unsuscribes(oldValue);
+                        Suscribes(newItem);
+                        OnReplacedInCollection(oldValue, newItem);
+                    }
+
+            }
+
         }
 
         /// <summary>
@@ -270,29 +277,33 @@ namespace Bb.Diagrams
         /// <param name="items">items to add</param>
         public void RemoveRange(IEnumerable<TValue> items)
         {
-
-            List<TValue> listRemoved = new List<TValue>(items.Count());
-
-            var dispose = () =>
+            if (items.Any())
             {
-                var a = listRemoved.ToArray();
-                Unsuscribes(a);
-                OnChangedInCollection(NotifyCollectionChangedAction.Remove, a);
-            };
 
-            using (_lock.LockForUpgradeableRead(dispose))
-                foreach (var item in items)
+                List<TValue> listRemoved = new List<TValue>(items.Count());
+
+                var dispose = () =>
                 {
-                    var key = _key(item);
-                    if (_dic.ContainsKey(key))
-                        using (_lock.LockForWrite())
-                            if (_dic.ContainsKey(key))
-                            {
-                                _dic.Remove(key);
-                                listRemoved.Add(item);
-                            }
-                }
+                    var a = listRemoved.ToArray();
+                    Unsuscribes(a);
+                    OnChangedInCollection(NotifyCollectionChangedAction.Remove, a);
+                };
 
+                using (_lock.LockForUpgradeableRead(dispose))
+                    foreach (var item in items)
+                    {
+                        var key = _key(item);
+                        if (_dic.ContainsKey(key))
+                            using (_lock.LockForWrite())
+                                if (_dic.ContainsKey(key))
+                                {
+                                    _dic.Remove(key);
+                                    listRemoved.Add(item);
+                                }
+                    }
+
+
+            }
         }
 
         /// <summary>

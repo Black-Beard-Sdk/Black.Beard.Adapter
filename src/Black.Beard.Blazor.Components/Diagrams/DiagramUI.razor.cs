@@ -135,6 +135,28 @@ namespace Bb.Diagrams
             }
         }
 
+        [EvaluateValidation(false)]
+        [Inject]
+        public IBusyService BusyService
+        {
+            get => _busyService;
+            set
+            {
+                if (_busyService != null)
+                    _busyService.BusyChanged -= _busyService_BusyChanged;
+                _busyService = value;
+                _busyService.BusyChanged += _busyService_BusyChanged;
+
+            }
+        }
+
+        [EvaluateValidation(false)]
+        private BlazorDiagram UIDiagram { get; set; } = null!;
+
+        [Parameter]
+        public MudExpansionPanel ExpansionDiagnostic { get; set; }
+
+
         #region undo / Redo
 
         public TransactionViewList? UndoList => u;
@@ -144,7 +166,7 @@ namespace Bb.Diagrams
         {
             get
             {
-                if (u.Any())
+                if (u != null && u.Any())
                     return Icons.Material.Filled.KeyboardArrowDown;
                 return null;
             }
@@ -153,7 +175,7 @@ namespace Bb.Diagrams
         {
             get
             {
-                if (r.Any())
+                if (r != null && r.Any())
                     return Icons.Material.Filled.KeyboardArrowDown;
                 return null;
             }
@@ -163,7 +185,7 @@ namespace Bb.Diagrams
         {
             get
             {
-                if (u == null)
+                if (u != null && u == null)
                     return true;
                 return !u.Any();
             }
@@ -173,7 +195,7 @@ namespace Bb.Diagrams
         {
             get
             {
-                if (r == null)
+                if (r != null && r == null)
                     return true;
                 return !r.Any();
             }
@@ -196,33 +218,10 @@ namespace Bb.Diagrams
             StateHasChanged();
         }
 
-
-        [EvaluateValidation(false)]
-        [Inject]
-        public IBusyService BusyService
-        {
-            get => _busyService;
-            set
-            {
-                if (_busyService != null)
-                    _busyService.BusyChanged -= _busyService_BusyChanged;
-                _busyService = value;
-                _busyService.BusyChanged += _busyService_BusyChanged;
-
-            }
-        }
-
-        [EvaluateValidation(false)]
-        private BlazorDiagram UIDiagram { get; set; } = null!;
-
-        [Parameter]
-        public MudExpansionPanel ExpansionDiagnostic { get; set; }
-
         protected override void OnInitialized()
         {
 
         }
-
 
         protected override Task OnInitializedAsync()
         {

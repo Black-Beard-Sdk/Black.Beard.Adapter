@@ -21,7 +21,7 @@ namespace Bb.Modules.Etl
 
             AddPort(PortAlignment.Right);
 
-            this.SetTypeModel<EtlWebService>();
+            this.WithModel<EtlWebService>();
             //this.SetTypeUI<CustomGroupWidget>();
             this.IsControlled(false);
         }

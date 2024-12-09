@@ -22,7 +22,7 @@ namespace Bb.Modules.Etl
             AddPort(PortAlignment.Right);
 
             this.AddParentType<EtlWebService>();
-            this.SetTypeModel<EtlWebMethodService>();
+            this.WithModel<EtlWebMethodService>();
             //this.SetTypeUI<TableNode>();
 
         }

@@ -1,8 +1,6 @@
 ﻿using Bb.Addons;
 using Bb.ComponentModel.Attributes;
-using Bb.Diagrams;
 using Bb.Modules.Etl.Models;
-using Bb.Modules.Sgbd.Models;
 
 namespace Bb.Modules.Etl
 {
@@ -20,7 +18,7 @@ namespace Bb.Modules.Etl
                 new Guid(ModuleDatas.Filter)
             )
         {
-            this.Page = typeof(EtlDiagramPage);
+            this.Page = typeof(DiagramPage);
         }
 
         public const string Filter = "C9119B69-5DD9-45D2-A28A-617D6CB9D7F9";

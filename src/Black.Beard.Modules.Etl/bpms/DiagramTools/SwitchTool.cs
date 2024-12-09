@@ -16,7 +16,7 @@ namespace Bb.Modules.Bpms
         {
             
             this.AddParentType<BpmsSwimLane>();
-            this.SetTypeModel<BpmsSwitch>();
+            this.WithModel<BpmsSwitch>();
             //this.SetTypeUI<SwimLaneComponent>();
             //this.IsControlled(true);
             //this.IsLocked(false);
