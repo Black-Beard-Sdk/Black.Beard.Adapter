@@ -3,6 +3,7 @@ using Bb.ComponentDescriptors;
 using Bb.ComponentModel.Translations;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Transactions;
 
 namespace Bb.PropertyGrid
 {
@@ -37,7 +38,7 @@ namespace Bb.PropertyGrid
         public Margin CurrentMargin { get; set; } = Margin.Dense;
 
         [Parameter]
-        public PropertyObjectDescriptor Property { get; set; }
+        public Descriptor Property { get; set; }
 
         [Parameter]
         public Action<PropertyObjectDescriptor> PropertyValidationHasChanged { get; set; }
@@ -54,6 +55,8 @@ namespace Bb.PropertyGrid
         [Inject]
         public IServiceProvider ServiceProvider { get; set; }
 
+        //[Parameter]
+        //public ITransactionManager TransactionManager { get; set; }
 
         public IDictionary<string, object> Parameters
         {
@@ -64,7 +67,8 @@ namespace Bb.PropertyGrid
                 {
                     { "CurrentVariant", CurrentVariant },
                     { "CurrentMargin", CurrentMargin },
-                    { "Property", Property },
+                    { "Descriptor", Property },
+                    //{ "TransactionManager", TransactionManager },
                 };
 
                 Parent?.BuildDynamicParameter(result);

@@ -7,7 +7,8 @@
           disabled="@Property.ReadOnly"
           rows="5"
           cols="60"
-          onchange="@((ChangeEventArgs e) => HandleOnChange(e))">
+          onchange="@((ChangeEventArgs e) => HandleOnChange(e))"
+          onfocus="@OnFocus">
         @Value
     </textarea>
 
@@ -20,6 +21,6 @@
             Disabled="@Property.ReadOnly"
             Variant="@CurrentVariant"
             Margin="@CurrentMargin"
-              />
+            onfocus="@OnFocus" />
 
 

@@ -6,6 +6,14 @@ namespace Bb.PropertyGrid
     {
 
 
+        protected override void OnAfterRender(bool firstRender)
+        {
+            base.OnAfterRender(firstRender);
+
+            var a = this.StrategyName;
+
+        }
+
 
 
 

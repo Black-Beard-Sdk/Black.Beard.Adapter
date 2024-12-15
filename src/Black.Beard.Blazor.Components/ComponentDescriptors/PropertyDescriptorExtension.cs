@@ -38,7 +38,7 @@ namespace Bb.ComponentDescriptors
 
             catch (Exception ex)
             {
-                var messages = new DiagnosticValidatorItem(descriptor);
+                var messages = new DiagnosticValidatorItem();
                 messages.Add("Failed to resolve the value." + ex.Message);
                 return messages;
             }
@@ -49,7 +49,7 @@ namespace Bb.ComponentDescriptors
         public static DiagnosticValidatorItem ValidateValue(this PropertyDescriptor descriptor, object value, ITranslateService translator = null)
         {
 
-            var messages = new DiagnosticValidatorItem(descriptor)
+            var messages = new DiagnosticValidatorItem()
             {
                 Value = value
             };

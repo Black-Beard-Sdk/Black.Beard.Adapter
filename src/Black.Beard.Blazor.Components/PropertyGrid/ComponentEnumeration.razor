@@ -9,7 +9,8 @@
            
            @bind-Value="Value"
            HelperText="@Property.GetDescription()"
-           AnchorOrigin="Origin.BottomCenter">
+           AnchorOrigin="Origin.BottomCenter"
+           onfocus="@OnFocus">
 
 
     @foreach (var item in Items)

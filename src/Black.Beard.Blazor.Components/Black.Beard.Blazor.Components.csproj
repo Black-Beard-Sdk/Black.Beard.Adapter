@@ -35,11 +35,14 @@
     <Compile Remove="Diagrams\Toolbox.razor.cs" />
     <Compile Remove="Diagrams\ToolboxList.cs" />
     <Compile Remove="PropertyGrid\ComponentFieldTree.razor.cs" />
+    <Compile Remove="PropertyGrid\PropertyListView.initializers.cs" />
+    <Compile Remove="PropertyGrid\PropertyListView.razor.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Remove="Diagrams\Toolbox.razor" />
     <Content Remove="PropertyGrid\ComponentFieldTree.razor" />
+    <Content Remove="PropertyGrid\PropertyListView.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +59,12 @@
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
     <PackageReference Include="MudBlazor" Version="7.15.0" />
     <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="PropertyGrid\ComponentGrid.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 	
 </Project>

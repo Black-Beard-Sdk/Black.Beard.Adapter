@@ -1,95 +1,113 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.TypeDescriptors;
+using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Bb.ComponentDescriptors
 {
 
-    public class ObjectDescriptor
+
+    public class ObjectDescriptor : Descriptor
     {
 
-        public ObjectDescriptor(object instance,
+        public ObjectDescriptor
+        (
+            object instance,
             Type type,
-            ITranslateService translateService,
+            ITranslateHost translateService,
             IServiceProvider serviceProvider,
             string strategyName,
             Func<PropertyDescriptor, bool> propertyDescriptorFilter = null,
-            Func<PropertyObjectDescriptor, bool> propertyFilter = null)
+            Func<PropertyObjectDescriptor, bool> propertyFilter = null
+        )
+            : base(serviceProvider, translateService, strategyName, type, propertyDescriptorFilter, propertyFilter)
         {
-            this.StrategyName = strategyName;
-            Instance = instance;
-            _type = type;
-            TranslateService = translateService;
-            ServiceProvider = serviceProvider;
-            _items = new List<PropertyObjectDescriptor>();
+            Value = instance;
             _invaLidItems = new List<PropertyObjectDescriptor>();
+            Analyze();
+        }
 
+        protected override void Analyze()
+        {
+            if (Type != null)
+            {
 
-            if (propertyDescriptorFilter != null)
-                PropertyDescriptorFilter = propertyDescriptorFilter;
-            else
-                PropertyDescriptorFilter = (p) =>
-                {
-                    if (p is IDynamicActiveProperty i)
-                        return i.IsActive(Instance);
-                    return true;
-                };
+                base.Analyze();
 
-            if (propertyFilter != null)
-                PropertyFilter = propertyFilter;
-            else
-                PropertyFilter = (p) => true;
+                if (Type.IsValueType || Type == typeof(string))
+                    Trace.WriteLine($"the list of string or value types are not managed. Please use Mapper<{Type.Name}>");
 
-            if (_type != null)
-                Analyze();
+                else if (IsEnumerable && Value is IEnumerable e)
+                    AnalyseEnumerable(e);
+
+                else
+                    AnalyzeProperties();
+
+            }
+
 
         }
 
-
-        public Func<PropertyDescriptor, bool> PropertyDescriptorFilter { get; }
-
-        public Func<PropertyObjectDescriptor, bool> PropertyFilter { get; }
-
-        private void Analyze()
+        private void AnalyseEnumerable(IEnumerable e)
         {
-            if (_type != null)
+            foreach (var item in e)
             {
-                if (_type.IsValueType || _type == typeof(string))
-                    Trace.WriteLine($"the list of string or value types are not managed. Please use Mapper<{_type.Name}>");
 
-                else
-                {
+                var descriptor = this.CreateSub(item);
 
-                    var properties = TypeDescriptor.GetProperties(Instance);
-                    foreach (PropertyDescriptor property in properties)
-                        if (PropertyDescriptorFilter(property) && property.IsBrowsable)
-                        {
-                            var p = new PropertyObjectDescriptor(property, this, StrategyName)
-                                .Build();
-                            p.Enabled = PropertyFilter == null || PropertyFilter(p);
-                            if (p.IsValid)
-                                _items.Add(p);
-                            else
-                                _invaLidItems.Add(p);
-                        }
+                descriptor.Enabled = true;
+                Add(descriptor);
 
-                }
             }
         }
 
-        public ITranslateService TranslateService { get; }
+        private void AnalyzeProperties()
+        {
+            var properties = TypeDescriptor.GetProperties(Value);
+            foreach (PropertyDescriptor property in properties)
+                if (PropertyDescriptorFilter(property) && property.IsBrowsable)
+                {
 
-        public IServiceProvider ServiceProvider { get; }
-        public string StrategyName { get; }
-        public object Instance { get; set; }
+                    var p = new PropertyObjectDescriptor(property, this, StrategyName, PropertyDescriptorFilter, PropertyFilter);
+                    if (p.Browsable)
+                    {
+                        p.Enabled = PropertyFilter == null || PropertyFilter(p);
+
+                        if (p.IsValid)
+                            Add(p);
+                        else
+                            _invaLidItems.Add(p);
+                    }
+                }
+        }
+
+        protected override void AssignStrategy(StrategyEditor strategy)
+        {
+
+            var i = strategy.AttributeInitializers;
+            if (i != null)
+            {
+
+                var attributes = TypeDescriptor.GetAttributes(Value).OfType<Attribute>().ToList();
+                foreach (Attribute attribute in attributes)
+                    if (i.TryGetValue(attribute.GetType(), out var a))
+                        a(attribute, _strategy, this);
+            }
+
+            base.AssignStrategy(strategy);
+
+
+        }
+
 
         public IEnumerable<TranslatedKeyLabel> Categories()
         {
 
-            var result = _items
-                .Where(c => c.Browsable)
-                .Select(x => x.Category).ToList();
+            var result = Items
+                            .OfType<PropertyObjectDescriptor>()
+                            .Where(c => c.Browsable)
+                            .Select(x => x.Category).ToList();
 
             var h = new HashSet<string>();
             foreach (var item in result)
@@ -98,29 +116,18 @@ namespace Bb.ComponentDescriptors
 
         }
 
-        public void ValidationHasChanged<T>(IComponentFieldBase<T> componentFieldBase)
-        {
-
-            UiPropertyValidationHasChanged?.Invoke(componentFieldBase);
-
-            PropertyValidationHasChanged?.Invoke(componentFieldBase.Property);
-
-        }
-
-        public Action<IComponentFieldBase> UiPropertyValidationHasChanged { get; set; }
-
-        public Action<PropertyObjectDescriptor> PropertyValidationHasChanged { get; set; }
 
         public IEnumerable<PropertyObjectDescriptor> ItemsByCategories(TranslatedKeyLabel category)
         {
 
             var c = category.ToString();
 
-            var result = _items
-                .Where(c => c.Browsable)
-                .Where(x => x.Category.ToString() == c)
-                // .OrderBy(c => c.Display.ToString())
-                ;
+            var result = Items
+                            .OfType<PropertyObjectDescriptor>()
+                            .Where(c => c.Browsable)
+                            .Where(x => x.Category.ToString() == c)
+                            // .OrderBy(c => c.Display.ToString())
+                            ;
 
             foreach (var item in result)
                 yield return item;
@@ -128,34 +135,10 @@ namespace Bb.ComponentDescriptors
         }
 
 
-        public IEnumerable<PropertyObjectDescriptor> Items { get => _items; }
-
         public IEnumerable<PropertyObjectDescriptor> InvalidItems { get => _invaLidItems; }
 
-        private readonly Type _type;
-        private readonly List<PropertyObjectDescriptor> _items;
+
         private readonly List<PropertyObjectDescriptor> _invaLidItems;
-
-
-        internal void HasChanged(PropertyObjectDescriptor propertyObjectDescriptor)
-        {
-            PropertyHasChanged?.Invoke(propertyObjectDescriptor, Instance);
-        }
-
-        public DiagnosticValidator Validate()
-        {
-
-            var validator = new DiagnosticValidator();
-
-            foreach (var item in _items)
-                if (item.Enabled && !item.Validate(out var result))
-                    validator.Add(result);
-
-            return validator;
-
-        }
-
-        public Action<PropertyObjectDescriptor, object> PropertyHasChanged { get; set; }
 
     }
 

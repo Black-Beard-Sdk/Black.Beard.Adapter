@@ -233,17 +233,17 @@ namespace Bb.Diagrams
 
         }
 
-        private void _relayCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        protected void RelayCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             CollectionChanged?.Invoke(sender, e);
         }
 
-        private void N_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        protected void RelayPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(sender, e);
         }
 
-        private void N_PropertyChanging(object? sender, PropertyChangingEventArgs e)
+        private void RelayPropertyChanging(object? sender, PropertyChangingEventArgs e)
         {
             PropertyChanging?.Invoke(sender, e);
         }

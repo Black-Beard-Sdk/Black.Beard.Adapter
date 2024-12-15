@@ -67,7 +67,7 @@ namespace Bb.PropertyGrid
             get
             {
 
-                if (Property != null)
+                if (Descriptor != null)
                 {
                     var r = Load();
                     if (r != null)
@@ -80,8 +80,8 @@ namespace Bb.PropertyGrid
             set
             {
 
-                if (Property != null)
-                    if (!object.Equals(Property.Value, value))
+                if (this.Property != null)
+                    if (!object.Equals(Descriptor.Value, value))
                     {
 
                         Transaction? transaction = null;
@@ -91,7 +91,7 @@ namespace Bb.PropertyGrid
 
                         try
                         {
-                            Property.Value = Save(value);
+                            Descriptor.Value = Save(value);
                             PropertyChange();
                             transaction?.Commit();
                         }
@@ -108,39 +108,55 @@ namespace Bb.PropertyGrid
         public T? GetStep()
         {
 
-            var step = this.Property.Step;
-            var result = Convert.ChangeType(step, typeof(T));
+            if (this.Property != null)
+            {
+                var step = Property.Step;
+                var result = Convert.ChangeType(step, typeof(T));
 
-            if (object.Equals(result, 0))
-                result = 1;
+                if (object.Equals(result, 0))
+                    result = 1;
 
-            return (T)result;
+                return (T)result;
+
+            }
+
+            return default(T);
 
         }
 
         public T? GetMinimum()
         {
 
-            var step = this.Property.Minimum;
-            var result = Convert.ChangeType(step, typeof(T));
+            if (this.Property != null)
+            {
+                var step = Property.Minimum;
+                var result = Convert.ChangeType(step, typeof(T));
 
-            if (object.Equals(result, 0))
-                result = 1;
+                if (object.Equals(result, 0))
+                    result = 1;
 
-            return (T)result;
+                return (T)result;
+            }
+
+            return default(T);
 
         }
 
         public T? GetMaximum()
         {
 
-            var step = this.Property.Maximum;
-            var result = Convert.ChangeType(step, typeof(T));
+            if (this.Property != null)
+            {
+                var step = Property.Maximum;
+                var result = Convert.ChangeType(step, typeof(T));
 
-            if (object.Equals(result, 0))
-                result = 1;
+                if (object.Equals(result, 0))
+                    result = 1;
 
-            return (T)result;
+                return (T)result;
+            }
+
+            return default(T);
 
         }
 
@@ -150,22 +166,22 @@ namespace Bb.PropertyGrid
             if (this.Property != null)
             {
 
-                string? lastError = Property.ErrorText;
-                Property.ErrorText = null;
+                string? lastError = Descriptor.ErrorText;
+                Descriptor.ErrorText = null;
 
                 var messages = new List<string>();
-                if (!Property.Validate(o, out var result))
-                    Property.ErrorText = result.Message;
+                if (!Descriptor.Validate(o, out var result))
+                    Descriptor.ErrorText = result.Message;
 
-                var newError = !string.IsNullOrEmpty(Property.ErrorText);
+                var newError = !string.IsNullOrEmpty(Descriptor.ErrorText);
 
-                if (!this.Changed || newError != Property.InError || lastError != Property.ErrorText)
+                if (!this.Changed || newError != Descriptor.InError || lastError != Descriptor.ErrorText)
                 {
-                    Property.InError = newError;
+                    Descriptor.InError = newError;
                     ValidationHasChanged();
                 }
 
-                return Property.ErrorText;
+                return Descriptor.ErrorText;
 
             }
 
@@ -176,19 +192,19 @@ namespace Bb.PropertyGrid
         private void ValidationHasChanged()
         {
 
-            if (this.Property != null)
+            if (this.Descriptor != null)
             {
 
-                var p = this.Property;
+                var p = Descriptor;
 
-                if (p.UIPropertyValidationHasChanged != null)
-                    p.UIPropertyValidationHasChanged(this);
+                if (Property.UIPropertyValidationHasChanged != null)
+                    Property.UIPropertyValidationHasChanged(this);
 
-                if (p.PropertyValidationHasChanged != null)
-                    p.PropertyValidationHasChanged(this.Property);
+                if (p.ValidationHasChanged != null)
+                    p.ValidationHasChanged(Descriptor);
 
-                if (p.Parent != null)
-                    this.Property.Parent.ValidationHasChanged(this);
+                if (Property.Parent != null)
+                    Descriptor.Parent.ValidationChanged(this);
 
             }
 
@@ -204,18 +220,18 @@ namespace Bb.PropertyGrid
 
             object _value = null;
 
-            if (Property != null)
+            if (Descriptor != null)
             {
 
                 try
                 {
 
-                    var v = Property.Value;
+                    var v = Descriptor.Value;
                     if (v == null)
                         return null;
 
-                    _value = v.GetType() != this.Property.Type
-                        ? v.ToObject(this.Property.Type)
+                    _value = v.GetType() != Descriptor.Type
+                        ? v.ToObject(Descriptor.Type)
                         : _value = v;
 
                     var c = object.Equals(v, _value);

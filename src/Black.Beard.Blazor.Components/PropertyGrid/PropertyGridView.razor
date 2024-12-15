@@ -8,14 +8,14 @@
     @if (Descriptor != null && Descriptor.Items != null)
     {
 
-        <MudContainer>
+        <MudContainer style="margin-left:-10px">
 
                 @if (WithGroup)
                 {
                     @foreach (TranslatedKeyLabel category in Descriptor.Categories())
                     {
 
-                        <MudExpansionPanel Text="@TranslateService?.Translate(category)" IsExpanded="true">
+                        <MudExpansionPanel Text="@TranslationService?.Translate(category)" IsExpanded="true">
                             @foreach (PropertyObjectDescriptor property in Descriptor.ItemsByCategories(category))
                             {
                                 <DynamicPropertyComponent Parent="@this"
@@ -30,7 +30,7 @@
                 }
                 else
                 {
-                    @foreach (PropertyObjectDescriptor property in Descriptor.Items)
+                    @foreach (Descriptor property in Descriptor.Items)
                     {
                         <DynamicPropertyComponent 
                             Parent="@this"

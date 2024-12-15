@@ -9,7 +9,34 @@
 
     <DialogContent>
 
-        <PropertyGridView @ref="CurrentPropertyGridView" SelectedObject="@ViewObject" />
+
+        @if(WithList)
+        {
+
+            <MudGrid>
+                <MudItem xs="4" md="4">
+
+                    <PropertyGridView @ref="CurrentPropertyGridView" SelectedObject="@ViewObject" />
+
+                    @* <MudList T="string">
+                        <MudListItem Text="Inbox" Icon="@Icons.Material.Filled.Inbox" />
+                        <MudListItem Text="Trash" SecondaryText="Removed e-mails" />
+                        <MudListItem Text="Spam" SecondaryText="E-mails from common providers" />
+                    </MudList> *@
+                </MudItem>
+
+                <MudItem xs="8" md="8">
+                    
+                </MudItem>
+
+            </MudGrid>
+
+        }
+        else
+        {
+            <PropertyGridView @ref="CurrentPropertyGridView" SelectedObject="@ViewObject" />
+        }
+        
 
     </DialogContent>
 

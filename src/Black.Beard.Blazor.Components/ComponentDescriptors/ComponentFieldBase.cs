@@ -8,9 +8,11 @@ namespace Bb.ComponentDescriptors
 
         ITranslateService TranslateService { get; set; }
 
-        PropertyObjectDescriptor? Property { get; set; }
+        Descriptor Descriptor { get; set; }
 
-        string StrategyName { get; set; }
+        PropertyObjectDescriptor? Property { get; }
+
+        string StrategyName { get; }
 
     }
 

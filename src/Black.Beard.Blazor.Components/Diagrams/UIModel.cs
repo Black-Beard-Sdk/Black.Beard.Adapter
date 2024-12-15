@@ -91,7 +91,7 @@ namespace Bb.Diagrams
                 this.SetPosition(Source.Position.X, Source.Position.Y);
             }
 
-            if (e.PropertyName == nameof(Size))
+            if (e.PropertyName == nameof(Size) && Source.Size != null)
             {
                 this.Size = new Size(Source.Size.Width, Source.Size.Height);
             }
@@ -233,6 +233,7 @@ namespace Bb.Diagrams
             }
         }
 
+        [Browsable(false)]
         public Guid? Parent => this.Source.UuidParent;
 
         /// <summary>

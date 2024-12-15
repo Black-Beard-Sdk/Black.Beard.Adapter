@@ -1,4 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -23,10 +25,10 @@ namespace Bb.ComponentDescriptors
             this.Key = key;
             _strategySource = new Dictionary<Type, string>();
             _strategySourceCreators = new Dictionary<Type, Func<object>>();
-            _strategyTargets = new Dictionary<string, (Type, Action<StrategyMapper, PropertyObjectDescriptor>)>();
+            _strategyTargets = new Dictionary<string, (Type, Action<StrategyMapper, Descriptor>)>();
             _strategies = new Dictionary<Type, StrategyEditor>();
-            _initializerFromAttributes = new Dictionary<Type, Action<Attribute, StrategyMapper, PropertyObjectDescriptor>>();
-            _initializerCustoms = new List<(Func<Type, bool>, Action<Type, StrategyMapper, PropertyObjectDescriptor>)>();
+            _initializerFromAttributes = new Dictionary<Type, Action<Attribute, StrategyMapper, Descriptor>>();
+            _initializerCustoms = new List<(Func<Type, bool>, Action<Type, StrategyMapper, Descriptor>)>();
         }
 
         #endregion Ctors
@@ -80,6 +82,7 @@ namespace Bb.ComponentDescriptors
         /// <returns>see <see cref="StrategyMapper"/> for fluent syntax</returns>
         public StrategyMapper Source(string targetStrategyName, Type type, Func<object>? creator = null)
         {
+
             if (!_strategySource.ContainsKey(type))
                 _strategySource.Add(type, targetStrategyName);
             else
@@ -109,7 +112,7 @@ namespace Bb.ComponentDescriptors
         /// <param name="targetStrategyName">Target strategy name to match for select the specified editor type</param>
         /// <param name="initializer">Action to execute for configure the specified editor</param>
         /// <returns>see <see cref="StrategyMapper"/> for fluent syntax</returns>
-        public StrategyMapper ToTarget<T>(PropertyKindView targetStrategyName, Action<StrategyMapper, PropertyObjectDescriptor> initializer = null)
+        public StrategyMapper ToTarget<T>(PropertyKindView targetStrategyName, Action<StrategyMapper, Descriptor> initializer = null)
         {
             return ToTarget<T>(targetStrategyName.ToString(), initializer);
         }
@@ -121,7 +124,7 @@ namespace Bb.ComponentDescriptors
         /// <param name="targetStrategyName">Target strategy name to match for select the specified editor type</param>
         /// <param name="initializer">Action to execute for configure the specified editor</param>
         /// <returns>see <see cref="StrategyMapper"/> for fluent syntax</returns>
-        public StrategyMapper ToTarget<T>(string targetStrategyName, Action<StrategyMapper, PropertyObjectDescriptor> initializer = null)
+        public StrategyMapper ToTarget<T>(string targetStrategyName, Action<StrategyMapper, Descriptor> initializer = null)
         {
             return ToTarget(targetStrategyName.ToString(), typeof(T), initializer);
         }
@@ -133,7 +136,7 @@ namespace Bb.ComponentDescriptors
         /// <param name="type">Type to use for the editor</param>
         /// <param name="initializer">Action to execute for configure the specified editor</param>
         /// <returns>see <see cref="StrategyMapper"/> for fluent syntax</returns>
-        public StrategyMapper ToTarget(PropertyKindView targetStrategy, Type type, Action<StrategyMapper, PropertyObjectDescriptor> initializer = null)
+        public StrategyMapper ToTarget(PropertyKindView targetStrategy, Type type, Action<StrategyMapper, Descriptor> initializer = null)
         {
             return ToTarget(targetStrategy.ToString(), type, initializer);
         }
@@ -145,7 +148,7 @@ namespace Bb.ComponentDescriptors
         /// <param name="type">Type to use for the editor</param>
         /// <param name="initializer">Action to execute for configure the specified editor</param>
         /// <returns>see <see cref="StrategyMapper"/> for fluent syntax</returns>
-        public StrategyMapper ToTarget(string targetStrategyName, Type type, Action<StrategyMapper, PropertyObjectDescriptor> initializer = null)
+        public StrategyMapper ToTarget(string targetStrategyName, Type type, Action<StrategyMapper, Descriptor> initializer = null)
         {
             if (!_strategyTargets.ContainsKey(targetStrategyName))
                 _strategyTargets.Add(targetStrategyName, (type, initializer));
@@ -162,7 +165,7 @@ namespace Bb.ComponentDescriptors
         /// <typeparam name="T">Specified attribute</typeparam>
         /// <param name="initializer">Delegate to execute to configure</param>
         /// <returns>see <see cref="StrategyMapper"/> for fluent syntax</returns>
-        public StrategyMapper ConfigureOnAttribute<T>(Action<T, StrategyMapper, PropertyObjectDescriptor> initializer)
+        public StrategyMapper ConfigureOnAttribute<T>(Action<T, StrategyMapper, Descriptor> initializer)
             where T : Attribute
         {
 
@@ -179,7 +182,7 @@ namespace Bb.ComponentDescriptors
         /// <param name="attributeType">Specified attribute</param>
         /// <param name="initializer">Delegate to execute to configure</param>
         /// <returns>see <see cref="StrategyMapper"/> for fluent syntax</returns>
-        public StrategyMapper ConfigureOnAttribute(Type attributeType, Action<Attribute, StrategyMapper, PropertyObjectDescriptor> initializer)
+        public StrategyMapper ConfigureOnAttribute(Type attributeType, Action<Attribute, StrategyMapper, Descriptor> initializer)
         {
 
             if (!_initializerFromAttributes.TryGetValue(attributeType, out var list))
@@ -195,7 +198,7 @@ namespace Bb.ComponentDescriptors
         /// <param name="filter">filter to evaluate</param>
         /// <param name="initializer">Delegate to execute to configure</param>
         /// <returns>see <see cref="StrategyMapper"/> for fluent syntax</returns>
-        public StrategyMapper ConfigureWhere(Func<Type, bool> filter, Action<Type, StrategyMapper, PropertyObjectDescriptor> initializer)
+        public StrategyMapper ConfigureWhere(Func<Type, bool> filter, Action<Type, StrategyMapper, Descriptor> initializer)
         {
             _initializerCustoms.Add((filter, initializer));
             return this;
@@ -211,44 +214,77 @@ namespace Bb.ComponentDescriptors
         /// <param name="type"></param>
         /// <param name="strategy"></param>
         /// <returns></returns>
-        public bool TryGetValueByType(Type type, out StrategyEditor? strategy)
+        public bool TryGetValueByType(Type type, out StrategyEditor strategy)
         {
 
             if (!_strategies.TryGetValue(type, out strategy))
                 lock (_lock)
                     if (!_strategies.TryGetValue(type, out strategy))
+                    {
                         strategy = Create(type);
+                        if (!System.Diagnostics.Debugger.IsAttached)
+                            _strategies.Add(type, strategy);
+                    }
 
             return strategy != null;
 
         }
 
-        private StrategyEditor? Create(Type type)
+        private StrategyEditor Create(Type type)
         {
+
+            (Type, Action<StrategyMapper, Descriptor>) target = default;
+            Func<object>? creator = default;
 
             // Try to resolve from registered mapping
             if (TryResolveStrategyName(type, out var strategyName))
-                if (_strategyTargets.TryGetValue(strategyName, out var target))
-                    if (_strategySourceCreators.TryGetValue(type, out var creator))
+                if (_strategyTargets.TryGetValue(strategyName, out target))
+                    if (_strategySourceCreators.TryGetValue(type, out creator))
                         return new StrategyEditor(strategyName, type, target, creator)
                         {
                             Source = this.Key,
                             AttributeInitializers = _initializerFromAttributes
                         };
 
-            
-            // Create by default
-            StrategyEditor? strategy = new (this.Key, type, (null, null), null)
-            {
-                Source = this.Key
-            };
+            //if (type.IsConstructedGenericType)
+            //{
+            //    var t = type.GetGenericTypeDefinition();
+            //    var u = Create(t);
+            //    if (!u.Unknown)
+            //        return u;
+            //}
 
+            //else if (type.BaseType != null && type.BaseType.IsConstructedGenericType)
+            //{
+            //    var t = type.BaseType.GetGenericTypeDefinition();
+            //    var u = Create(t);
+            //    if (!u.Unknown)
+            //        return u;
+            //}
+
+            //else if (type.IsArray)
+            //{
+            //    var t = type.GetElementType();
+            //    var u = Create(t);
+            //    if (!u.Unknown)
+            //        return u;
+            //}
+
+            // Create by default
+            var ctor = type.GetConstructor(new Type[0]);
+            if (ctor != null)
+                creator = () => ctor.Invoke(new object[0]);
+
+            StrategyEditor? strategy = new(PropertyKindView.Object, type, target, creator)
+            {
+                Source = this.Key,
+                Unknown = true,
+            };
 
             // apply all initializers that match with filter
             foreach (var item in _initializerCustoms)
                 if (item.Item1(type))
                     strategy.Initializers.Add(item.Item2);
-
 
             return strategy;
 
@@ -265,6 +301,12 @@ namespace Bb.ComponentDescriptors
 
             if (_strategySource.TryGetValue(type, out strategyName))
                 return true;
+
+            if (typeof(IEnumerable).IsAssignableFrom(type))
+            {
+                strategyName = PropertyKindView.List;
+                return true;
+            }
 
             return false;
 
@@ -298,6 +340,9 @@ namespace Bb.ComponentDescriptors
         {
 
             var strategy = new StrategyMapper(name)
+
+                .Source(PropertyKindView.List, typeof(List<>))
+
                 .Source(PropertyKindView.String, () => string.Empty)
                 .Source<char>(PropertyKindView.Char)
                 .Source(PropertyKindView.Bool, () => true)
@@ -328,50 +373,66 @@ namespace Bb.ComponentDescriptors
                 .Source(PropertyKindView.Double, () => 0d)
                 .Source<double?>(PropertyKindView.Double, () => 0d)
                 .Source<decimal>(PropertyKindView.Decimal, () => 0)
-                .Source<decimal?>(PropertyKindView.Decimal, () => 0);
+                .Source<decimal?>(PropertyKindView.Decimal, () => 0)
+
+                ;
 
             strategy
                 .ConfigureOnAttribute<StringMaskAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.Mask = attribute.Mask;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                        prop.Mask = attribute.Mask;
                 })
 
                 .ConfigureOnAttribute<EditorAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.EditorType = Type.GetType(attribute.EditorTypeName);
+                    if (descriptor is PropertyObjectDescriptor prop)
+                        prop.ComponentView = Type.GetType(attribute.EditorTypeName);
                 })
 
                 .ConfigureOnAttribute<StepNumericAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.Step = attribute.Step;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                        prop.Step = attribute.Step;
                 })
 
                 .ConfigureOnAttribute<StringLengthAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.Maximum = attribute.MaximumLength;
-                    descriptor.Minimum = attribute.MinimumLength;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                    {
+                        prop.Maximum = attribute.MaximumLength;
+                        prop.Minimum = attribute.MinimumLength;
+                    }
                 })
 
                 .ConfigureOnAttribute<MaxLengthAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.Maximum = attribute.Length;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                        prop.Maximum = attribute.Length;
                 })
 
                 .ConfigureOnAttribute<MinLengthAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.Maximum = attribute.Length;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                        prop.Maximum = attribute.Length;
                 })
 
                 .ConfigureOnAttribute<RangeAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.Minimum = (int)attribute.Minimum;
-                    descriptor.Maximum = (int)attribute.Maximum;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                    {
+                        prop.Minimum = (int)attribute.Minimum;
+                        prop.Maximum = (int)attribute.Maximum;
+                    }
                 })
 
                 .ConfigureOnAttribute<DisplayFormatAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.FormatString = attribute.DataFormatString;
-                    descriptor.HtmlEncode = attribute.HtmlEncode;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                    {
+                        prop.FormatString = attribute.DataFormatString;
+                        prop.HtmlEncode = attribute.HtmlEncode;
+                    }
                 })
 
                 .ConfigureOnAttribute<EditableAttribute>((attribute, mapper, descriptor) =>
@@ -386,22 +447,25 @@ namespace Bb.ComponentDescriptors
 
                 .ConfigureOnAttribute<ReadOnlyAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.ReadOnly = attribute.IsReadOnly;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                        prop.ReadOnly = attribute.IsReadOnly;
                 })
 
                 .ConfigureOnAttribute<DefaultValueAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.DefaultValue = attribute.Value;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                        prop.DefaultValue = attribute.Value;
                 })
 
                 .ConfigureOnAttribute<RequiredAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.Required = true;
+                    if (descriptor is PropertyObjectDescriptor prop)
+                        prop.Required = true;
                 })
 
                 .ConfigureOnAttribute<DesignerAttribute>((attribute, mapper, descriptor) =>
                 {
-                    descriptor.EditorType = Type.GetType(attribute.DesignerTypeName);
+                    descriptor.ComponentView = Type.GetType(attribute.DesignerTypeName);
                 });
 
             if (DefaultInitializerExtension != null)
@@ -422,13 +486,13 @@ namespace Bb.ComponentDescriptors
         public string Key { get; }
 
         private Dictionary<Type, string> _strategySource;
-        private Dictionary<Type, Action<Attribute, StrategyMapper, PropertyObjectDescriptor>> _initializerFromAttributes;
-        private List<(Func<Type, bool>, Action<Type, StrategyMapper, PropertyObjectDescriptor>)> _initializerCustoms;
+        private Dictionary<Type, Action<Attribute, StrategyMapper, Descriptor>> _initializerFromAttributes;
+        private List<(Func<Type, bool>, Action<Type, StrategyMapper, Descriptor>)> _initializerCustoms;
         private Dictionary<Type, Func<object>> _strategySourceCreators;
         private Dictionary<Type, StrategyEditor> _strategies;
         private volatile object _lock = new object();
         private static object _lock1 = new object();
-        private Dictionary<string, (Type, Action<StrategyMapper, PropertyObjectDescriptor>)> _strategyTargets;
+        private Dictionary<string, (Type, Action<StrategyMapper, Descriptor>)> _strategyTargets;
         private static Dictionary<string, StrategyMapper> _mappers;
 
     }

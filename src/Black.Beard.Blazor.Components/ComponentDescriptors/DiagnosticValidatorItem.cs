@@ -5,9 +5,9 @@ namespace Bb.ComponentDescriptors
     public class DiagnosticValidatorItem
     {
 
-        public DiagnosticValidatorItem(PropertyDescriptor descriptor)
+        public DiagnosticValidatorItem()
         {
-            this.Descriptor = descriptor;
+
             this._diagnostics = new List<string>();
         }
 
@@ -24,7 +24,6 @@ namespace Bb.ComponentDescriptors
 
         public List<string> MessageService => _diagnostics;
 
-        public PropertyDescriptor Descriptor { get; }
         public object Value { get; internal set; }
 
         private readonly List<string> _diagnostics;

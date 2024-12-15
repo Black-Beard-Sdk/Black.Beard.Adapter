@@ -1,0 +1,12 @@
+﻿@inherits ComponentFieldBase<object>
+@using MudBlazor
+@using Bb.ComponentDescriptors
+@using Bb.ComponentModel.Translations
+
+<PropertyGridView @ref="CurrentPropertyGridView"
+                  SelectedObject="@Value"
+                  AfterPropertyHaschanged="PropertyHasChanged"
+                  CurrentMargin="@CurrentMargin"
+                  CurrentVariant="@CurrentVariant"
+                  WithGroup="@WithGroup"
+                  Focused="OnFocusedRelay" />

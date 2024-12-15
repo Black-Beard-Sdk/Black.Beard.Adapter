@@ -19,9 +19,12 @@ namespace Bb.Editors
         [CascadingParameter]
         MudDialogInstance MudDialog { get; set; }
 
+         
+        public bool WithList { get => Actions.WithList; }
+
 
         [Parameter]
-        public EditorResultComponent Actions { get; set; }
+        public Editor Actions { get; set; }
 
         public string Title { get => MudDialog.Title; }
 

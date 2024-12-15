@@ -2,6 +2,7 @@
 using Bb.ComponentDescriptors;
 using Bb.ComponentModel.Translations;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 
 // https://www.fluentui-blazor.net/
@@ -11,22 +12,60 @@ namespace Bb.PropertyGrid
     public partial class ComponentFieldBase : ComponentBase, IComponentFieldBase
     {
 
-        [Parameter]
-        public string StrategyName { get; set; }
 
-
-        [Parameter]
-        public PropertyObjectDescriptor? Property
+        public ComponentFieldBase()
         {
-            get => _property;
+            OnFocus = new EventCallback<FocusEventArgs>(this, OnFocused);
+        }
+
+
+
+        protected EventCallback<FocusEventArgs> OnFocus;
+
+        public virtual async void OnFocused(FocusEventArgs args)
+        {
+            this.ParentGrid?.SetFocus(this);
+        }
+
+        public virtual async void OnFocusedRelay(PropertyGridView sender, ComponentFieldBase component)
+        {
+            if (component != this)
+                this.ParentGrid?.SetFocus(component);
+        }
+
+        public string StrategyName => Descriptor?.StrategyName;
+
+        [Parameter]
+        public Descriptor? Descriptor
+        {
+            get => _descriptor;
             set
             {
-                _property = value;
-                if (Enum.TryParse(typeof(InputType), Property.Mask.ToString(), out var valueResult))
-                    InputType = (InputType)valueResult;
+                _descriptor = value;
+
+                if (_descriptor is PropertyObjectDescriptor property) // Convert enum to local InputType
+                    if (Enum.TryParse(typeof(InputType), property.Mask.ToString(), out var valueResult))
+                        InputType = (InputType)valueResult;
+
                 PropertyChange();
+
             }
         }
+
+
+        public PropertyObjectDescriptor? Property
+        {
+            get
+            {
+                if (_descriptor is PropertyObjectDescriptor d)
+                    return d;
+                return default;
+            }
+        }
+
+        public PropertyGridView ParentGrid => Descriptor.Ui as PropertyGridView;
+
+        public bool WithGroup => ParentGrid?.WithGroup ?? false;
 
 
         [Parameter]
@@ -34,12 +73,6 @@ namespace Bb.PropertyGrid
 
 
         public virtual string? ValueString { get; set; }
-
-
-        protected string Translate(string key)
-        {
-            return TranslateService.Translate(key);
-        }
 
         [Parameter]
         public Variant CurrentVariant { get; set; }
@@ -50,7 +83,18 @@ namespace Bb.PropertyGrid
         [Inject]
         public ITranslateService TranslateService { get; set; }
 
-        public bool IsReadOnly => Property?.ReadOnly ?? false;
+        public bool IsReadOnly
+        {
+            get
+            {
+
+                if (this.Property != null)
+                    return Property.ReadOnly;
+
+                return false;
+
+            }
+        }
 
         public bool Changed { get; internal set; }
 
@@ -61,11 +105,10 @@ namespace Bb.PropertyGrid
         protected virtual void PropertyChange()
         {
             this.Changed = true;
-            if (_property != null)
+            if (Property != null)
             {
-
-                if (_property.PropertyHasChanged != null)
-                    _property.PropertyHasChanged(_property);
+                if (Property.PropertyHasChanged != null)
+                    Property.PropertyHasChanged(Property);
 
                 StateHasChanged();
 
@@ -79,13 +122,16 @@ namespace Bb.PropertyGrid
 
         protected virtual IMask? CreateMask()
         {
+            if (this.Property != null)
+            {
 
-            if (Property?.CreateMask != null)
-                return Property.CreateMask();
+                if (Property?.CreateMask != null)
+                    return Property.CreateMask();
 
-            if (!string.IsNullOrEmpty(Property?.PatternString))
-                return new RegexMask(Property.PatternString);
+                if (!string.IsNullOrEmpty(Property?.PatternString))
+                    return new RegexMask(Property.PatternString);
 
+            }
             return null;
 
         }
@@ -94,7 +140,7 @@ namespace Bb.PropertyGrid
         protected string LastTextInError = string.Empty;
 
         private IMask? _tagMask;
-        private PropertyObjectDescriptor? _property;
+        private Descriptor? _descriptor;
 
     }
 

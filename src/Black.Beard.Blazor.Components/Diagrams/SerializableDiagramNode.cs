@@ -142,6 +142,7 @@ namespace Bb.Diagrams
             }
         }
 
+        [Browsable(false)]
         public string? TypeNode
         {
             get => _typeNode;
@@ -167,6 +168,7 @@ namespace Bb.Diagrams
         #region Position / size
 
         [EvaluateValidation(false)]
+        [Browsable(false)]
         public Position Position
         {
             get => _position;
@@ -181,6 +183,7 @@ namespace Bb.Diagrams
             }
         }
 
+        [Browsable(false)]
         public Size? Size
         {
             get => _size;
@@ -195,9 +198,11 @@ namespace Bb.Diagrams
             }
         }
 
+        [Browsable(false)]
         [JsonIgnore, EvaluateValidation(false)]
         public bool Locked { get; internal set; }
 
+        [Browsable(false)]
         [JsonIgnore, EvaluateValidation(false)]
         public bool ControlledSize { get; internal set; }
 
@@ -282,6 +287,7 @@ namespace Bb.Diagrams
 
         #region ports
 
+        [Browsable(false)]
         public Ports Ports
         {
             get => _ports;

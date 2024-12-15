@@ -1,65 +1,111 @@
-﻿using Bb.Commands;
-using Bb.ComponentModel.Translations;
+﻿using Bb.ComponentModel.Translations;
 using MudBlazor;
+using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Bb.ComponentDescriptors
 {
 
 
     [DebuggerDisplay("{Name} : {Type}")]
-    public class PropertyObjectDescriptor
+    public class PropertyObjectDescriptor : Descriptor
     {
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyObjectDescriptor"/> class.
+        /// Initializes a new instance of the <see cref="ComponentDescriptors.PropertyObjectDescriptor"/> class.
         /// </summary>
         /// <param name="property"></param>
         /// <param name="parent"></param>
         /// <param name="strategyKey"></param>
-        public PropertyObjectDescriptor(PropertyDescriptor property, ObjectDescriptor parent, string strategyKey)
+        public PropertyObjectDescriptor(System.ComponentModel.PropertyDescriptor property, Descriptor parent, string strategyKey, Func<PropertyDescriptor, bool> propertyDescriptorFilter,
+            Func<PropertyObjectDescriptor, bool> propertyFilter)
+            : base(parent.ServiceProvider, parent, strategyKey, property.PropertyType, propertyDescriptorFilter, propertyFilter)
         {
 
-            _strategy = string.IsNullOrEmpty(strategyKey)
-                ? StrategyMapper.Get(string.Empty)
-                : StrategyMapper.Get(strategyKey);
-
-            StrategyName = _strategy.Key;
             Parent = parent;
             Name = property.Name;
             PropertyDescriptor = property;
+
+            Analyze();
+
+            DefaultValue = null;
+            Minimum = int.MinValue;
+            Maximum = int.MaxValue;
+
+            Step = 1;
+            Line = 1;
+            ComponentType = property.ComponentType;
+
+
+            if (ResolveSubType(Type, out Type sub, out bool isNullable))
+            {
+                SubType = sub;
+                IsNullable = isNullable;
+                //AddMethod = Resolve(Type, "Add", "Add");
+                //DelMethod = Resolve(Type, "Remove", "Del");
+            }
+
+            IsNullable = isNullable;
+
+
+            //if (ResolveSubType
+            //(
+            //    Type, out Type sub,
+            //    out bool isNullable, out bool isBrowsable, out bool isArray))
+            //{
+            //    SubType = sub;
+            //    IsNullable = isNullable;
+            //    Browsable = isBrowsable;
+            //    if (isBrowsable)
+            //    {
+            //        if (isArray)
+            //        {
+
+            //        }
+            //        else
+            //        {
+
+            //            AddMethod = Resolve(Type, "Add", "Add");
+            //            DelMethod = Resolve(Type, "Remove", "Del");
+
+            //            if (AddMethod == null && Value is IEnumerable e && IsEmpty(e))
+            //                isBrowsable = false;
+
+            //        }
+            //    }
+
+            //}
+            //else
+            //{
+            //    IsNullable = isNullable;
+            //    Browsable = isBrowsable;
+            //}
+
+        }
+
+        private static bool IsEmpty(IEnumerable e)
+        {
+            foreach (var item in e)
+                return false;
+            return true;
+        }
+
+        protected override void Analyze()
+        {
+
+            var property = PropertyDescriptor;
+
             Display = property.DisplayName.GetTranslation(property.Name);
             Description = property.Description;
             Category = property.Category.GetTranslation();
             Browsable = property.IsBrowsable;
             ReadOnly = property.IsReadOnly;
-            DefaultValue = null;
-            Minimum = int.MinValue;
-            Maximum = int.MaxValue;
-            Type = PropertyDescriptor.PropertyType;
-            Step = 1;
-            Line = 1;
-            ComponentType = property.ComponentType;
 
-            if (Type.IsGenericType && Type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                IsNullable = true;
-                SubType = Type.GetGenericArguments()[0];
-            }
-            else
-                SubType = typeof(void);
-        }
+            base.Analyze();
 
-        internal PropertyObjectDescriptor Build()
-        {
-
-            if (_strategy.TryGetValueByType(Type, out StrategyEditor? strategyEditor))
-                AssignStrategy(strategyEditor);
-
-            IsValid = EditorType != null;
-
-            return this;
+            IsValid = ComponentView != null;
 
         }
 
@@ -92,12 +138,12 @@ namespace Bb.ComponentDescriptors
         /// <summary>
         /// return the value of the property for the current instance
         /// </summary>
-        public object Value
+        public override object Value
         {
             get
             {
 
-                object result = PropertyDescriptor.GetValue(Parent.Instance);
+                object result = PropertyDescriptor.GetValue(Parent.Value);
 
                 //if (result == null)
                 //    return this.DefaultValue;
@@ -108,7 +154,7 @@ namespace Bb.ComponentDescriptors
 
             set
             {
-                PropertyDescriptor.SetValue(Parent.Instance, value);
+                PropertyDescriptor.SetValue(Parent.Value, value);
                 PropertyChange();
             }
 
@@ -122,13 +168,8 @@ namespace Bb.ComponentDescriptors
             Parent.HasChanged(this);
         }
 
-        private void AssignStrategy(StrategyEditor strategy)
+        protected override void AssignStrategy(StrategyEditor strategy)
         {
-
-            EditorType = strategy.ComponentView;
-            KindView = strategy.PropertyKindView;
-
-            strategy.Initializer?.Invoke(_strategy, this);
 
             var i = strategy.AttributeInitializers;
             if (i != null)
@@ -139,8 +180,7 @@ namespace Bb.ComponentDescriptors
                         a(attribute, _strategy, this);
             }
 
-            foreach (var item in strategy.Initializers)
-                item(Type, _strategy, this);
+            base.AssignStrategy(strategy);
 
         }
 
@@ -149,9 +189,9 @@ namespace Bb.ComponentDescriptors
         /// </summary>
         /// <param name="result"></param>
         /// <returns></returns>
-        public bool Validate(out DiagnosticValidatorItem result)
+        public override bool Validate(out DiagnosticValidatorItem result)
         {
-            result = PropertyDescriptor.ValidateValue(Value, Parent.TranslateService);
+            result = PropertyDescriptor.ValidateValue(Value, TranslationService);
             return result.IsValid;
         }
 
@@ -161,29 +201,12 @@ namespace Bb.ComponentDescriptors
         /// <param name="value"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public bool Validate(object value, out DiagnosticValidatorItem result)
+        public override bool Validate(object value, out DiagnosticValidatorItem result)
         {
-            result = PropertyDescriptor.ValidateValue(value, Parent.TranslateService);
+            result = PropertyDescriptor.ValidateValue(value, TranslationService);
             return result.IsValid;
         }
 
-        /// <summary>
-        /// Return the translated display
-        /// </summary>
-        /// <returns></returns>
-        public string GetDisplay()
-        {
-            return Parent.TranslateService.Translate(Display);
-        }
-
-        /// <summary>
-        /// Return the translated description
-        /// </summary>
-        /// <returns></returns>
-        public string GetDescription()
-        {
-            return Parent.TranslateService.Translate(Description);
-        }
 
         /// <summary>
         /// Return the translated category
@@ -191,7 +214,10 @@ namespace Bb.ComponentDescriptors
         /// <returns></returns>
         public string GetCategory()
         {
-            return Parent.TranslateService.Translate(Category);
+            TranslatedKeyLabel r = Category ?? "Misc";
+            if (TranslationService != null)
+                return TranslationService?.Translate(r);
+            return r;
         }
 
         /// <summary>
@@ -206,67 +232,58 @@ namespace Bb.ComponentDescriptors
 
         public Action<PropertyObjectDescriptor> PropertyHasChanged { get; set; }
 
+
+        public override string ToString()
+        {
+            return $"{Name} : {Type.Name}, {SubType?.Name}";
+        }
+
+
         /// <summary>
         /// Name of the property
         /// </summary>
         public string Name { get; }
 
-        /// <summary>
-        /// Type of the property
-        /// </summary>
-        public Type Type { get; set; }
 
         /// <summary>
-        /// Global strategy name
+        /// Name of the property
         /// </summary>
-        public string StrategyName { get; }
+        public override TranslatedKeyLabel Display
+        {
+            get => string.IsNullOrEmpty(base.Display) ? Name : base.Display;
+            internal protected set 
+            {
+                base.Display = value; 
+            }
+        }
 
-        /// <summary>
-        /// Validation error text
-        /// </summary>
-        public string ErrorText { get; set; }
-
-        /// <summary>
-        /// Return true if the validation is failed
-        /// </summary>
-        public bool InError { get; set; }
-
-
-
-        public Type EditorType { get; set; }
+        ///// <summary>
+        ///// Global strategy name
+        ///// </summary>
+        //public string StrategyName { get; }
 
         public Type ComponentType { get; }
 
         public Type SubType { get; set; }
 
-        public ObjectDescriptor Parent { get; }
+        //public Descriptor Parent { get; }
 
         public bool IsValid { get; private set; }
 
         /// <summary>
         /// PropertyDescriptor
         /// </summary>
-        public PropertyDescriptor PropertyDescriptor { get; set; }
-
-        public TranslatedKeyLabel Display { get; set; }
-
-        public TranslatedKeyLabel Description { get; set; }
+        public System.ComponentModel.PropertyDescriptor PropertyDescriptor { get; set; }
 
         public TranslatedKeyLabel Category { get; set; }
-
-        public bool Browsable { get; set; }
 
         public bool ReadOnly { get; set; }
 
         public object DefaultValue { get; set; }
 
         public bool Required { get; set; }
-        
+
         public bool HtmlEncode { get; set; }
-
-        public string KindView { get; set; }
-
-        public bool IsNullable { get; set; }
 
         public int Minimum { get; set; }
 
@@ -280,8 +297,6 @@ namespace Bb.ComponentDescriptors
 
         public int Line { get; set; }
 
-        public bool Enabled { get; set; }
-
         /// <summary>
         /// Delegate for create IMask
         /// </summary>
@@ -294,7 +309,6 @@ namespace Bb.ComponentDescriptors
         public StringType Mask { get; set; }
 
 
-        private readonly StrategyMapper _strategy;
 
     }
 

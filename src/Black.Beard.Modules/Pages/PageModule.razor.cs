@@ -80,7 +80,7 @@ namespace Bb.Pages
         private async void OpenEdit()
         {
 
-            var act = new EditorResultComponent()
+            var act = new Editor()
             {                
                 Validate = ctx =>
                 {
@@ -106,27 +106,12 @@ namespace Bb.Pages
                 
             };
 
-            var b = new DialogParameters
-            {
-                { "SelectedObject",  Module.Sources },
-                { "Actions", act }
-            };
-
-            var options = new DialogOptions()
-            {
-                MaxWidth = MaxWidth.Medium,
-                FullWidth = true,
-                CloseOnEscapeKey = false,
-                NoHeader = false,
-                Position = DialogPosition.Center,
-            };
-
             try
             {
 
                 await InvokeAsync(() =>
                 {                    
-                    var r = DialogService.ShowAsync<EditorComponent>(ComponentConstants.Edit.Translate(this), b, options);
+                    var r = DialogService.ShowAsync<EditorComponent>(ComponentConstants.Edit.Translate(this), act.Parameters(Module.Sources), act.Options);
                 });
 
             }

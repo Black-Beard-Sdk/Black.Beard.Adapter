@@ -22,16 +22,16 @@ namespace Bb.PropertyGrid
             if (this.Property.ListProvider != null && ListResolver == null)
             {
 
-                this.ListResolver = (IListProvider)Property.Parent.ServiceProvider.GetService(this.Property.ListProvider);
+                this.ListResolver = (IListProvider)Descriptor.ServiceProvider.GetService(this.Property.ListProvider);
 
                 if (this.ListResolver == null)
                 {
                     var factory2 = ObjectCreatorByIoc.GetActivator<IListProvider>(this.Property.ListProvider);
-                    this.ListResolver = factory2.Call(string.Empty, Property.Parent.ServiceProvider);
+                    this.ListResolver = factory2.Call(string.Empty, Descriptor.ServiceProvider);
                 }
 
                 this.ListResolver.Property = this.Property.PropertyDescriptor;
-                this.ListResolver.Instance = this.Property.Parent.Instance;
+                this.ListResolver.Instance = this.Property.Parent.Value;
 
             }
 
@@ -44,7 +44,7 @@ namespace Bb.PropertyGrid
 
         public override object Load()
         {
-            var v = Property.Value;
+            var v = Descriptor.Value;
             if (v != null)
                 foreach (ListItem item in this.Items)
                     if (item.Compare(v))

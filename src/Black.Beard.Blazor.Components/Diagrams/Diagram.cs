@@ -142,6 +142,7 @@ namespace Bb.Diagrams
 
         #region models
 
+        [Browsable(false)]
         public DiagramList<Guid, SerializableDiagramNode> Models
         {
             get => _models;
@@ -150,16 +151,16 @@ namespace Bb.Diagrams
 
                 if (_models != null)
                 {
-                    _models.CollectionChanged -= _relayCollectionChanged;
-                    _models.PropertyChanging -= N_PropertyChanging;
-                    _models.PropertyChanged -= N_PropertyChanged;
+                    _models.CollectionChanged -= RelayCollectionChanged;
+                    _models.PropertyChanging -= RelayPropertyChanging;
+                    _models.PropertyChanged -= RelayPropertyChanged;
                 }
 
                 _models = value;
 
-                _models.CollectionChanged += _relayCollectionChanged;
-                _models.PropertyChanging += N_PropertyChanging;
-                _models.PropertyChanged += N_PropertyChanged;
+                _models.CollectionChanged += RelayCollectionChanged;
+                _models.PropertyChanging += RelayPropertyChanging;
+                _models.PropertyChanged += RelayPropertyChanged;
 
             }
         }
@@ -275,6 +276,7 @@ namespace Bb.Diagrams
 
         #region links 
 
+        [Browsable(false)]
         public DiagramList<Guid, SerializableRelationship> Relationships
         {
             get => _relationships;
@@ -283,15 +285,15 @@ namespace Bb.Diagrams
 
                 if (_relationships != null)
                 {
-                    _relationships.CollectionChanged -= _relayCollectionChanged;
-                    _relationships.PropertyChanging -= N_PropertyChanging;
-                    _relationships.PropertyChanged -= N_PropertyChanged;
+                    _relationships.CollectionChanged -= RelayCollectionChanged;
+                    _relationships.PropertyChanging -= RelayPropertyChanging;
+                    _relationships.PropertyChanged -= RelayPropertyChanged;
                 }
 
                 _relationships = value;
-                _relationships.CollectionChanged += _relayCollectionChanged;
-                _relationships.PropertyChanging += N_PropertyChanging;
-                _relationships.PropertyChanged += N_PropertyChanged;
+                _relationships.CollectionChanged += RelayCollectionChanged;
+                _relationships.PropertyChanging += RelayPropertyChanging;
+                _relationships.PropertyChanged += RelayPropertyChanged;
 
             }
         }
@@ -315,6 +317,7 @@ namespace Bb.Diagrams
         public Guid TypeModelId { get; }
 
 
+        [Browsable(false)]
         [EvaluateValidation(false)]
         [JsonIgnore]
         public Action<Diagram> Save { get; private set; }
@@ -330,11 +333,13 @@ namespace Bb.Diagrams
         /// <summary>
         /// The toolbox will be dynamically and can change than the diagram is shown
         /// </summary>
+        [Browsable(false)]
         public bool DynamicToolbox { get; }
 
         /// <summary>
         /// Return the toolbox
         /// </summary>
+        [Browsable(false)]
         public DiagramToolbox Toolbox => _toolbox;
 
 

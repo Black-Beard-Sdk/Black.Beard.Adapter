@@ -2,6 +2,7 @@
 using Bb.ComponentModel.Translations;
 using Bb.Diagrams;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ using System.ComponentModel;
 namespace Bb.PropertyGrid
 {
 
-    public partial class PropertyGridView
+    public partial class PropertyGridView : ITranslateHost
     {
 
         static PropertyGridView()
@@ -19,35 +20,35 @@ namespace Bb.PropertyGrid
 
         }
 
-        private static bool _mapperInitialized = false;
-        private static object _lock = _mapperInitialized = false;
-
         public PropertyGridView()
         {
             _dynamicProperties = new Dictionary<string, Func<object>>();
         }
 
+        [Parameter]
+        public Action<PropertyGridView, ComponentFieldBase>? Focused { get; set; }
+
         [Inject]
-        public ITranslateService TranslateService { get; set; }
+        public ITranslateService TranslationService { get; set; }
 
         [Inject]
         public IServiceProvider ServiceProvider { get; set; }
 
         [Parameter]
-        public Func<PropertyObjectDescriptor, bool> PropertyFilter
+        public Func<ComponentDescriptors.PropertyObjectDescriptor, bool> PropertyFilter
         {
             get => _propertyFilter;
             set => _propertyFilter = value;
         }
 
         [Parameter]
-        public Action<PropertyObjectDescriptor> AfterPropertyHaschanged { get; set; }
+        public Action<ComponentDescriptors.PropertyObjectDescriptor> AfterPropertyHaschanged { get; set; }
 
         [Parameter]
         public Variant CurrentVariant { get; set; } = Variant.Text;
 
         [Parameter]
-        public Margin CurrentMargin { get; set; } = Margin.Dense;
+        public Margin CurrentMargin { get; set; } = Margin.None;
 
         private void Update()
         {
@@ -60,26 +61,35 @@ namespace Bb.PropertyGrid
                         _mapperInitialized = true;
                     }
 
-            Descriptor = new ObjectDescriptor(
-                _selectedObject,
-                _selectedObject?.GetType(),
-                TranslateService,
-                ServiceProvider,
-                StrategyName,
-                null,
-                PropertyFilter)
+            if (_selectedObject != null)
             {
-                PropertyHasChanged = PropertyHasChanged_Impl,
-            };
 
-            this.Descriptor.PropertyHasChanged = this.SubPropertyHasChanged;
+                Descriptor = new ObjectDescriptor
+                (
+                    _selectedObject,
+                    _selectedObject?.GetType(),
+                    this,
+                    ServiceProvider,
+                    StrategyName,
+                    null,
+                    PropertyFilter
+                )
+                {
+                    PropertyHasChanged = PropertyHasChanged_Impl,
+                };
 
-            try
-            {
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
+                Descriptor.SetUI(this);
+
+                this.Descriptor.PropertyHasChanged = this.SubPropertyHasChanged;
+
+                try
+                {
+                    StateHasChanged();
+                }
+                catch (Exception ex)
+                {
+
+                }
 
             }
 
@@ -159,10 +169,21 @@ namespace Bb.PropertyGrid
                 result.Add(item.Key, item.Value());
         }
 
-
         #region events
 
-        private IEventArgInterceptor<PropertyObjectDescriptorEventArgs> _interceptor;
+
+
+        internal virtual void SetFocus(ComponentFieldBase componentFieldBase)
+        {
+            if (Focused != null)
+            {
+                Focused.Invoke(this, componentFieldBase);
+            }
+            else
+            {
+
+            }
+        }
 
         public void Raise(IEventArgInterceptor<PropertyObjectDescriptorEventArgs> interceptor)
         {
@@ -182,20 +203,22 @@ namespace Bb.PropertyGrid
                 this.PropertyHasChanged -= _interceptor.Invoke;
         }
 
-        public event EventHandler<PropertyObjectDescriptorEventArgs> PropertyHasChanged;
-
-
-        internal void PropertyHasChanged_Impl(PropertyObjectDescriptor obj, object instance)
+        internal void PropertyHasChanged_Impl(ComponentDescriptors.PropertyObjectDescriptor obj, object instance)
         {
             PropertyHasChanged?.Invoke(this, new PropertyObjectDescriptorEventArgs(obj, instance));
         }
 
-        private void SubPropertyHasChanged(PropertyObjectDescriptor obj, object instance)
+        private void SubPropertyHasChanged(ComponentDescriptors.PropertyObjectDescriptor obj, object instance)
         {
             Update();
             PropertyHasChanged_Impl(obj, instance);
             AfterPropertyHaschanged?.Invoke(obj);
         }
+
+        private IEventArgInterceptor<PropertyObjectDescriptorEventArgs> _interceptor;
+        
+
+        public event EventHandler<PropertyObjectDescriptorEventArgs> PropertyHasChanged;
 
         #endregion events
 
@@ -214,15 +237,17 @@ namespace Bb.PropertyGrid
         string[] errors = { };
         MudForm form;
         private object _selectedObject;
-        private Func<PropertyObjectDescriptor, bool> _propertyFilter = c => true;
+        private Func<ComponentDescriptors.PropertyObjectDescriptor, bool> _propertyFilter = c => true;
         private Dictionary<string, Func<object>> _dynamicProperties;
+        private static bool _mapperInitialized = false;
+        private static object _lock = _mapperInitialized = false;
 
     }
 
     public class PropertyObjectDescriptorEventArgs : EventArgs
     {
 
-        public PropertyObjectDescriptorEventArgs(PropertyObjectDescriptor property, object instance)
+        public PropertyObjectDescriptorEventArgs(ComponentDescriptors.PropertyObjectDescriptor property, object instance)
         {
             this.Instance = instance;
             this.Property = property;
@@ -230,7 +255,7 @@ namespace Bb.PropertyGrid
 
         public object Instance { get; }
 
-        public PropertyObjectDescriptor Property { get; }
+        public ComponentDescriptors.PropertyObjectDescriptor Property { get; }
 
     }
 
