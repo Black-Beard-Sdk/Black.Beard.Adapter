@@ -11,7 +11,7 @@
         <MudTooltip Text="@ComponentConstants.Save.Translate(this)" Color="Color.Default">
 
             <MudIconButton Size="Size.Small"
-                           Class="mr-5"
+                           Class="mr-5 fontDiagram"
                            Icon="@Icons.Material.Filled.Save"
                            Color="MudBlazor.Color.Inherit"
                            OnClick="Save" />
@@ -19,39 +19,47 @@
 
         <MudStack Style="width: 80px;padding-left:10px">
             <MudTooltip Text="@ComponentConstants.Zoom.Translate(this)" Color="Color.Default">
-                <MudNumericField @bind-Value="@_zoomValue"
-                                 Variant="Variant.Text"
-                                 Min="0"
-                                 Max="300"
-                                 Step="20"
-                                 TextChanged="@_zoomTextChanged" />
+                <MudNumericField 
+                    @bind-Value="@_zoomValue"
+                    Class="fontDiagram"
+                    Variant="Variant.Text"
+                    Min="0"
+                    Max="300"
+                    Step="20"
+                    TextChanged="@_zoomTextChanged" />
             </MudTooltip>
         </MudStack>
 
         <MudStack Style="width: 80px;padding-left:10px">
             <MudTooltip Text="@ComponentConstants.GridSize.Translate(this)" Color="Color.Default">
-                <MudNumericField @bind-Value="@_gridSizeValue"
-                                 Variant="Variant.Text"
-                                 Min="0"
-                                 Max="200"
-                                 Step="5"
-                                 TextChanged="@_gridSizeUpTextChanged" />
+                <MudNumericField 
+                    @bind-Value="@_gridSizeValue"
+                    Class="fontDiagram"
+                    Variant="Variant.Text"
+                    Min="0"
+                    Max="200"
+                    Step="5"
+                    TextChanged="@_gridSizeUpTextChanged" />
             </MudTooltip>
         </MudStack>
 
 
         <MudTooltip Text="@ComponentConstants.ShowGrid.Translate(this)" Color="Color.Default">
-            <MudToggleIconButton @bind-Toggled="_showGrid"
-                                 Icon="@Icons.Material.Filled.GridOn"
-                                 ToggledIcon="@Icons.Material.Filled.GridOff"
-                                 onclick="@_gridShowChanged" />
+            <MudToggleIconButton 
+                @bind-Toggled="_showGrid"
+                Class="fontDiagram"
+                Icon="@Icons.Material.Filled.GridOn"
+                ToggledIcon="@Icons.Material.Filled.GridOff"
+                onclick="@_gridShowChanged" />
         </MudTooltip>
 
         <MudTooltip Text="@ComponentConstants.GridMode.Translate(this)" Color="Color.Default">
-            <MudToggleIconButton @bind-Toggled="_showPoint"
-                                 Icon="@Icons.Material.Filled.DragIndicator"
-                                 ToggledIcon="@Icons.Material.Filled.Grid4x4"
-                                 onclick="@_gridModeChanged" />
+            <MudToggleIconButton 
+                @bind-Toggled="_showPoint"
+                Class="fontDiagram"
+                Icon="@Icons.Material.Filled.DragIndicator"
+                ToggledIcon="@Icons.Material.Filled.Grid4x4"
+                onclick="@_gridModeChanged" />
         </MudTooltip>
 
         <MudTooltip Style="font-size: x-small;" Text="@ComponentConstants.Undo.Translate(this)" Color="Color.Default">
@@ -60,7 +68,7 @@
                 {
                     @foreach (var item in this.UndoList)
                     {
-                        <MudMenuItem OnClick="@((e) => OnRestoreUndo(e, item))">@item.Label</MudMenuItem>
+                        <MudMenuItem Class="fontDiagram" OnClick="@((e) => OnRestoreUndo(e, item))">@item.Label</MudMenuItem>
                     }
                 }
             </MudMenu>
@@ -86,7 +94,7 @@
                 {
                     <MudTooltip Text="@item.ToolTip.Translate(this)" Color="Color.Default">
                         <MudIconButton Size="Size.Small"
-                                       Class="mr-5"
+                                       Class="mr-5 fontDiagram"
                                        Icon="@item.Icon"
                                        Color="MudBlazor.Color.Inherit"
                                        OnClick="@((e) => item.Execute(e, this.Diagram))" />
@@ -98,7 +106,7 @@
     </MudToolBar>
 </MudPaper>
 
-<div class="full-size diagram-container dropzone @dropClass"
+<div class="fontDiagram;full-size diagram-container dropzone @dropClass"
      ondrop="@((DragEventArgs args)=>{HandleDrop(args);})"
      ondragover="event.preventDefault();"
      ondragenter="@HandleDragEnter"
@@ -112,7 +120,7 @@
                 <NavigatorWidget Width="200"
                                  Height="120"
                                  UseNodeShape="false"
-                                 Class="border border-black bg-white absolute"
+                                 Class="border border-black bg-white absolute fontDiagram"
                                  Style="bottom: 15px; right: 15px;">
 
                 </NavigatorWidget>

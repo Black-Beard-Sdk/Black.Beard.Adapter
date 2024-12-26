@@ -1,0 +1,90 @@
+2024-12-19 14:04:44.8202 Info Loading assembly name: NLog.Web.AspNetCore
+2024-12-19 14:04:44.8979 Info NLog.Web.AspNetCore, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.15.1182. Product version: 5.3.15+9364343ea6995553ea48ce3422101edf9e3a8104. GlobalAssemblyCache: False
+2024-12-19 14:04:44.9255 Info Loading assembly name: NLog.DiagnosticSource
+2024-12-19 14:04:44.9508 Warn Error has been raised. Exception: NLog.NLogConfigurationException: Error loading extensions: NLog.DiagnosticSource
+ ---> System.IO.FileNotFoundException: Could not load file or assembly 'NLog.DiagnosticSource, Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.
+
+File name: 'NLog.DiagnosticSource, Culture=neutral, PublicKeyToken=null'
+   at System.Reflection.RuntimeAssembly.InternalLoad(AssemblyName assemblyName, StackCrawlMark& stackMark, AssemblyLoadContext assemblyLoadContext, RuntimeAssembly requestingAssembly, Boolean throwOnFileNotFound)
+   at System.Reflection.Assembly.Load(String assemblyString)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(String assemblyName)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(ConfigurationItemFactory factory, String assemblyName, String itemNamePrefix)
+   at NLog.Config.LoggingConfigurationParser.ParseExtensionWithAssemblyName(String assemblyName, String prefix)
+   --- End of inner exception stack trace ---
+2024-12-19 14:04:44.9669 Info Loading assembly name: NLog.Extensions.Logging
+2024-12-19 14:04:44.9669 Info NLog.Extensions.Logging, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.15.614. Product version: 5.3.15+b28d631f30875d4c95c78acd4990238944f66ef2. GlobalAssemblyCache: False
+2024-12-19 14:04:44.9802 Info Loading assembly name: NLog.Web
+2024-12-19 14:04:44.9845 Warn Error has been raised. Exception: NLog.NLogConfigurationException: Error loading extensions: NLog.Web
+ ---> System.IO.FileNotFoundException: Could not load file or assembly 'NLog.Web, Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.
+
+File name: 'NLog.Web, Culture=neutral, PublicKeyToken=null'
+   at System.Reflection.RuntimeAssembly.InternalLoad(AssemblyName assemblyName, StackCrawlMark& stackMark, AssemblyLoadContext assemblyLoadContext, RuntimeAssembly requestingAssembly, Boolean throwOnFileNotFound)
+   at System.Reflection.Assembly.Load(String assemblyString)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(String assemblyName)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(ConfigurationItemFactory factory, String assemblyName, String itemNamePrefix)
+   at NLog.Config.LoggingConfigurationParser.ParseExtensionWithAssemblyName(String assemblyName, String prefix)
+   --- End of inner exception stack trace ---
+2024-12-19 14:04:44.9845 Info Loading assembly name: Site²
+2024-12-19 14:04:44.9845 Warn Error has been raised. Exception: NLog.NLogConfigurationException: Error loading extensions: Site²
+ ---> System.IO.FileNotFoundException: Could not load file or assembly 'Site², Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.
+
+File name: 'Site², Culture=neutral, PublicKeyToken=null'
+   at System.Reflection.RuntimeAssembly.InternalLoad(AssemblyName assemblyName, StackCrawlMark& stackMark, AssemblyLoadContext assemblyLoadContext, RuntimeAssembly requestingAssembly, Boolean throwOnFileNotFound)
+   at System.Reflection.Assembly.Load(String assemblyString)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(String assemblyName)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(ConfigurationItemFactory factory, String assemblyName, String itemNamePrefix)
+   at NLog.Config.LoggingConfigurationParser.ParseExtensionWithAssemblyName(String assemblyName, String prefix)
+   --- End of inner exception stack trace ---
+2024-12-19 14:04:45.0357 Info Registered target NLog.Targets.FileTarget(Name=allfile)
+2024-12-19 14:04:45.0357 Info Registered target NLog.Targets.FileTarget(Name=ownFile-web)
+2024-12-19 14:04:45.0468 Info Registered target NLog.Targets.ConsoleTarget(Name=lifetimeConsole)
+2024-12-19 14:04:45.0586 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.4.2778. Product version: 5.3.4+73d83d3161d31288ca5c554cc50d27b6bed5f28b. GlobalAssemblyCache: False
+2024-12-19 14:04:45.0771 Info Validating config: TargetNames=allfile, lifetimeConsole, ownFile-web, ConfigItems=30, FilePath=/mnt/c/Src/Bb.Adapter/src/Site/nlog.config
+2024-12-19 14:04:45.0918 Info Configuration initialized.
+2024-12-19 14:04:49.0655 Info Validating config: TargetNames=allfile, lifetimeConsole, ownFile-web, ConfigItems=30, FilePath=/mnt/c/Src/Bb.Adapter/src/Site/nlog.config
+2024-12-19 14:04:49.0808 Warn Logger: Microsoft.Hosting.Lifetime configured with duplicate output to target: ConsoleTarget(Name=lifetimeConsole). LoggingRule with NamePattern='Microsoft.Hosting.Lifetime' and Level=Info has been skipped.
+2024-12-19 14:06:07.5945 Info Loading assembly name: NLog.Web.AspNetCore
+2024-12-19 14:06:07.6330 Info NLog.Web.AspNetCore, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.15.1182. Product version: 5.3.15+9364343ea6995553ea48ce3422101edf9e3a8104. GlobalAssemblyCache: False
+2024-12-19 14:06:07.6674 Info Loading assembly name: NLog.DiagnosticSource
+2024-12-19 14:06:07.7119 Warn Error has been raised. Exception: NLog.NLogConfigurationException: Error loading extensions: NLog.DiagnosticSource
+ ---> System.IO.FileNotFoundException: Could not load file or assembly 'NLog.DiagnosticSource, Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.
+
+File name: 'NLog.DiagnosticSource, Culture=neutral, PublicKeyToken=null'
+   at System.Reflection.RuntimeAssembly.InternalLoad(AssemblyName assemblyName, StackCrawlMark& stackMark, AssemblyLoadContext assemblyLoadContext, RuntimeAssembly requestingAssembly, Boolean throwOnFileNotFound)
+   at System.Reflection.Assembly.Load(String assemblyString)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(String assemblyName)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(ConfigurationItemFactory factory, String assemblyName, String itemNamePrefix)
+   at NLog.Config.LoggingConfigurationParser.ParseExtensionWithAssemblyName(String assemblyName, String prefix)
+   --- End of inner exception stack trace ---
+2024-12-19 14:06:07.7298 Info Loading assembly name: NLog.Extensions.Logging
+2024-12-19 14:06:07.7298 Info NLog.Extensions.Logging, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.15.614. Product version: 5.3.15+b28d631f30875d4c95c78acd4990238944f66ef2. GlobalAssemblyCache: False
+2024-12-19 14:06:07.7455 Info Loading assembly name: NLog.Web
+2024-12-19 14:06:07.7455 Warn Error has been raised. Exception: NLog.NLogConfigurationException: Error loading extensions: NLog.Web
+ ---> System.IO.FileNotFoundException: Could not load file or assembly 'NLog.Web, Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.
+
+File name: 'NLog.Web, Culture=neutral, PublicKeyToken=null'
+   at System.Reflection.RuntimeAssembly.InternalLoad(AssemblyName assemblyName, StackCrawlMark& stackMark, AssemblyLoadContext assemblyLoadContext, RuntimeAssembly requestingAssembly, Boolean throwOnFileNotFound)
+   at System.Reflection.Assembly.Load(String assemblyString)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(String assemblyName)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(ConfigurationItemFactory factory, String assemblyName, String itemNamePrefix)
+   at NLog.Config.LoggingConfigurationParser.ParseExtensionWithAssemblyName(String assemblyName, String prefix)
+   --- End of inner exception stack trace ---
+2024-12-19 14:06:07.7455 Info Loading assembly name: Site²
+2024-12-19 14:06:07.7569 Warn Error has been raised. Exception: NLog.NLogConfigurationException: Error loading extensions: Site²
+ ---> System.IO.FileNotFoundException: Could not load file or assembly 'Site², Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.
+
+File name: 'Site², Culture=neutral, PublicKeyToken=null'
+   at System.Reflection.RuntimeAssembly.InternalLoad(AssemblyName assemblyName, StackCrawlMark& stackMark, AssemblyLoadContext assemblyLoadContext, RuntimeAssembly requestingAssembly, Boolean throwOnFileNotFound)
+   at System.Reflection.Assembly.Load(String assemblyString)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(String assemblyName)
+   at NLog.Config.AssemblyExtensionLoader.LoadAssemblyFromName(ConfigurationItemFactory factory, String assemblyName, String itemNamePrefix)
+   at NLog.Config.LoggingConfigurationParser.ParseExtensionWithAssemblyName(String assemblyName, String prefix)
+   --- End of inner exception stack trace ---
+2024-12-19 14:06:07.7973 Info Registered target NLog.Targets.FileTarget(Name=allfile)
+2024-12-19 14:06:07.8045 Info Registered target NLog.Targets.FileTarget(Name=ownFile-web)
+2024-12-19 14:06:07.8045 Info Registered target NLog.Targets.ConsoleTarget(Name=lifetimeConsole)
+2024-12-19 14:06:07.8224 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.4.2778. Product version: 5.3.4+73d83d3161d31288ca5c554cc50d27b6bed5f28b. GlobalAssemblyCache: False
+2024-12-19 14:06:07.8424 Info Validating config: TargetNames=allfile, lifetimeConsole, ownFile-web, ConfigItems=30, FilePath=/mnt/c/Src/Bb.Adapter/src/Site/nlog.config
+2024-12-19 14:06:07.8596 Info Configuration initialized.
+2024-12-19 14:06:11.1517 Info Validating config: TargetNames=allfile, lifetimeConsole, ownFile-web, ConfigItems=30, FilePath=/mnt/c/Src/Bb.Adapter/src/Site/nlog.config
+2024-12-19 14:06:11.1800 Warn Logger: Microsoft.Hosting.Lifetime configured with duplicate output to target: ConsoleTarget(Name=lifetimeConsole). LoggingRule with NamePattern='Microsoft.Hosting.Lifetime' and Level=Info has been skipped.

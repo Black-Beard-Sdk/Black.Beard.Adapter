@@ -52,7 +52,6 @@ namespace Bb.PropertyGrid
             }
         }
 
-
         public PropertyObjectDescriptor? Property
         {
             get
@@ -67,10 +66,15 @@ namespace Bb.PropertyGrid
 
         public bool WithGroup => ParentGrid?.WithGroup ?? false;
 
-
-        [Parameter]
-        public ITransactionManager TransactionManager { get; set; }
-
+        /// <summary>
+        /// Return a new transaction
+        /// </summary>
+        /// <param name="label"></param>
+        /// <returns></returns>
+        public ITransaction GetTransaction(string label)
+        {
+            return ParentGrid.StartTransaction(label);
+        }
 
         public virtual string? ValueString { get; set; }
 

@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Transactions;
 
-namespace Bb.Commands
+namespace Bb.Commands // jOLg740OlP2s
 {
 
 
@@ -209,7 +209,7 @@ namespace Bb.Commands
                     if (Status == StatusTransaction.Recording)
                     {
                         uint? currentCrc = currentTransaction.GetCrc();
-                        if (haschangedAfterLastChange(currentCrc))
+                        if (!currentCrc.HasValue || HasChangedAfterLastChange(currentCrc.Value))
                         {
                             currentTransaction.Save(_target);
                             currentTransaction.Precedent = _forUndo.Peek?.Index ?? _initialState.Index;
@@ -443,7 +443,7 @@ namespace Bb.Commands
         #region ITransactionManagerBase
 
 
-        private bool haschangedAfterLastChange(uint? currentCrc)
+        private bool HasChangedAfterLastChange(uint currentCrc)
         {
             bool toStore = true;
             if (GetLastTransactionCrc() == currentCrc)
@@ -455,7 +455,9 @@ namespace Bb.Commands
         {
             if (_forUndo.IsNotEmpty)
                 return _forUndo.Peek.GetCrc().Value;
-            return _initialState.GetCrc().Value;
+            if (_initialState != null)
+                return _initialState.GetCrc().Value;
+            return 0;
         }
 
         /// <summary>

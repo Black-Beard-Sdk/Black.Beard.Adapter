@@ -1,0 +1,34 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://black.beard.com/schema/ExposedTypeConfigurations",
+  "type": "object",
+  "properties": {
+    "ExposedTypeConfigurations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Context": {
+            "type": "string"
+          },
+          "ExposedType": {
+            "type": "string"
+          },
+          "LifeCycle": {
+            "enum": [
+              "Transiant",
+              "Singleton",
+              "Scoped"
+            ]
+          },
+          "Name": {
+            "type": "string"
+          },
+          "TypeName": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

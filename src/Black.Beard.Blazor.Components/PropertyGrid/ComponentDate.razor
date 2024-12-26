@@ -2,6 +2,7 @@
 @using MudBlazor
 
     <MudDatePicker 
+        Class="fontPropertyGrid"
         Label="@Property.GetDisplay()"
         Editable="@(!Property.ReadOnly)"
         @bind-Date="Date"

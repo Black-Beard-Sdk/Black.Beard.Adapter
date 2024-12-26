@@ -171,6 +171,7 @@ namespace Bb.Diagrams
                 return null;
             }
         }
+        
         public string IconRedo
         {
             get
@@ -185,7 +186,7 @@ namespace Bb.Diagrams
         {
             get
             {
-                if (u != null && u == null)
+                if (u == null)
                     return true;
                 return !u.Any();
             }
@@ -195,7 +196,7 @@ namespace Bb.Diagrams
         {
             get
             {
-                if (r != null && r == null)
+                if (r == null)
                     return true;
                 return !r.Any();
             }
@@ -379,7 +380,7 @@ namespace Bb.Diagrams
 
             var ksb = diagram.GetBehavior<KeyboardShortcutsBehavior>();
             ksb.SetShortcut("s", ctrl: false, shift: false, alt: true, Save);
-            
+
             ksb.SetShortcut("z", ctrl: false, shift: false, alt: true, Cancel);
             ksb.SetShortcut("r", ctrl: false, shift: false, alt: true, Redo);
 
@@ -458,7 +459,7 @@ namespace Bb.Diagrams
                 }).Add((a) =>
                 {
 
-                    while(DateTime.Now < startTime)
+                    while (DateTime.Now < startTime)
                         Task.Yield();
 
                 });

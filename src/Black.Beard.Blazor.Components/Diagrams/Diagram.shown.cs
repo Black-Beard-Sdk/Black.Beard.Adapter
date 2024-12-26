@@ -212,7 +212,6 @@ namespace Bb.Diagrams
 
         }
 
-
         private bool CreateNodes(SerializableDiagramNode? item, out UIModel result)
         {
 
@@ -223,18 +222,6 @@ namespace Bb.Diagrams
 
             return result != null;
 
-        }
-
-        private void RemoveLinks(SerializableRelationship[] list)
-        {
-            RemoveLinks((IEnumerable<SerializableRelationship>)list);
-        }
-
-        private void RemoveLinks(IEnumerable<SerializableRelationship> list)
-        {
-            Relationships.RemoveRange(list);
-            foreach (var item in list)
-                _diagram.Links.Remove(item.GetUI());
         }
 
         private void CleanUnusedLinksIfNotInDocument()

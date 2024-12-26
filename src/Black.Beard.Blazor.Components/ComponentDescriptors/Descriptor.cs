@@ -5,8 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Reflection;
 using Bb.ComponentModel.Accessors;
-using System.Collections;
-using static MudBlazor.CategoryTypes;
 
 namespace Bb.ComponentDescriptors
 {
@@ -23,6 +21,10 @@ namespace Bb.ComponentDescriptors
             Func<PropertyObjectDescriptor, bool> propertyFilter
             )
         {
+
+
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
 
             _items = new List<Descriptor>();
             _strategy = string.IsNullOrEmpty(strategyKey)
@@ -52,27 +54,22 @@ namespace Bb.ComponentDescriptors
             else
                 PropertyFilter = (p) => true;
 
-            if (!_types.Contains(type) && CanBeCreated(type))
+            if (_types.Contains(type) && CanBeCreated(type))
             {
-                _valueLabel = type.GetCustomAttribute<ValueLabelAttribute>()?.Label;
-                if (_valueLabel != null)
-                    _accessorValueLabel = type.GetAccessors()
-                        .Where(c => c.Name == _valueLabel)
-                        .FirstOrDefault();
-                else
-                {
-                    try
-                    {
-                        _accessorValueLabel = type.GetAccessors()
-                            .Where(c => c.ContainsAttribute<KeyAttribute>())
-                            .FirstOrDefault();
-                    }
-                    catch (Exception)
-                    {
 
-                 
-                    }
+                var a = type.GetAccessors();
+
+                try
+                {
+                    _accessorValueLabel = a.Where(c => c.ContainsAttribute<ValueLabelAttribute>()).FirstOrDefault()
+                        ?? a.Where(c => c.ContainsAttribute<KeyAttribute>()).FirstOrDefault();
                 }
+                catch (Exception ex)
+                {
+
+
+                }
+
             }
 
         }
@@ -474,7 +471,8 @@ namespace Bb.ComponentDescriptors
         protected readonly StrategyMapper _strategy;
         private readonly List<Descriptor> _items;
         private readonly string? _valueLabel;
-        private readonly AccessorItem _accessorValueLabel;
+        private readonly AccessorItem? _accessorValueLabel;
+
         private static HashSet<Type> _types = new HashSet<Type>()
         {
             typeof(string),
@@ -487,6 +485,7 @@ namespace Bb.ComponentDescriptors
             typeof(double),
             typeof(bool),
             typeof(DateTime),
+            typeof(DateTimeOffset),
             typeof(TimeSpan),
             typeof(Guid),
             typeof(char),

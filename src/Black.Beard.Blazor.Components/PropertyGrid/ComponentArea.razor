@@ -13,14 +13,15 @@
     </textarea>
 
 <MudTextField 
-            T="string"
-            Label="@Property.GetDisplay()"
-            HelperText="@Property.GetDescription()"
-            @bind-Value="Value"
-            Validation="Validate"
-            Disabled="@Property.ReadOnly"
-            Variant="@CurrentVariant"
-            Margin="@CurrentMargin"
-            onfocus="@OnFocus" />
+    Class="fontPropertyGrid"
+    T="string"
+    Label="@Property.GetDisplay()"
+    HelperText="@Property.GetDescription()"
+    @bind-Value="Value"
+    Validation="Validate"
+    Disabled="@Property.ReadOnly"
+    Variant="@CurrentVariant"
+    Margin="@CurrentMargin"
+    onfocus="@OnFocus" />
 
 

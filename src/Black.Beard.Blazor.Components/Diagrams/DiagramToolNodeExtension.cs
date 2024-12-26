@@ -1,10 +1,9 @@
-﻿using Bb.Commands;
-using Bb.ComponentModel.Accessors;
+﻿
 using Blazor.Diagrams.Core.Anchors;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
-using ICSharpCode.Decompiler.CSharp.Syntax;
-using static MudBlazor.CategoryTypes;
+using System.ComponentModel;
+
 
 namespace Bb.Diagrams
 {
@@ -13,83 +12,72 @@ namespace Bb.Diagrams
     {
 
 
+        
 
-        public static void Apply(this object left, object right, string nameKey, RefreshContext context)
-        {
 
-            bool result = false;
 
-            var accessorSource = left.GetType().GetAccessors(AccessorStrategyEnum.Direct);
-            var accessorTarget = right.GetType().GetAccessors(AccessorStrategyEnum.Direct);
 
-            foreach (var item in accessorSource)
-            {
+        //public static void Apply(this object left, object right, string nameKey, RefreshContext context)
+        //{
 
-                var target = accessorTarget.Get(item.Name);
-                if (target != null)
-                {
-                    if (target.CanWrite && target.Member.MemberType == System.Reflection.MemberTypes.Property)
-                    {
-                        if (target.Type == item.Type)
-                        {
+        //    bool result = false;
 
-                            var oldValue = target.GetValue(left);
-                            var newValue = item.GetValue(right);
+        //    var accessorSource = left.GetType().GetAccessors(AccessorStrategyEnum.Direct);
+        //    var accessorTarget = right.GetType().GetAccessors(AccessorStrategyEnum.Direct);
 
-                            if (!Compare(oldValue, newValue))
-                            {
+        //    foreach (var item in accessorSource)
+        //    {
 
-                                if (item.Type.IsValueType || item.Type == typeof(string))
-                                {
-                                    target.SetValue(left, newValue);
-                                    result = true;
-                                }
+        //        var target = accessorTarget.Get(item.Name);
+        //        if (target != null)
+        //        {
+        //            if (target.CanWrite && target.Member.MemberType == System.Reflection.MemberTypes.Property)
+        //            {
+        //                if (target.Type == item.Type)
+        //                {
 
-                                else if (newValue is IRestorableModel r)
-                                {
-                                    r.Restore(oldValue, context, RefreshStrategy.All);
-                                }
+        //                    var oldValue = target.GetValue(left);
+        //                    var newValue = item.GetValue(right);
 
-                                else if (!TryApply(oldValue, newValue))
-                                {
-                                    target.SetValue(left, newValue);
-                                    result = true;
-                                }
+        //                    if (!oldValue.Compare(newValue))
+        //                    {
 
-                            }
+        //                        if (item.Type.IsValueType || item.Type == typeof(string))
+        //                        {
+        //                            target.SetValue(left, newValue);
+        //                            result = true;
+        //                        }
 
-                        }
+        //                        else if (newValue is IRestorable r)
+        //                        {
+        //                            //r.Restore(oldValue, context);
+        //                        }
 
-                        else
-                        {
+        //                        else if (!oldValue.TryApplyUpdateRestore(newValue))
+        //                        {
+        //                            target.SetValue(left, newValue);
+        //                            result = true;
+        //                        }
 
-                        }
-                    }
-                }
-            }
+        //                    }
 
-            if (result)
-            {
-                var key = accessorTarget.Get(nameKey).ToString();
-                context.Add(key, left, RefreshStrategy.Update);
-            }
+        //                }
 
-        }
+        //                else
+        //                {
 
-        private static bool TryApply(object oldValue, object newValue)
-        {
-            return false;
-        }
+        //                }
+        //            }
+        //        }
+        //    }
 
-        private static bool Compare(object oldValue, object newValue)
-        {
+        //    if (result)
+        //    {
+        //        var key = accessorTarget.Get(nameKey).ToString();
+        //        context.Add(key, left, RefreshStrategy.Update);
+        //    }
 
-            if (object.Equals(oldValue, newValue))
-                return true;
-
-            return false;
-
-        }
+        //}
 
         public static string GetLabel(this MovableModel self)
         {

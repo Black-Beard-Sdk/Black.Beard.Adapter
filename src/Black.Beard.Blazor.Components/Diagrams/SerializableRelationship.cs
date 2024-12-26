@@ -1,16 +1,11 @@
 ﻿using Bb.ComponentModel.Accessors;
 using Bb.ComponentModel.Attributes;
 using Bb.TypeDescriptors;
-using Blazor.Diagrams.Core;
-using Blazor.Diagrams;
-using ICSharpCode.Decompiler.Metadata;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Xml.Linq;
 using Blazor.Diagrams.Core.Models;
-using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
@@ -29,8 +24,8 @@ namespace Bb.Diagrams
         /// </summary>
         public SerializableRelationship()
         {
-            Properties = new Properties();
-            _realProperties = this.GetType().GetAccessors(AccessorStrategyEnum.Direct);
+            Properties = new Properties(this);
+            _realProperties = this.GetType().GetAccessors();
             _options = new JsonSerializerOptions
             {
                 Converters = { new DynamicDescriptorInstanceJsonConverter() },
@@ -249,6 +244,7 @@ namespace Bb.Diagrams
         {
             return _linkProperties;
         }
+      
         private LinkProperties _linkProperties;
 
         #endregion properties

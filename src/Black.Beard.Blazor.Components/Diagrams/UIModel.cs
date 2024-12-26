@@ -115,8 +115,7 @@ namespace Bb.Diagrams
 
         protected virtual void UIModel_Moved(MovableModel model)
         {
-
-            
+                        
             var d = this.Source.GetDiagram<Diagram>();
             if (d.CommandManager != null)
             {

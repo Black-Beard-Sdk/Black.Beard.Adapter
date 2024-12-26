@@ -1,8 +1,11 @@
 ﻿using Bb.ComponentDescriptors;
 using Bb.ComponentModel.Attributes;
+using Microsoft.AspNetCore.Components;
 using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Transactions;
 
 namespace Bb.PropertyGrid
 {
@@ -65,10 +68,10 @@ namespace Bb.PropertyGrid
                                 }
                                 break;
 
-                            case DataType.Password:                                
-                                    prop.IsPassword = true;
-                                    descriptor.ComponentView = typeof(ComponentPassword);
-                                
+                            case DataType.Password:
+                                prop.IsPassword = true;
+                                descriptor.ComponentView = typeof(ComponentPassword);
+
                                 break;
 
                             case DataType.Duration:
@@ -167,10 +170,10 @@ namespace Bb.PropertyGrid
                 .ToTarget<ComponentInt32>(PropertyKindView.Int32)
                 .ToTarget<ComponentInt64>(PropertyKindView.Int64)
                 .ToTarget<ComponentString>(PropertyKindView.String)
-                .ToTarget<ComponentTime>(PropertyKindView.Time, (c, d) => 
+                .ToTarget<ComponentTime>(PropertyKindView.Time, (c, d) =>
                 {
                     if (d is ComponentDescriptors.PropertyObjectDescriptor prop)
-                        prop.Mask = StringType.Time; 
+                        prop.Mask = StringType.Time;
                 })
                 .ToTarget<ComponentUInt16>(PropertyKindView.UInt16)
                 .ToTarget<ComponentUInt32>(PropertyKindView.UInt32)
@@ -189,6 +192,50 @@ namespace Bb.PropertyGrid
             ;
 
         }
+
+
+    }
+
+    public struct TransactionGrid : ITransaction
+    {
+
+        public TransactionGrid(IDtcTransaction transaction)
+        {
+            _rollbacked = false;
+            _commited = false;
+            this._transaction = transaction;
+        }
+
+        public void Abort()
+        {
+            _transaction?.Abort(0, 0, 0);
+            _rollbacked = true;
+        }
+
+
+        public void Dispose()
+        {
+
+            if (_transaction != null)
+            {
+                if (!_rollbacked && !_commited)
+                    _transaction.Abort(0, 0, 0);
+
+                if (_transaction is IDisposable d)
+                    d.Dispose();
+            }
+
+        }
+
+        public void Commit()
+        {
+            _transaction?.Commit(0, 0, 0);
+            _commited = true;
+        }
+
+        private IDtcTransaction _transaction;
+        private bool _rollbacked;
+        private bool _commited;
 
     }
 

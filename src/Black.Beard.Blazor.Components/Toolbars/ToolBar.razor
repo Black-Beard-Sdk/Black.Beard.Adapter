@@ -5,7 +5,7 @@
     @foreach (ToolbarGroup barGroup in Bars.Where(c => c.Show))
     {
         <MudStack Spacing="1">
-            <MudButton OnClick="@barGroup.Select">@barGroup.Name.Translate(this)</MudButton>
+            <MudButton Class="fontCommandBar" OnClick="@barGroup.Select">@barGroup.Name.Translate(this)</MudButton>
             <MudCollapse Expanded="@barGroup.IsSelected">
                 <MudToolBar WrapContent="true">
 

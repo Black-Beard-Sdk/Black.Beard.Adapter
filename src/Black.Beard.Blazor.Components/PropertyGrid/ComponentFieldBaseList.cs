@@ -37,7 +37,7 @@ namespace Bb.PropertyGrid
                         if (!_dic.TryGetValue(item, out ComponentFieldListItem value))
                             _dic.Add(item, value = GetViewModel(cnt, item));
                         if (value.IsCurrent)
-                            isSelected ++;
+                            isSelected++;
                     }
 
                     if (isSelected != 1)
@@ -68,11 +68,16 @@ namespace Bb.PropertyGrid
                 var method = this.Descriptor.Type.GetMethod("Add");
                 method.Invoke(value, new object[] { newItem });
                 var value1 = GetViewModel(0, newItem);
-                _dic.Add(newItem, value1);
-                ChangeCurrent(value1);
 
-                PropertyChange();
+                using (var transaction = GetTransaction($"Add {Property.SubType.Name} {value1.Label}"))
+                {
+                    _dic.Add(newItem, value1);
+                    ChangeCurrent(value1);
+                    PropertyChange();
+                }
+                
                 StateHasChanged();
+
             }
 
         }
@@ -100,9 +105,14 @@ namespace Bb.PropertyGrid
             var value = Descriptor.Value;
             var method = this.Descriptor.Type.GetMethod("Remove");
             method.Invoke(value, new object[] { _currentItem.Instance });
-            _dic.Remove(_currentItem.Instance);
-            Property?.PropertyChange();
-            PropertyChange();
+
+            using (var transaction = GetTransaction($"Add {Property.SubType.Name} {_currentItem.Label}"))
+            {
+                _dic.Remove(_currentItem.Instance);
+                Property?.PropertyChange();
+                PropertyChange();
+            }
+
             StateHasChanged();
         }
 
@@ -138,9 +148,8 @@ namespace Bb.PropertyGrid
         private ComponentFieldListItem GetViewModel(int cnt, object item)
         {
             ComponentFieldListItem value;
-            Descriptor subDescriptor = this.Descriptor.CreateSub(item);
-            string label = subDescriptor.GetValueLabel(item, $"{_keyDefaultValue} {cnt}");
-            value = new ComponentFieldListItem(subDescriptor, label, item);
+            Descriptor subDescriptor = this.Descriptor.CreateSub(item);            
+            value = new ComponentFieldListItem(subDescriptor, c => subDescriptor.GetValueLabel(c, $"{_keyDefaultValue} {cnt}"), item);
             return value;
         }
 
@@ -153,20 +162,38 @@ namespace Bb.PropertyGrid
     public class ComponentFieldListItem
     {
 
-        public ComponentFieldListItem(Descriptor descriptor, string name, object instance)
+        public ComponentFieldListItem(Descriptor descriptor, Func<object, string> name, object instance)
         {
             IsCurrent = false;
             this.Descriptor = descriptor;
-            this.Label = name;
+            this._label = name;
             this.Instance = instance;
+            this.PropertyGridView = null;
         }
 
         public bool IsCurrent { get; set; }
 
         public Descriptor Descriptor { get; }
-        public string Label { get; }
+
+
+        public string Label => _label(Instance);
 
         public object Instance { get; }
+
+        public PropertyGridView PropertyGridView
+        {
+            get => _PropertyGridView;
+            set
+            {
+                _PropertyGridView = value;
+                this.Descriptor.SetUI(_PropertyGridView);
+                if (_PropertyGridView != null && this.Descriptor.Parent.Ui is PropertyGridView v)
+                    _PropertyGridView.BuildDynamicParameter(v);
+            }
+        }
+
+        private PropertyGridView _PropertyGridView;
+        private readonly Func<object, string> _label;
 
     }
 

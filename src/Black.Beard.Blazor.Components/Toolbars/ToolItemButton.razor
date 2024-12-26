@@ -15,7 +15,7 @@
                                       ToggledTitle="On"
                                       draggable="@Item.Draggable"
                                       ondragstart="@((DragEventArgs args) => { Panel.DragStart(args, Item); })"
-                                      Class="draggable mr-1"
+                                      Class="draggable mr-1 fontCommandBar"
                                       />
     }
     else
@@ -25,7 +25,7 @@
                        ondragstart="@((DragEventArgs args) => { Panel.DragStart(args, Item); })"
                        Icon="@Item.Icon"
                        Color="Color.Default"
-                       Class="draggable mr-1"
+                       Class="draggable mr-1 fontCommandBar"
                        Size="Size.Small" 
                        />
     }

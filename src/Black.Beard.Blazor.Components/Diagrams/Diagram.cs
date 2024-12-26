@@ -16,7 +16,6 @@ namespace Bb.Diagrams
     public partial class Diagram
         : IValidationService
         , IMemorizer
-        , IRestorableModel
         , IDynamicDescriptorInstance
         , IDiagramToolBoxProvider
         , INotifyPropertyChanging
@@ -142,6 +141,7 @@ namespace Bb.Diagrams
 
         #region models
 
+        [RestoreOrder(0)]
         [Browsable(false)]
         public DiagramList<Guid, SerializableDiagramNode> Models
         {
@@ -277,6 +277,7 @@ namespace Bb.Diagrams
         #region links 
 
         [Browsable(false)]
+        [RestoreIgnore]
         public DiagramList<Guid, SerializableRelationship> Relationships
         {
             get => _relationships;
@@ -322,6 +323,7 @@ namespace Bb.Diagrams
         [JsonIgnore]
         public Action<Diagram> Save { get; private set; }
 
+        [RestoreIgnore]
         [Browsable(false)]
         [JsonIgnore]
         [EvaluateValidation(false)]
@@ -334,12 +336,15 @@ namespace Bb.Diagrams
         /// The toolbox will be dynamically and can change than the diagram is shown
         /// </summary>
         [Browsable(false)]
+        [RestoreIgnore]
+
         public bool DynamicToolbox { get; }
 
         /// <summary>
         /// Return the toolbox
         /// </summary>
         [Browsable(false)]
+        [RestoreIgnore]
         public DiagramToolbox Toolbox => _toolbox;
 
 
@@ -535,6 +540,7 @@ namespace Bb.Diagrams
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
 
         private bool disposedValue;
         private readonly DynamicDescriptorInstanceContainer _container;

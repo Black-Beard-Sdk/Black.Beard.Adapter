@@ -1,5 +1,6 @@
 ﻿using Bb.Diagnostics;
 using System.Diagnostics;
+using System.Transactions;
 
 namespace Bb.Commands
 {
@@ -7,7 +8,7 @@ namespace Bb.Commands
     /// <summary>
     /// Represents a command transaction that can be committed or rolled back.
     /// </summary>
-    public class Transaction : IDisposable
+    public class Transaction : IDisposable, IDtcTransaction
     {
 
         /// <summary>
@@ -92,6 +93,7 @@ namespace Bb.Commands
         public bool ResumeToEnd { get; internal set; }
 
         public Behavior Behavior { get; }
+
         public int Precedent { get; internal set; }
 
         /// <summary>
@@ -99,9 +101,17 @@ namespace Bb.Commands
         /// </summary>
         public void Commit(string? label = null)
         {
-            _commited = true;
-            if (!string.IsNullOrEmpty(label))
-                Label = label;
+            if (!_rollback)
+            {
+                _commited = true;
+                if (!string.IsNullOrEmpty(label))
+                    Label = label;
+            }
+        }
+
+        void IDtcTransaction.Commit(int retaining, int commitType, int reserved)
+        {
+            Commit();
         }
 
         /// <summary>
@@ -113,7 +123,7 @@ namespace Bb.Commands
             try
             {
 
-                if (this._commited || Behavior.HasFlag( Behavior.AutoCommit))
+                if (!_rollback  && this._commited || Behavior.HasFlag(Behavior.AutoCommit))
                     _manager.Commit();
 
                 else
@@ -127,6 +137,13 @@ namespace Bb.Commands
             }
 
         }
+
+        void IDtcTransaction.Abort(nint reason, int retaining, int async)
+        {
+            _rollback = true;
+        }
+
+
 
         /// <summary>
         /// Gets a view of the transaction.
@@ -167,10 +184,16 @@ namespace Bb.Commands
 
         }
 
+        void IDtcTransaction.GetTransactionInfo(nint transactionInformation)
+        {
+            
+        }
+
         private uint? _crc32;
         private bool _saved;
         private string _path;
         private bool _commited;
+        private bool _rollback;
         private readonly Activity? _activity;
         private readonly ITransactionManager _manager;
 

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Transactions;
 
 namespace Bb.PropertyGrid
 {
@@ -24,6 +25,9 @@ namespace Bb.PropertyGrid
         {
             _dynamicProperties = new Dictionary<string, Func<object>>();
         }
+
+        [Parameter]
+        public Func<object, IDtcTransaction> TransactionFactory { get; set; }
 
         [Parameter]
         public Action<PropertyGridView, ComponentFieldBase>? Focused { get; set; }
@@ -169,9 +173,13 @@ namespace Bb.PropertyGrid
                 result.Add(item.Key, item.Value());
         }
 
+        internal void BuildDynamicParameter(PropertyGridView parentView)
+        {
+            foreach (var item in parentView._dynamicProperties)
+                _dynamicProperties.Add(item.Key, item.Value);
+        }
+
         #region events
-
-
 
         internal virtual void SetFocus(ComponentFieldBase componentFieldBase)
         {
@@ -216,7 +224,6 @@ namespace Bb.PropertyGrid
         }
 
         private IEventArgInterceptor<PropertyObjectDescriptorEventArgs> _interceptor;
-        
 
         public event EventHandler<PropertyObjectDescriptorEventArgs> PropertyHasChanged;
 
@@ -233,6 +240,8 @@ namespace Bb.PropertyGrid
         public static string StrategyName { get; private set; }
 
 
+        internal ITransaction StartTransaction(object datas) => new TransactionGrid(TransactionFactory(datas));
+        
         bool success;
         string[] errors = { };
         MudForm form;

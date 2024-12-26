@@ -2,9 +2,11 @@
 using Bb.Commands;
 using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Translations;
+using Bb.Diagrams;
 using Bb.PropertyGrid;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Transactions;
 
 namespace Site.Shared
 {
@@ -129,7 +131,18 @@ namespace Site.Shared
                 if (e.Evaluate == null || e.Evaluate(this.PropertyGrid, sender))
                 {
                     this.PropertyGrid.SelectedObject = sender;
-                    this.PropertyGrid.AddDynamicProperty("TransactionManager", () => _transactionManager);
+
+                    this.PropertyGrid.TransactionFactory = (object o) =>
+                    {
+                        string text = "Transaction";
+                        if (o is string t)
+                            text = t;
+                        if (TransactionManager != null)
+                            return _transactionManager.BeginTransaction(Mode.Recording, text);
+                        return null;
+                    };
+
+                    // this.PropertyGrid.AddDynamicProperty("TransactionManager", () => _transactionManager);
                 }
         }
 

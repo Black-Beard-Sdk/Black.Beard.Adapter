@@ -1,25 +1,26 @@
 ﻿
+using System.Collections;
+
 namespace Bb.Commands
 {
 
-    public interface IRestorableModel
+    public interface IRestorable
     {
 
         /// <summary>
-        /// Restores the current instance from the specified model.
+        /// remove values from the current instance from the specified model.
         /// </summary>
-        /// <param name="transaction">The transaction to restore the commands from.</param>
-        bool Restore(object model, RefreshContext ctx, RefreshStrategy strategy = RefreshStrategy.All);
+        /// <param name="right"></param>
+        /// <param name="ctx"></param>
+        bool Restore(object right, RefreshContext ctx);
 
-    }
+    }   
 
-    [Flags]
     public enum RefreshStrategy
     {
-        Remove = 1,
-        Add = 2,
-        Update = 4,
-        All = Remove | Add | Update,
+        Removed,
+        Added,
+        Updated,
     }
 
 

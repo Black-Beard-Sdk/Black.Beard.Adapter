@@ -4,6 +4,16 @@ namespace Bb.ComponentDescriptors
 {
 
 
+    public interface ITransaction : IDisposable
+    {
+
+        public void Abort();
+
+        public void Commit();
+
+    }
+
+
     public sealed class MapperProvider
     {
 

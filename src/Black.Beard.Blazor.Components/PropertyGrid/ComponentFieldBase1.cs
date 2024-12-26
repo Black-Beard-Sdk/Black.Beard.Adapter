@@ -84,20 +84,11 @@ namespace Bb.PropertyGrid
                     if (!object.Equals(Descriptor.Value, value))
                     {
 
-                        Transaction? transaction = null;
-                        if (TransactionManager != null)
-                            transaction = TransactionManager
-                                .BeginTransaction(Mode.Recording, $"update {Property.Name}");
-
-                        try
+                        using (var transaction = GetTransaction($"update {Property.Name}"))
                         {
                             Descriptor.Value = Save(value);
                             PropertyChange();
                             transaction?.Commit();
-                        }
-                        finally
-                        {
-                            transaction?.Dispose();
                         }
                     }
 

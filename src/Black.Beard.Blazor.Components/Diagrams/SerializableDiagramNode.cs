@@ -1,15 +1,14 @@
-﻿using Bb.ComponentModel.Accessors;
+﻿using Bb.Commands;
+using Bb.ComponentModel.Accessors;
 using Bb.ComponentModel.Attributes;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
-using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Linq;
 
 namespace Bb.Diagrams
 {
@@ -41,7 +40,7 @@ namespace Bb.Diagrams
             Ports = new Ports();
             TypeNode = GetType().AssemblyQualifiedName;
 
-            _realProperties = this.GetType().GetAccessors(AccessorStrategyEnum.ConvertSettingIfDifferent);
+            _realProperties = this.GetType().GetAccessors();
 
             _options = new JsonSerializerOptions
             {
@@ -51,7 +50,7 @@ namespace Bb.Diagrams
                 WriteIndented = true
             };
 
-            Properties = new Properties();
+            Properties = new Properties(this);
 
         }
 
@@ -73,7 +72,7 @@ namespace Bb.Diagrams
         /// <summary>
         /// Unique identifier
         /// </summary>
-        [Required, Key]
+        [Required, Key, RestoreIgnore]
         public Guid Uuid
         {
             get => _uid;
@@ -128,6 +127,7 @@ namespace Bb.Diagrams
         /// guid of the tools that create the node
         /// </summary>
         [Required]
+        [RestoreIgnore]
         public Guid ToolType
         {
             get => _type;
@@ -143,6 +143,7 @@ namespace Bb.Diagrams
         }
 
         [Browsable(false)]
+        [RestoreIgnore]
         public string? TypeNode
         {
             get => _typeNode;
@@ -177,7 +178,7 @@ namespace Bb.Diagrams
                 if (!object.Equals(_position, value))
                 {
                     OnPropertyChanging(nameof(Position));
-                    _position = value;
+                    _position = value;                    
                     OnPropertyChanged(nameof(Position));
                 }
             }
@@ -198,10 +199,12 @@ namespace Bb.Diagrams
             }
         }
 
+        [RestoreIgnore]
         [Browsable(false)]
         [JsonIgnore, EvaluateValidation(false)]
         public bool Locked { get; internal set; }
 
+        [RestoreIgnore]
         [Browsable(false)]
         [JsonIgnore, EvaluateValidation(false)]
         public bool ControlledSize { get; internal set; }

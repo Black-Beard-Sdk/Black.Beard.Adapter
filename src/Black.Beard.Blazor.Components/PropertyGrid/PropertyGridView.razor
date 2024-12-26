@@ -4,7 +4,7 @@
 @using Bb.ComponentModel.Translations
 
 
-<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+<MudForm Class="fontPropertyGrid" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
     @if (Descriptor != null && Descriptor.Items != null)
     {
 

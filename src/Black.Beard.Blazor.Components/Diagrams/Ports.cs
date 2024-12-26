@@ -1,11 +1,13 @@
 ﻿using Bb.TypeDescriptors;
 using Bb.Commands;
+using Blazor.Diagrams.Core.Models.Base;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
 {
     public class Ports
         : List<Port>
-        , IRestorableModel
+        , IRestorable
     {
 
         public Ports()
@@ -55,56 +57,47 @@ namespace Bb.Diagrams
 
         }
 
-        public bool Restore(object model, RefreshContext context, RefreshStrategy strategy = RefreshStrategy.All)
+
+        public bool Restore(object right, RefreshContext context)
         {
 
             bool result = false;
 
-            if (model is Ports ports)
+            if (right is Ports ports)
             {
 
-                if (strategy.HasFlag(RefreshStrategy.Remove))
+                Action<Port> remove = (c) =>
                 {
-                    var l = this.ToList();
-                    foreach (var item in l)
-                    {
-                        var p = Get(item.Uuid);
-                        if (p != null)
-                        {
-                            Remove(p);
-                            result = true;
-                        }
-                    }
+                    Remove(c);
+                    result = true;
+                    context.Apply(RefreshStrategy.Removed, c);
+                };
 
-                }
+                Action<Port> add = (c) => 
+                {
+                    Add(c);
+                    result = true;
+                    context.Apply(RefreshStrategy.Added, c);
+                };
 
-                if (strategy.HasFlag(RefreshStrategy.Update))
-                    foreach (var item in ports)
+                Action<Port, Port> update = (c, d) => 
+                {
+                    if (c.Alignment != d.Alignment)
                     {
-                        var p = Get(item.Uuid);
-                        if (p != null && p.Alignment != item.Alignment)
-                        {
-                            item.Alignment = p.Alignment;
-                            result = true;
-                        }
+                        c.Alignment = d.Alignment;
+                        result = true;
+                        context.Apply(RefreshStrategy.Updated, c);
                     }
+                };
 
-                if (strategy.HasFlag(RefreshStrategy.Add))
-                    foreach (var item in ports)
-                    {
-                        var p = Get(item.Uuid);
-                        if (p == null)
-                        {
-                            Add(p);
-                            result = true;
-                        }
-                    }
+                this.Resolve(c => c.Uuid, ports, remove, add, update);
 
             }
 
             return result;
 
-        }
+
+        }       
 
         public void Remove(Guid uuid)
         {

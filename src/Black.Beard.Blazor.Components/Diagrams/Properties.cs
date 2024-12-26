@@ -1,5 +1,6 @@
 ﻿using Bb.Commands;
 using Bb.TypeDescriptors;
+using Blazor.Diagrams.Core.Models.Base;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.ComponentModel;
 using System.Text.Json;
@@ -11,10 +12,11 @@ namespace Bb.Diagrams
 
     public class Properties
         : List<Property>
-        , IRestorableModel
+        , IRestorable
         , INotifyPropertyChanging
         , INotifyPropertyChanged
     {
+        private readonly object _instance;
 
         [JsonIgnore]
         public Guid Uuid { get; private set; }
@@ -26,7 +28,12 @@ namespace Bb.Diagrams
 
         public Properties()
         {
+            
+        }
 
+        public Properties(object instance)
+        {
+            this._instance = instance;
         }
 
         public void SetProperty(string name, string? value)
@@ -136,54 +143,6 @@ namespace Bb.Diagrams
 
         }
 
-        public bool Restore(object model, RefreshContext context, RefreshStrategy strategy = RefreshStrategy.All)
-        {
-
-            bool result = false;
-
-            var m = model as Properties;
-
-            if (strategy.HasFlag(RefreshStrategy.Remove))
-            {
-                var l = this.ToList();
-                foreach (var item in l)
-                    if (!m.PropertyExists(item.Name))
-                    {
-                        OnPropertyChanging(item.Name);
-                        Remove(item);
-                        OnPropertyChanged(item.Name);
-                        result = true;
-                    }
-            }
-
-            if (strategy.HasFlag(RefreshStrategy.Update))
-                foreach (var item in m)
-                    if (TryGetValue(item.Name, out var value))
-                        if (item.Value != value.Value)
-                        {
-                            OnPropertyChanging(item.Name);
-                            SetProperty(item);
-                            OnPropertyChanged(item.Name);
-                            result = true;
-                        }
-
-            if (strategy.HasFlag(RefreshStrategy.Add))
-                foreach (var item in m)
-                    if (!this.PropertyExists(item.Name))
-                    {
-                        OnPropertyChanging(item.Name);
-                        Add(item);
-                        OnPropertyChanged(item.Name);
-                        result = true;
-                    }
-
-            if (result)
-                context.Add(this.Uuid, null, RefreshStrategy.Update);
-
-            return result;
-
-        }
-
         #region OnChange
 
         protected void OnPropertyChanging(string propertyName)
@@ -229,6 +188,51 @@ namespace Bb.Diagrams
             return base.Equals(obj);
         }
 
+
+        public bool Restore(object model, RefreshContext context)
+        {
+
+            bool result = false;
+
+            var m = model as Properties;
+
+            var l = this.ToList();
+            foreach (var item in l)
+                if (!m.PropertyExists(item.Name))
+                {
+                    OnPropertyChanging(item.Name);
+                    Remove(item);
+                    OnPropertyChanged(item.Name);
+                    result = true;
+                }
+
+            foreach (var item in m)
+                if (TryGetValue(item.Name, out var value))
+                    if (item.Value != value.Value)
+                    {
+                        OnPropertyChanging(item.Name);
+                        SetProperty(item);
+                        OnPropertyChanged(item.Name);
+                        result = true;
+                    }
+
+            foreach (var item in m)
+                if (!this.PropertyExists(item.Name))
+                {
+                    OnPropertyChanging(item.Name);
+                    Add(item);
+                    OnPropertyChanged(item.Name);
+                    result = true;
+                }
+
+            if (result)
+                context.Apply(RefreshStrategy.Updated, this._instance);
+
+            return result;
+
+        }
+
+      
     }
 
 }

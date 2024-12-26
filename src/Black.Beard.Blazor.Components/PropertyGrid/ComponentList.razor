@@ -9,11 +9,11 @@
 
 
 
-<div style="border-block-color:gray;border-block-width:1px" onfocus="@OnFocus">
+<div class="fontPropertyGrid" style="border-block-color:gray;border-block-width:1px" onfocus="@OnFocus">
     @foreach (var row in Rows)
     {
 
-        <MudPaper Class="pa-4;d-flex justify-center align-center cursor-grab" onclick="@((MouseEventArgs e) => OnClick(e, row))">
+        <MudPaper Class="fontPropertyGrid;pa-4;d-flex justify-center align-center cursor-grab" onclick="@((MouseEventArgs e) => OnClick(e, row))">
             <MudStack Spacing="1">
                 <MudStack Spacing="1" Row="true ">
                     <MudIconButton Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => Del(row))" Size="Size.Small" />
@@ -22,6 +22,7 @@
                 <MudDivider />
                 <MudCollapse Expanded="@row.IsCurrent">
                     <PropertyGridView 
+                        @ref="row.PropertyGridView"
                         SelectedObject="@row.Instance"
                         AfterPropertyHaschanged="PropertyHasChanged"
                         CurrentMargin="@CurrentMargin"

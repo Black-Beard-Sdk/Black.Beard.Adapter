@@ -1,15 +1,15 @@
 ﻿namespace Bb.ComponentDescriptors
 {
-    [System.AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+
+    [System.AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public sealed class ValueLabelAttribute : Attribute
     {
 
-        public ValueLabelAttribute(string label)
+        public ValueLabelAttribute()
         {
-            this.Label = label;
+            
         }
 
-        public string Label { get; }
     }
 
 

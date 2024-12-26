@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Channels;
 using static MudBlazor.CategoryTypes;
 
 namespace Bb.Diagrams
@@ -18,9 +19,10 @@ namespace Bb.Diagrams
         , INotifyCollectionChanged
         , INotifyPropertyChanging
         , INotifyPropertyChanged
+        , IRestorable
         where TKey : IComparable
+        where TValue : class
     {
-
 
         #region ctors
 
@@ -31,21 +33,16 @@ namespace Bb.Diagrams
         static DiagramList()
         {
 
-            string name = string.Empty;
             var a = typeof(TValue).GetAccessors();
-
             foreach (var item in a)
                 if (item.ContainsAttribute<KeyAttribute>())
                 {
-                    name = item.Name;
+                    _key = (c) => (TKey)item.GetValue(c);
                     break;
                 }
 
-            if (string.IsNullOrEmpty(name))
-                throw new Exception($"The type {nameof(TValue)} must implement IKey of add an attribute Key on the property that be functional key.");
-
-            var key = a.Where(c => c.Name == name).FirstOrDefault();
-            _key = (c) => (TKey)key.GetValue(c);
+            if (_key == default)
+                throw new Exception($"The type {nameof(TValue)} have no key. Please add an attribute Key on the property that be functional key.");
 
         }
 
@@ -85,19 +82,28 @@ namespace Bb.Diagrams
         #endregion ctors
 
 
-
         /// <summary>
         /// Try to add a range of elements to the collection or replace them if the keys already exists.
         /// </summary>
         /// <param name="newItems">The elements to add to the collection.</param>
         public void AddRange(params TValue[] newItems)
         {
+            AddRange((IEnumerable<TValue>)newItems);
+        }
+
+        /// <summary>
+        /// Try to add a range of elements to the collection or replace them if the keys already exists.
+        /// </summary>
+        /// <param name="newItems">The elements to add to the collection.</param>
+        public void AddRange(IEnumerable<TValue> newItems)
+        {
 
             if (newItems.Any())
             {
 
-                List<TValue> listAdded = new List<TValue>(newItems.Length);
-                List<(TValue, TValue)> listUpdated = new List<(TValue, TValue)>(newItems.Length);
+                var length = newItems.Count();
+                List<TValue> listAdded = new List<TValue>(length);
+                List<(TValue, TValue)> listUpdated = new List<(TValue, TValue)>(length);
 
 
                 using (_lock.LockForUpgradeableRead())
@@ -543,6 +549,10 @@ namespace Bb.Diagrams
                 Unsuscribes(item);
         }
 
+
+
+
+
         /// <summary>
         /// Return the elements that are in the model but not in the current collection.
         /// </summary>
@@ -581,6 +591,165 @@ namespace Bb.Diagrams
                     yield return value;
         }
 
+        public bool RestoreRemove(object model, RefreshContext context)
+        {
+
+            bool changed = false;
+
+            TValue[] items = null;
+
+            if (model is DiagramList<TKey, TValue> list)
+            {
+
+                // remove items that are not in the model
+                items = list.FindMissingFrom(this).ToArray();
+                if (items.Length > 0)
+                {
+                    changed = true;
+                    RemoveRange(items);
+                    foreach (var item in items)
+                        context.Apply<TValue>(RefreshStrategy.Removed, item, _key(item).ToString());
+                }
+
+            }
+
+            return changed;
+
+        }
+
+        public bool Restore(object model, RefreshContext context)
+        {
+
+            bool changed = false;
+
+            TValue[] items = null;
+
+            if (model is DiagramList<TKey, TValue> list)
+            {
+
+                // remove items that are not in the model
+                items = list.FindMissingFrom(this).ToArray();
+                if (items.Length > 0)
+                {
+                    changed = true;
+                    RemoveRange(items);
+                    foreach (var item in items)
+                        context.Apply<TValue>(RefreshStrategy.Removed, item, _key(item).ToString());
+                }
+
+                List<TValue> addedItems = new List<TValue>();
+                List<(TValue, TValue)> updatedItems = new List<(TValue, TValue)>();
+                RestoreUpdate(list, context, addedItems, updatedItems);
+
+                if (addedItems.Count > 0)
+                {
+                    changed = true;
+                    context.Register(RefreshStrategy.Added, () =>
+                    {
+                        AddRange(addedItems);
+                        context.Apply(RefreshStrategy.Added, addedItems, $"update list of {typeof(TValue)}");
+                    });
+
+                }
+
+                if (updatedItems.Count > 0)
+                    context.Register(RefreshStrategy.Updated, () =>
+                    {
+                        foreach (var item in updatedItems)
+                            if (context.ApplyUpdate(item.Item1, item.Item2))
+                            {
+                                changed = true;
+                                var k = _key(item.Item1);
+                                context.Apply(RefreshStrategy.Updated, item.Item1, $"update {typeof(TValue)} {k}");
+                            }
+                    });
+
+            }
+
+            return changed;
+
+        }
+
+        public bool RestoreUpdate(object model, RefreshContext context)
+        {
+
+            bool changed = false;
+
+            TValue[] items = null;
+
+            if (model is DiagramList<TKey, TValue> list)
+            {
+
+                List<TValue> addedItems = new List<TValue>();
+                List<(TValue, TValue)> updatedItems = new List<(TValue, TValue)>();
+                RestoreUpdate(list, context, addedItems, updatedItems);
+
+                if (addedItems.Count > 0)
+                {
+                    changed = true;
+                    AddRange(addedItems);
+                    context.Apply(RefreshStrategy.Added, addedItems, $"update list of {typeof(TValue)}");
+                }
+
+                if (updatedItems.Count > 0)
+                    foreach (var item in updatedItems)
+                    {
+
+                        var s = item.Item2;
+                        var t = item.Item1;
+
+                        if (context.ApplyUpdate(s, t))
+                        {
+                            changed = true;
+                            var k = _key(s);
+                            context.Apply(RefreshStrategy.Updated, s, $"update {typeof(TValue)} {k}");
+                        }
+                    }
+                
+
+            }
+
+            return changed;
+
+        }
+
+        public void RestoreUpdate(DiagramList<TKey, TValue> listSource, RefreshContext context, List<TValue> addedItems, List<(TValue, TValue)> updatedItems)
+        {
+
+            foreach (var item in listSource)
+            {
+                var k = _key(item);
+                if (this.TryGetValue(k, out TValue value))
+                    updatedItems.Add((value, item));
+
+                else
+                    addedItems.Add(value);
+            }
+
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+                return false;
+            return obj.GetHashCode() == GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+
+            int i = 0;
+
+            unchecked
+            {
+                foreach (var item in _dic.Keys.OrderBy(c => c))
+                    i ^= _dic[item].GetHashCode();
+            }
+
+            return i;
+
+        }
+
         /// <summary>
         /// Occurs when the collection changes.
         /// </summary>
@@ -593,6 +762,8 @@ namespace Bb.Diagrams
         private static readonly Func<TValue, TKey> _key;
 
     }
+
+
 
 
 }

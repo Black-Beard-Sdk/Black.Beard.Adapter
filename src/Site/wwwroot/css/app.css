@@ -1,5 +1,22 @@
 ﻿
 
+
+.fontPropertyGrid {
+    font-size: smaller
+}
+
+.fontCommandBar {
+    font-size: smaller
+}
+
+.fontDiagram {
+    font-size: smaller
+}
+
+.PropertyGridAjustPosition {
+    margin-left: -20px
+}
+
 .diagram-container {
     width: 100%;
     height: 100%;

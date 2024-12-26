@@ -1,19 +1,21 @@
 ﻿@inherits ComponentFieldBase<string>
 @using MudBlazor
 
-<MudTextField T="string"
-              Label="@Property.GetDisplay()"
-              HelperText="@Property.GetDescription()"
-              @bind-Value="Value"
-              Validation="Validate"
-              Disabled="@Property.ReadOnly"
-              Format="@Property.FormatString"
-              MaxLength="@Property.Maximum"
+<MudTextField 
+    T="string"
+    Class="fontPropertyGrid"
+    Label="@Property.GetDisplay()"
+    HelperText="@Property.GetDescription()"
+    @bind-Value="Value"
+    Validation="Validate"
+    Disabled="@Property.ReadOnly"
+    Format="@Property.FormatString"
+    MaxLength="@Property.Maximum"
 
-              Variant="@CurrentVariant"
-              Margin="@CurrentMargin"
+    Variant="@CurrentVariant"
+    Margin="@CurrentMargin"
 
-              Lines="@Property.Line"
-              InputType="@inputType" 
-              onfocus="@OnFocus" />
+    Lines="@Property.Line"
+    InputType="@inputType" 
+    onfocus="@OnFocus" />
 

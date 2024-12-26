@@ -9,8 +9,6 @@ namespace Bb.PropertyGrid
     public partial class ComponentGrid
     {
 
-        public ITranslateService TranslationService => ParentGrid.TranslationService;
-
         public override void OnFocusedRelay(PropertyGridView sender, ComponentFieldBase component)
         {
             base.OnFocusedRelay(sender, component);
