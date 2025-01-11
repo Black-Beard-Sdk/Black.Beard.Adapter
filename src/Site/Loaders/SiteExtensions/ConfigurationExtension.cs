@@ -72,24 +72,32 @@ namespace Site.Loaders.SiteExtensions
         /// </code>
         /// </example>
         /// <returns></returns>
-        public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder, IEnumerable<string> paths)
+        public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder)
         {
 
             builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
             {
-
-                config.LoadConfigurationFile(paths.ToArray(), null, null)   // Load all files in the paths.
-                      .AddUserSecrets(Assembly.GetEntryAssembly())
-                      .AddCommandLine(Environment.GetCommandLineArgs())
-                      .AddEnvironmentVariables();
-
+                config.LoadConfiguration(null, null);   // Load all files in the paths.
                 config.ConfigureApplication(hostingContext, builder);       // Resolve all injection class for loading configuration
-                
             });
 
             return builder;
+
         }
 
+        public static IConfigurationBuilder LoadConfiguration(this IConfigurationBuilder builder, string pattern = null,
+            Func<FileInfo, bool> filter = null)
+        {
+
+            builder.LoadConfigurationFile(pattern, filter)   // Load all files in the paths.
+                  .AddUserSecrets(Assembly.GetEntryAssembly())
+                  .AddCommandLine(Environment.GetCommandLineArgs())
+                  .AddEnvironmentVariables()
+                  .AddCommandLine(Environment.GetCommandLineArgs())
+                  ;
+
+            return builder;
+        }
 
         private static IConfigurationBuilder ConfigureApplication(this IConfigurationBuilder config, WebHostBuilderContext hostingContext, WebApplicationBuilder builder)
         {
@@ -102,7 +110,6 @@ namespace Site.Loaders.SiteExtensions
         }
 
         private static IConfigurationBuilder LoadConfigurationFile(this IConfigurationBuilder config,
-            string[] paths,
             string pattern = null,
             Func<FileInfo, bool> filter = null)
         {
@@ -119,26 +126,7 @@ namespace Site.Loaders.SiteExtensions
                 contentRootPath.AsDirectory()
             };
 
-            if (paths != null)
-                foreach (var path in paths)
-                {
-
-                    DirectoryInfo c;
-
-                    if (path.FilePathIsAbsolute())
-                        c = path.AsDirectory();
-                    else
-                    {
-                        var p = contentRootPath;
-                        if (!string.IsNullOrEmpty(path))
-                            p = p.Combine(path);
-                        c = p.AsDirectory();
-                    }
-
-                    if (c != null && c.Exists)
-                        dirs.Add(c);
-
-                }
+            dirs.AddRange(ConfigurationFolder.Instance);         
 
             if (string.IsNullOrEmpty(pattern))
                 pattern = $"*.{environmentName}.json";

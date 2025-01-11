@@ -51,6 +51,7 @@ namespace Bb.Configuration.Git
 
         public bool CanExecute(IConfigurationBuilder context)
         {
+
             var builtConfig = context.Build();
             var canExecute = builtConfig["Initializer:" + FriendlyName];
             if (canExecute != null)
@@ -75,7 +76,7 @@ namespace Bb.Configuration.Git
 
             // Download configuration from git
             var loader = new ConfigurationLoader(_configuration);
-            loader.Refresh(_targetFolder, _configuration.GitBranch ?? "main");
+            loader.Refresh(_targetFolder);
 
             // Load downloaded configuration
             var paths = _targetFolder.AsDirectory().GetDirectories().Select(c => c.FullName);

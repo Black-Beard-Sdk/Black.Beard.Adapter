@@ -5,12 +5,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Reflection;
 using Bb.ComponentModel.Accessors;
+using System.Collections.Generic;
 
 namespace Bb.ComponentDescriptors
 {
 
     public class Descriptor : ITranslateHost
     {
+
+        static Descriptor()
+        {
+            Descriptor._listKeyValue = new ListKeyLabels();
+        }
+
 
         public Descriptor(
             IServiceProvider serviceProvider,
@@ -21,7 +28,6 @@ namespace Bb.ComponentDescriptors
             Func<PropertyObjectDescriptor, bool> propertyFilter
             )
         {
-
 
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -54,23 +60,8 @@ namespace Bb.ComponentDescriptors
             else
                 PropertyFilter = (p) => true;
 
-            if (_types.Contains(type) && CanBeCreated(type))
-            {
-
-                var a = type.GetAccessors();
-
-                try
-                {
-                    _accessorValueLabel = a.Where(c => c.ContainsAttribute<ValueLabelAttribute>()).FirstOrDefault()
-                        ?? a.Where(c => c.ContainsAttribute<KeyAttribute>()).FirstOrDefault();
-                }
-                catch (Exception ex)
-                {
-
-
-                }
-
-            }
+            if (!_types2.Contains(type) && CanBeCreated(type))
+                Descriptor._listKeyValue.Add(type);
 
         }
 
@@ -79,15 +70,25 @@ namespace Bb.ComponentDescriptors
             return new SubObjectDescriptor(instance, type ?? instance.GetType(), this);
         }
 
+
+        public string GetValueKey(object parent)
+        {
+
+            if (Descriptor._listKeyValue.TryGetKey(parent, out var result))
+                return result(parent)?.ToString();
+
+            return default;
+
+        }
+
         public string GetValueLabel(object parent, string defaultValue)
         {
-            if (_accessorValueLabel != null)
-            {
-                var i = _accessorValueLabel.GetValue(parent)?.ToString();
-                if (!string.IsNullOrEmpty(i))
-                    return i;
-            }
+
+            if (Descriptor._listKeyValue.TryGetLabel(parent, out var result))
+                return result(parent);
+
             return defaultValue;
+
         }
 
 
@@ -120,55 +121,6 @@ namespace Bb.ComponentDescriptors
 
 
         #region Type analyze
-
-        //protected static bool ResolveSubType(Type type, out Type subType, out bool isNullable, out bool isBrowsable, out bool isArray)
-        //{
-
-        //    isArray = false;
-        //    subType = null;
-        //    isBrowsable = true;
-        //    isNullable = false;
-
-        //    if (_types.Contains(type)) { }
-
-        //    else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-        //    {
-        //        isNullable = true;
-        //        subType = type.GetGenericArguments()[0];
-        //    }
-
-        //    else if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
-        //    {
-        //        var interfaces = type.GetInterfaces();
-        //        foreach (var item in interfaces)
-        //            if (item.IsGenericType && item.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-        //            {
-        //                subType = item.GetGenericArguments()[0];
-        //                if (!CanBeCreated(subType))
-        //                    isBrowsable = false;
-        //                break;
-        //            }
-        //        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-        //        {
-        //            subType = type.GetGenericArguments()[0];
-        //            if (!CanBeCreated(subType))
-        //                isBrowsable = false;
-        //        }
-        //    }
-
-        //    else if (type.IsArray)
-        //    {
-        //        subType = type.GetElementType();
-        //        isArray = true;
-        //    }
-        //    else
-        //    {
-
-        //    }
-
-        //    return subType != default;
-
-        //}
 
         protected static bool ResolveSubType(Type type, out Type subType, out bool isNullable)
         {
@@ -355,6 +307,7 @@ namespace Bb.ComponentDescriptors
 
         protected void Add(Descriptor descriptor)
         {
+            descriptor.Parent = this;
             this._items.Add(descriptor);
 
         }
@@ -379,9 +332,7 @@ namespace Bb.ComponentDescriptors
 
         public override string ToString()
         {
-
             return Type.Name;
-
         }
 
         /// <summary>
@@ -408,8 +359,14 @@ namespace Bb.ComponentDescriptors
             return r;
         }
 
+        public Descriptor RootParent => Parent == null ? this : Parent.RootParent;
 
         public Descriptor Parent { get; protected set; }
+
+        internal void SetParent(Descriptor parent)
+        {
+            Parent = parent;
+        }
 
         /// <summary>
         /// Validation error text
@@ -471,9 +428,39 @@ namespace Bb.ComponentDescriptors
         protected readonly StrategyMapper _strategy;
         private readonly List<Descriptor> _items;
         private readonly string? _valueLabel;
-        private readonly AccessorItem? _accessorValueLabel;
-
+        private static readonly ListKeyLabels _listKeyValue;
         private static HashSet<Type> _types = new HashSet<Type>()
+        {
+            typeof(string),
+            typeof(int),
+            typeof(int?),
+            typeof(long),
+            typeof(long?),
+            typeof(short),
+            typeof(short?),
+            typeof(byte),
+            typeof(byte?),
+            typeof(decimal),
+            typeof(decimal?),
+            typeof(float),
+            typeof(float?),
+            typeof(double),
+            typeof(double?),
+            typeof(bool),
+            typeof(bool?),
+            typeof(DateTime),
+            typeof(DateTime?),
+            typeof(DateTimeOffset),
+            typeof(DateTimeOffset?),
+            typeof(TimeSpan),
+            typeof(TimeSpan?),
+            typeof(Guid),
+            typeof(Guid?),
+            typeof(char),
+            typeof(char?),
+        };
+
+        private static HashSet<Type> _types2 = new HashSet<Type>()
         {
             typeof(string),
             typeof(int),
@@ -489,6 +476,51 @@ namespace Bb.ComponentDescriptors
             typeof(TimeSpan),
             typeof(Guid),
             typeof(char),
+
+            typeof(int?),
+            typeof(long?),
+            typeof(short?),
+            typeof(byte?),
+            typeof(decimal?),
+            typeof(float?),
+            typeof(double?),
+            typeof(bool?),
+            typeof(DateTime?),
+            typeof(DateTimeOffset?),
+            typeof(TimeSpan?),
+            typeof(Guid?),
+            typeof(char?),
+
+            typeof(List<string>),
+            typeof(List<int>),
+            typeof(List<long>),
+            typeof(List<short>),
+            typeof(List<byte>),
+            typeof(List<decimal>),
+            typeof(List<float>),
+            typeof(List<double>),
+            typeof(List<bool>),
+            typeof(List<DateTime>),
+            typeof(List<DateTimeOffset>),
+            typeof(List<TimeSpan>),
+            typeof(List<Guid>),
+            typeof(List<char>),
+
+            typeof(string[]),
+            typeof(int[]),
+            typeof(long[]),
+            typeof(short[]),
+            typeof(byte[]),
+            typeof(decimal[]),
+            typeof(float[]),
+            typeof(double[]),
+            typeof(bool[]),
+            typeof(DateTime[]),
+            typeof(DateTimeOffset[]),
+            typeof(TimeSpan[]),
+            typeof(Guid[]),
+            typeof(char[]),
+
         };
 
     }

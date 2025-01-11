@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Logging.NLog", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ToPackage", "ToPackage", "{4E7EA3FE-DAFA-4F80-B4CB-A3C7627936A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBeard.ComponentModel.Extend", "BlackBeard.ComponentModel.Extend\BlackBeard.ComponentModel.Extend.csproj", "{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{139757FF-39BA-4DA1-8C07-C2235FB735DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{139757FF-39BA-4DA1-8C07-C2235FB735DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{139757FF-39BA-4DA1-8C07-C2235FB735DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +74,7 @@ Global
 		{1CD0213B-01CD-455F-9C3B-141810046F8D} = {4E7EA3FE-DAFA-4F80-B4CB-A3C7627936A5}
 		{3BFADDFC-9D61-4EC3-9779-FA453467F6F2} = {4E7EA3FE-DAFA-4F80-B4CB-A3C7627936A5}
 		{139757FF-39BA-4DA1-8C07-C2235FB735DB} = {4E7EA3FE-DAFA-4F80-B4CB-A3C7627936A5}
+		{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3} = {4E7EA3FE-DAFA-4F80-B4CB-A3C7627936A5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9CC54D6C-A600-4E86-926F-5E949C01895A}

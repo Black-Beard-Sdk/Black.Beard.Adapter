@@ -1,12 +1,9 @@
 ﻿using Bb;
 using Bb.Commands;
-using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Translations;
-using Bb.Diagrams;
 using Bb.PropertyGrid;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using System.Transactions;
 
 namespace Site.Shared
 {
@@ -20,7 +17,7 @@ namespace Site.Shared
         }
 
 
-        [EvaluateValidation(false)]
+        [Bb.ComponentModel.Attributes.EvaluateValidation(false)]
         [Inject]
         public ITranslateService TranslationService { get; set; }
 
@@ -46,11 +43,11 @@ namespace Site.Shared
         }
 
 
-        [EvaluateValidation(false)]
+        [Bb.ComponentModel.Attributes.EvaluateValidation(false)]
         [Inject]
         public IFocusedService<PropertyGridView> PropertyGridFocusedService { get; set; }
 
-        [EvaluateValidation(false)]
+        [Bb.ComponentModel.Attributes.EvaluateValidation(false)]
         [Inject]
         public IFocusedService<ITransactionManager> TransactionManager { get; set; }
 

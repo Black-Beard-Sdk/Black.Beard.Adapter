@@ -12,23 +12,27 @@ namespace Site.Loaders
         /// <summary>
         /// Ensure required assemblies are loaded
         /// </summary>
-        public static void Load(string filename = "ExposedAssemblyRepositories.json")
+        public static void Load(string filename, string[] configPaths)
         {
 
-            var _currentDirectory = Directory.GetCurrentDirectory();
-            var dir = _currentDirectory.Combine("Configs").AsDirectory();
-            var files = dir.GetFiles(filename, SearchOption.AllDirectories);
-            foreach (var file in files)
-                try
-                {
-                    ExposedAssemblyRepositories assemblies
-                        = file.LoadFromFileAndDeserialize<ExposedAssemblyRepositories>();
-                    assemblies.Load();
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
+            foreach (var repertoireConfig in configPaths)
+            {
+
+                var _currentDirectory = Directory.GetCurrentDirectory();
+                var dir = _currentDirectory.Combine(repertoireConfig).AsDirectory();
+                var files = dir.GetFiles(filename, SearchOption.AllDirectories);
+                foreach (var file in files)
+                    try
+                    {
+                        ExposedAssemblyRepositories assemblies
+                            = file.LoadFromFileAndDeserialize<ExposedAssemblyRepositories>();
+                        assemblies.Load();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw;
+                    }
+            }
 
         }
 

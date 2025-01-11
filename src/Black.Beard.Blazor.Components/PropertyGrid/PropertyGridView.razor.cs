@@ -26,8 +26,33 @@ namespace Bb.PropertyGrid
             _dynamicProperties = new Dictionary<string, Func<object>>();
         }
 
+
+
+
         [Parameter]
-        public Func<object, IDtcTransaction> TransactionFactory { get; set; }
+        public PropertyGridView Parent { get; set; }
+
+        [Parameter]
+        public Func<object, IDtcTransaction> TransactionFactory
+        {
+            get => _transactionFactory ?? Parent?.TransactionFactory;
+            set { _transactionFactory = value; }
+        }
+
+        private Func<object, IDtcTransaction> _transactionFactory;
+
+        internal ITransaction StartTransaction(object datas)
+        {
+
+            if (TransactionFactory != null)
+                return new TransactionGrid(TransactionFactory(datas));
+
+            if (Parent != null)
+                return Parent.StartTransaction(datas);
+
+            return new TransactionGrid(null);
+
+        }
 
         [Parameter]
         public Action<PropertyGridView, ComponentFieldBase>? Focused { get; set; }
@@ -239,9 +264,6 @@ namespace Bb.PropertyGrid
 
         public static string StrategyName { get; private set; }
 
-
-        internal ITransaction StartTransaction(object datas) => new TransactionGrid(TransactionFactory(datas));
-        
         bool success;
         string[] errors = { };
         MudForm form;

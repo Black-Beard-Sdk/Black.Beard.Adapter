@@ -28,7 +28,9 @@
                         CurrentMargin="@CurrentMargin"
                         CurrentVariant="@CurrentVariant"
                         WithGroup="@WithGroup"
-                        Focused="OnFocusedRelay" />
+                        Focused="OnFocusedRelay" 
+                        Parent="@ParentGrid"
+                        TransactionFactory="@ParentGrid.TransactionFactory" />
                 </MudCollapse>
             </MudStack>
         </MudPaper>

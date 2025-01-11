@@ -99,7 +99,46 @@ namespace Bb.TypeDescriptors
             return default;
 
         }
-        
+
+        /// <summary>
+        /// Return the first attribute that match with the specified type
+        /// </summary>
+        /// <typeparam name="T">Attribute to find</typeparam>
+        /// <param name="property">property that contains attribute</param>
+        /// <returns>return true if an attribute exists</returns>
+        public static bool WithAttribute<T>(this PropertyDescriptor property, out T attribute)
+            where T : Attribute
+        {
+            attribute = default;
+            foreach (Attribute attr in property.Attributes)
+                if (typeof(T).IsAssignableFrom(attr.GetType()))
+                {
+                    attribute = (T)attr;
+                    return true;
+                }
+
+            return false;
+
+        }
+
+        /// <summary>
+        /// Return the first attribute that match with the specified type
+        /// </summary>
+        /// <typeparam name="T">Attribute to find</typeparam>
+        /// <param name="property">property that contains attribute</param>
+        /// <returns></returns>
+        public static bool ContainsAttribute<T>(this PropertyDescriptor property)
+            where T : Attribute
+        {
+
+            foreach (Attribute attribute in property.Attributes)
+                if (typeof(T).IsAssignableFrom(attribute.GetType()))
+                    return true;
+
+            return false;
+
+        }
+
         /// <summary>
         /// Return the list of attributes that match with the specified type
         /// </summary>
@@ -131,6 +170,46 @@ namespace Bb.TypeDescriptors
                     return (T)attribute;
 
             return default;
+
+        }
+
+        /// <summary>
+        /// Return the list of attributes that match with the specified type
+        /// </summary>
+        /// <typeparam name="T">attribute to find</typeparam>
+        /// <param name="event">event that contains attribute</param>
+        /// <returns></returns>
+        public static bool ContainsAttribute<T>(this EventDescriptor @event)
+                    where T : Attribute
+        {
+
+            foreach (Attribute attribute in @event.Attributes)
+                if (typeof(T).IsAssignableFrom(attribute.GetType()))
+                    return true;
+
+            return false;
+
+        }
+
+
+        /// <summary>
+        /// Return the first attribute that match with the specified type
+        /// </summary>
+        /// <typeparam name="T">Attribute to find</typeparam>
+        /// <param name="event">property that contains attribute</param>
+        /// <returns>return true if an attribute exists</returns>
+        public static bool WithAttribute<T>(this EventDescriptor @event, out T attribute)
+            where T : Attribute
+        {
+            attribute = default;
+            foreach (Attribute attr in @event.Attributes)
+                if (typeof(T).IsAssignableFrom(attr.GetType()))
+                {
+                    attribute = (T)attr;
+                    return true;
+                }
+
+            return false;
 
         }
 

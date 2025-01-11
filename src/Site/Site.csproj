@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.135" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.135" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.138" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.138" />
     <PackageReference Include="Black.Beard.Helpers" Version="2.0.47" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
     <PackageReference Include="MudBlazor" Version="7.15.0" />
@@ -34,6 +34,7 @@
     <ProjectReference Include="..\Black.Beard.Logging.NLog\Black.Beard.Logging.NLog.csproj" />
     <ProjectReference Include="..\Black.Beard.Modules.Etl\Black.Beard.Modules.Datas.csproj" />
     <ProjectReference Include="..\Black.Beard.Modules\Black.Beard.Modules.csproj" />
+    <ProjectReference Include="..\BlackBeard.ComponentModel.Extend\BlackBeard.ComponentModel.Extend.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,6 +44,10 @@
     <Content Update="Configs\ExposedAssemblyRepositories.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logs\" />
   </ItemGroup>
 	
 </Project>

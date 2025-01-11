@@ -79,7 +79,7 @@ namespace Bb.PropertyGrid
                                 break;
 
                             case DataType.PhoneNumber:
-                                prop.Mask = StringType.Telephone;
+                                prop.Mask = StringType.Phone;
                                 break;
 
                             case DataType.MultilineText:

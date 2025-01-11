@@ -33,7 +33,10 @@ namespace Bb.Loaders
                 if (uiService != null)
                 {
                     var loader = new InjectionLoader<MenuService>(UIConstants.LeftMenu, scope.ServiceProvider)
-                        .LoadModules()
+                        .LoadModules(c =>
+                        {
+                        
+                        })
                         .Execute(uiService);
                 }
 

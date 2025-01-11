@@ -9,7 +9,7 @@ using Bb.PropertyGrid;
 using Blazor.Diagrams.Core.Models.Base;
 using Bb.ComponentModel.Translations;
 using MudBlazor;
-using Bb.ComponentModel.Attributes;
+
 using Bb.Toolbars;
 using Blazor.Diagrams.Components.Widgets;
 using Blazor.Diagrams.Core.Models;
@@ -89,7 +89,7 @@ namespace Bb.Diagrams
 
         #endregion zoom / GridSize
 
-        [EvaluateValidation(false)]
+        [ComponentModel.Attributes.EvaluateValidation(false)]
         public DiagramDiagnostics Diagnostics { get; set; }
 
 
@@ -97,19 +97,19 @@ namespace Bb.Diagrams
         //[Inject]
         //public IJSRuntime JS { get; set; }
 
-        [EvaluateValidation(false)]
+        [ComponentModel.Attributes.EvaluateValidation(false)]
         [Inject]
         public ITranslateService TranslationService { get; set; }
 
-        [EvaluateValidation(false)]
+        [ComponentModel.Attributes.EvaluateValidation(false)]
         [Inject]
         public IFocusedService<ToolbarList> GlobalBarFocusService { get; set; }
 
-        [EvaluateValidation(false)]
+        [ComponentModel.Attributes.EvaluateValidation(false)]
         [Inject]
         public IFocusedService<ITransactionManager> TransactionManager { get; set; }
 
-        [EvaluateValidation(false)]
+        [ComponentModel.Attributes.EvaluateValidation(false)]
         [Inject]
         public IFocusedService<PropertyGridView> PropertyGridFocusedService { get; set; }
 
@@ -135,7 +135,7 @@ namespace Bb.Diagrams
             }
         }
 
-        [EvaluateValidation(false)]
+        [ComponentModel.Attributes.EvaluateValidation(false)]
         [Inject]
         public IBusyService BusyService
         {
@@ -150,7 +150,7 @@ namespace Bb.Diagrams
             }
         }
 
-        [EvaluateValidation(false)]
+        [ComponentModel.Attributes.EvaluateValidation(false)]
         private BlazorDiagram UIDiagram { get; set; } = null!;
 
         [Parameter]

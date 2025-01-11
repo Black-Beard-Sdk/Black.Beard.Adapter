@@ -1,22 +1,17 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Loaders;
-using Microsoft.Extensions.Configuration;
-using NLog;
-using System.Diagnostics;
 
 namespace Bb.Logging.NLog
 {
-
-
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<Initializer>), LifeCycle = IocScopeEnum.Transiant)]
     [Priority(1)]
-    public class NLogInitializer : IInjectBuilder<Initializer>
+    public class ConfigLoggerInitializer : IInjectBuilder<Initializer>
     {
-    
+
         public string FriendlyName => typeof(NLogInitializer).Name;
 
-        public Type Type => typeof(NLogInitializer);
+        public Type Type => typeof(ConfigLoggerInitializer);
 
         public bool CanExecute(Initializer context) => context.CanExecuteModule(FriendlyName);
 
@@ -26,8 +21,7 @@ namespace Bb.Logging.NLog
 
         public object Execute(Initializer context)
         {
-            var Logger = Loggers.InitializeLogger();
-            Trace.Listeners.Add(new NLogTraceListener());
+
             return null;
         }
 

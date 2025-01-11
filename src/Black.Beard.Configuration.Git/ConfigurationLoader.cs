@@ -2,6 +2,10 @@
 using Bb;
 using System;
 using LibGit2Sharp.Handlers;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Globalization;
 
 
 namespace Bb.Configuration.Git
@@ -32,24 +36,101 @@ namespace Bb.Configuration.Git
 
         #endregion ctor
 
-        public GitConfiguration GitConfiguration { get; set; }
 
-        public bool Refresh(string localFolder, string branch = "main")
+        public string GetLocalBranchName(string localFolder)
         {
 
+            using (var repo = new Repository(localFolder))
+            {
+
+                var l = repo.Commits.Last();
+
+                var b = repo.Branches
+                    .Where(c => (!c.IsRemote && c.IsTracking))
+                    .FirstOrDefault();
+                if (b != null)
+                {
+                    var t1 = "origin/";
+                    var t = b.TrackedBranch.FriendlyName;
+
+                    if (t.StartsWith(t1))
+                        t = t.Substring(t1.Length);
+
+                    return t;
+
+                }
+            }
+
+            return null;
+
+        }
+
+        public void GetStatus(string localFolder)
+        {
+
+            using (var repo = new Repository(localFolder))
+            {
+
+                foreach (Commit c in repo.Commits.Take(1))
+                {
+
+                    Console.WriteLine(string.Format("commit {0}", c.Id));
+
+                    if (c.Parents.Count() > 1)
+                    {
+                        Console.WriteLine("Merge: {0}",
+                            string.Join(" ", c.Parents.Select(p => p.Id.Sha.Substring(0, 7)).ToArray()));
+                    }
+
+                    Console.WriteLine(string.Format("Author: {0} <{1}>", c.Author.Name, c.Author.Email));
+                    Console.WriteLine("Date:   {0}", c.Author.When.ToString(RFC2822Format, CultureInfo.InvariantCulture));
+                    Console.WriteLine();
+                    Console.WriteLine(c.Message);
+                    Console.WriteLine();
+                }
+            }
+        }
+
+
+        public GitConfiguration GitConfiguration { get; set; }
+
+        public string RepositoryLocal { get; private set; }
+
+        /// <summary>
+        /// Refresh the git repository
+        /// </summary>
+        /// <param name="folder">target folder</param>
+        /// <param name="branch">branch to clone</param>
+        /// <returns></returns>
+        public bool Refresh(string localFolder, string? branch = null)
+        {
             var folder = localFolder.AsDirectory();
+            return Refresh(folder, branch);
+        }
+
+        /// <summary>
+        /// Clone the git repository
+        /// </summary>
+        /// <param name="folder">target folder</param>
+        /// <param name="branch">branch to clone</param>
+        /// <returns></returns>
+        public bool Refresh(DirectoryInfo folder, string? branch = null)
+        {
+
             if (!folder.Exists)
                 folder.CreateFolderIfNotExists();
 
-            var status = GitConfiguration.Initialized(localFolder);
+            var f = folder.FullName;
+
+            var status = GitConfiguration.Initialized(folder.FullName);
             switch (status)
             {
 
                 case GitStatus.NotInitialized:
-                    return Clone(localFolder, branch);
+                    return Clone(f, branch ?? GitConfiguration.GitBranch ?? "main");
 
                 case GitStatus.Initialized:
-                    return Pull(localFolder);
+                    return Pull(f);
 
                 case GitStatus.FolderNotEmpty:
                 case GitStatus.FolderNotCreated:
@@ -63,6 +144,37 @@ namespace Bb.Configuration.Git
 
         #region private
 
+        private bool Fetch(string localFolder)
+        {
+            try
+            {
+
+                string logMessage = string.Empty;
+                using (var repo = new Repository(localFolder))
+                {
+                    FetchOptions options = GetFetchOptions();
+                    foreach (Remote remote in repo.Network.Remotes)
+                    {
+                        IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
+                        Commands.Fetch(repo, remote.Name, refSpecs, options, logMessage);
+                    }
+                }
+
+                if (string.IsNullOrEmpty(logMessage))
+                    Console.WriteLine(logMessage);
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to pull : {ex.Message}");
+            }
+
+            return false;
+
+        }
+
         private bool Pull(string localFolder)
         {
             try
@@ -70,8 +182,10 @@ namespace Bb.Configuration.Git
                 using (var repo = new Repository(localFolder))
                 {
                     var pullOptions = GetPullOptions();
-                    var signature = new Signature(new Identity(GitConfiguration.GitUserName, GitConfiguration.GitEmail), DateTimeOffset.Now);
+                    var identity = new Identity(GitConfiguration.GitUserName, GitConfiguration.GitEmail);
+                    var signature = new Signature(identity, DateTimeOffset.Now);
                     Commands.Pull(repo, signature, pullOptions);
+                    this.RepositoryLocal = localFolder;
                 }
 
                 return true;
@@ -91,7 +205,7 @@ namespace Bb.Configuration.Git
             try
             {
                 var cloneOptions = GetCloneOptions(branch);
-                var repLocal = Repository.Clone(GitConfiguration.GitRemoteUrl, localFolder, cloneOptions);
+                this.RepositoryLocal = Repository.Clone(GitConfiguration.GitRemoteUrl, localFolder, cloneOptions);
                 return true;
             }
             catch (Exception ex)
@@ -101,6 +215,15 @@ namespace Bb.Configuration.Git
 
             return false;
 
+        }
+
+        private FetchOptions GetFetchOptions(string branch = "main")
+        {
+            FetchOptions options = new FetchOptions()
+            {
+                CredentialsProvider = GetCredential()
+            };
+            return options;
         }
 
         private CloneOptions GetCloneOptions(string branch = "main")
@@ -113,33 +236,26 @@ namespace Bb.Configuration.Git
                 RecurseSubmodules = true,
                 IsBare = false,
             };
-
-            if (GitConfiguration.HasPassword)
-                options.FetchOptions.CredentialsProvider = GetCredential();
-            else
-                options.FetchOptions.CredentialsProvider = (_url, _user, _cred) => new LibGit2Sharp.DefaultCredentials();
-
+            options.FetchOptions.CredentialsProvider = GetCredential();
             return options;
 
         }
 
         private PullOptions GetPullOptions()
         {
-
-            var options = new PullOptions();
-            options.FetchOptions = new FetchOptions();
-
-            if (GitConfiguration.HasPassword)
-                options.FetchOptions.CredentialsProvider = GetCredential();
-            else
-                options.FetchOptions.CredentialsProvider = (_url, _user, _cred) => new LibGit2Sharp.DefaultCredentials();
-
+            var options = new PullOptions()
+            {
+                FetchOptions = GetFetchOptions()
+            };
             return options;
-
         }
 
         private CredentialsHandler GetCredential()
         {
+
+            if (!GitConfiguration.HasPassword)
+                return (_url, _user, _cred) => new LibGit2Sharp.DefaultCredentials();
+
             return (_url, _user, _cred) =>
             {
                 return new UsernamePasswordCredentials()
@@ -151,6 +267,9 @@ namespace Bb.Configuration.Git
         }
 
         #endregion private
+
+
+        private const string RFC2822Format = "ddd dd MMM HH:mm:ss yyyy K";
 
     }
 }

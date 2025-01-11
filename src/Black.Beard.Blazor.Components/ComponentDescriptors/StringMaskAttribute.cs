@@ -1,5 +1,4 @@
-﻿
-namespace Bb.ComponentDescriptors
+﻿namespace Bb.ComponentDescriptors
 {
 
 
@@ -15,5 +14,5 @@ namespace Bb.ComponentDescriptors
         public StringType Mask { get; }
     }
 
-
+  
 }

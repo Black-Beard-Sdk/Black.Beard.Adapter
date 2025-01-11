@@ -52,13 +52,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.135" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.135" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.138" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.138" />
     <PackageReference Include="Black.Beard.Helpers" Version="2.0.47" />
     <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.47" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
     <PackageReference Include="MudBlazor" Version="7.15.0" />
     <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlackBeard.ComponentModel.Extend\BlackBeard.ComponentModel.Extend.csproj" />
   </ItemGroup>
 
   <ItemGroup>

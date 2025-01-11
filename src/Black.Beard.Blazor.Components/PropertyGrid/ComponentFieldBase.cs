@@ -73,7 +73,7 @@ namespace Bb.PropertyGrid
         /// <returns></returns>
         public ITransaction GetTransaction(string label)
         {
-            return ParentGrid.StartTransaction(label);
+             return ParentGrid.StartTransaction(label);
         }
 
         public virtual string? ValueString { get; set; }

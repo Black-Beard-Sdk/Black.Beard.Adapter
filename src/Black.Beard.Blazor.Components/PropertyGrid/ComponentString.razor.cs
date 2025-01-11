@@ -20,7 +20,7 @@ namespace Bb.PropertyGrid
                     inputType = InputType.Number;
                     break;
 
-                case StringType.Telephone:
+                case StringType.Phone:
                     inputType = InputType.Telephone;
                     break;
 
@@ -29,8 +29,7 @@ namespace Bb.PropertyGrid
                     break;
 
                 case StringType.Color:
-                    inputType = InputType.Color;
-                    break;
+                     break;
 
                 case StringType.Date:
                     inputType = InputType.Date;
@@ -51,11 +50,23 @@ namespace Bb.PropertyGrid
                 case StringType.Week:
                     inputType = InputType.Week;
                     break;
-
+                                   
+                case StringType.DateTime:
+                    break;
+               
+                case StringType.Text:
+                case StringType.Password:
+                case StringType.PasswordRepeat:
+                case StringType.Hidden:
+                case StringType.Search:
+                case StringType.File:
+                case StringType.Image:
+                case StringType.Range:
+                case StringType.Select:
+                case StringType.Textarea:
                 case StringType.Undefined:
                 default:
                     break;
-
             }
 
             return base.OnInitializedAsync();
