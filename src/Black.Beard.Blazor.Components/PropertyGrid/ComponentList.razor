@@ -3,55 +3,95 @@
 @using Microsoft.AspNetCore.Components.Web
 @using MudBlazor
 
-<MudText Class=".mud-input.mud-input-text.mud-input-text-with-label">@Descriptor?.GetDisplay() 
-    <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="Add" Size="Size.Small" />
-</MudText>
-
-
-
-<div class="fontPropertyGrid" style="border-block-color:gray;border-block-width:1px" onfocus="@OnFocus">
-    @foreach (var row in Rows)
+<MudText Class=".mud-input.mud-input-text.mud-input-text-with-label">
+    @Descriptor?.GetDisplay()
+    @if (this.CanAdd)
     {
+        <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="Add" Size="Size.Small" />
+    }
+    </MudText>
 
-        <MudPaper Class="fontPropertyGrid;pa-4;d-flex justify-center align-center cursor-grab" onclick="@((MouseEventArgs e) => OnClick(e, row))">
+
+    <div class="fontPropertyGrid" style="border-block-color:gray;border-block-width:1px" onfocus="@OnFocus">
+        @foreach (var row in Rows)
+    {
+        <MudPaper Class="fontPropertyGrid;pa-4;d-flex justify-center align-center cursor-grab"
+                  onclick="@((MouseEventArgs e) => OnClick(e, row))">
             <MudStack Spacing="1">
+
                 <MudStack Spacing="1" Row="true ">
-                    <MudIconButton Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => Del(row))" Size="Size.Small" />
-                    @row.Label
+                    @if (this.CanDel)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Outlined.Delete"
+                                       OnClick="@(() => Del(row))"
+                                       Size="Size.Small" />
+                    }
+                    @if (this.Descriptor?.ChildCount > 1)
+                    {
+                        @row.Label
+                    }
                 </MudStack>
+
                 <MudDivider />
                 <MudCollapse Expanded="@row.IsCurrent">
-                    <PropertyGridView 
-                        @ref="row.PropertyGridView"
-                        SelectedObject="@row.Instance"
-                        AfterPropertyHaschanged="PropertyHasChanged"
-                        CurrentMargin="@CurrentMargin"
-                        CurrentVariant="@CurrentVariant"
-                        WithGroup="@WithGroup"
-                        Focused="OnFocusedRelay" 
-                        Parent="@ParentGrid"
-                        TransactionFactory="@ParentGrid.TransactionFactory" />
+
+                    @if (row.IsStapleType)
+                    {
+
+                        <DynamicPropertyComponent 
+                            Parent="@ParentGrid"
+                            Descriptor="@row.Descriptor"
+                            Model="@row.Value"
+                            CurrentVariant="@CurrentVariant"
+                            CurrentMargin="@CurrentMargin"
+                            ShowPolicy="@ShowPolicyEnum.HideLabel" />
+
+@*                      <PropertyGridView 
+                            @ref="row.PropertyGridView"
+                            SelectedObject="@row"
+                            AfterPropertyHaschanged="PropertyHasChanged"
+                            CurrentMargin="@CurrentMargin"
+                            CurrentVariant="@CurrentVariant"
+                            WithGroup="@WithGroup"
+                            Focused="OnFocusedRelay"
+                            Parent="@ParentGrid"
+                            TransactionFactory="@ParentGrid.TransactionFactory" /> *@
+
+                    }
+                    else
+                    {
+
+                        <PropertyGridView @ref="row.PropertyGridView"
+                                          SelectedObject="@row.Value"
+                                          AfterPropertyHaschanged="PropertyHasChanged"
+                                          CurrentMargin="@CurrentMargin"
+                                          CurrentVariant="@CurrentVariant"
+                                          WithGroup="@WithGroup"
+                                          Focused="OnFocusedRelay"
+                                          Parent="@ParentGrid"
+                                          TransactionFactory="@ParentGrid.TransactionFactory" />
+                    }
                 </MudCollapse>
             </MudStack>
         </MudPaper>
+
     }
 </div>
 
-<MudMessageBox 
-    @ref="mbox" 
-    Title="@TranslateService.Translate("p:PropertyGrid,k:RemoveItemTitle,l:en-us,d:Remove item ?")" 
-    CancelText="@TranslateService.Translate("p:PropertyGrid,k:CancelButton,l:en-us,d:Cancel ?")">
+<MudMessageBox @ref="mbox"
+               Title="@TranslateService.Translate("p:PropertyGrid,k:RemoveItemTitle,l:en-us,d:Remove item ?")"
+               CancelText="@TranslateService.Translate("p:PropertyGrid,k:CancelButton,l:en-us,d:Cancel ?")">
 
     <MessageContent>
         @TranslateService.Translate("p:PropertyGrid,k:RemoveItemQuestion,l:en-us,d:Are you sure you want remove this item ?")
     </MessageContent>
 
     <YesButton>
-        <MudButton 
-            Variant="Variant.Filled" 
-            OnClick="@(() => Remove())" 
-            Color="Color.Error" 
-            StartIcon="@Icons.Material.Filled.Delete">@TranslateService.Translate("p:PropertyGrid,k:RemoveButton,l:en-us,d:Delete")
+        <MudButton Variant="Variant.Filled"
+                   OnClick="@(() => Remove())"
+                   Color="Color.Error"
+                   StartIcon="@Icons.Material.Filled.Delete">
+            @TranslateService.Translate("p:PropertyGrid,k:RemoveButton,l:en-us,d:Delete")
         </MudButton>
     </YesButton>
 

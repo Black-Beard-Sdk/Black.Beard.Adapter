@@ -212,7 +212,7 @@ namespace Bb.Commands // jOLg740OlP2s
                         if (!currentCrc.HasValue || HasChangedAfterLastChange(currentCrc.Value))
                         {
                             currentTransaction.Save(_target);
-                            currentTransaction.Precedent = _forUndo.Peek?.Index ?? _initialState.Index;
+                            currentTransaction.Precedent = _forUndo.Peek?.Index ?? _initialState?.Index ?? -1;
                             _forUndo.Push(currentTransaction);
                         }
 
@@ -313,6 +313,17 @@ namespace Bb.Commands // jOLg740OlP2s
 
                     }
 
+            }
+
+        }
+
+
+        public void RemoveLast()
+        {
+
+            using (var l2 = _lock.LockForWrite())
+            {
+                _forUndo.Pop();
             }
 
         }
@@ -598,6 +609,7 @@ namespace Bb.Commands // jOLg740OlP2s
         {
             return _index++;
         }
+
 
         private Transaction _initialState;
         private Stack<Transaction> _transactions;

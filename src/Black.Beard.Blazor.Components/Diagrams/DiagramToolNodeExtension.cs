@@ -93,6 +93,16 @@ namespace Bb.Diagrams
 
         }
 
+        public static string GetLabel(this ILinkable self)
+        {
+            var p = self as PortModel;
+            if (p != null)
+                return p.GetLabel();
+
+            return null;
+
+        }
+
         public static string GetLabel(this Anchor self)
         {
 

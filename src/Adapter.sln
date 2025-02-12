@@ -17,11 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Configuration.G
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Configuration.Vault.Azure", "Black.Beard.Configuration.Vault.Azure\Black.Beard.Configuration.Vault.Azure.csproj", "{3BFADDFC-9D61-4EC3-9779-FA453467F6F2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Logging.NLog", "Black.Beard.Logging.NLog\Black.Beard.Logging.NLog.csproj", "{139757FF-39BA-4DA1-8C07-C2235FB735DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Monitoring", "Black.Beard.Logging.NLog\Black.Beard.Monitoring.csproj", "{139757FF-39BA-4DA1-8C07-C2235FB735DB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ToPackage", "ToPackage", "{4E7EA3FE-DAFA-4F80-B4CB-A3C7627936A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBeard.ComponentModel.Extend", "BlackBeard.ComponentModel.Extend\BlackBeard.ComponentModel.Extend.csproj", "{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackBeard.ComponentModel.Extend", "BlackBeard.ComponentModel.Extend\BlackBeard.ComponentModel.Extend.csproj", "{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Configuration", "Black.Beard.Configuration\Black.Beard.Configuration.csproj", "{8110F0BA-52B8-4043-B7C5-BA536C540111}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +67,10 @@ Global
 		{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D3AFF2C-AFB2-43B2-82D2-AA6E213E07E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8110F0BA-52B8-4043-B7C5-BA536C540111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8110F0BA-52B8-4043-B7C5-BA536C540111}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8110F0BA-52B8-4043-B7C5-BA536C540111}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8110F0BA-52B8-4043-B7C5-BA536C540111}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,22 +1,29 @@
-using Bb.ComponentModel.Factories;
+using Bb.Configuration;
 using Bb.ComponentModel.Loaders;
 using Site.Loaders.SiteExtensions;
 
-// Run all initializer in the libs
-_Initializer.PrepareInitialization();
 
-var builder = WebApplication.CreateBuilder(args)
-                            .LoadConfiguration()
-                            .ConfigureTrace();
+// Run all initializer in the libs referenced
+//      - download configuration from git   (Black.Beard.Configuration.Git) ConfigLoaderInitializer
+//      - Init logger Nlog                  (Black.Beard.Logging.NLog)      NLogInitializer
+//          - NLogInitializer initialize Nlog & redirect trace on Nlog tracer
+string typeToExcludeInProviderService = "Bb.Wizards.WizardModel;Bb.UIComponents.Guards.GuardPolicy";
+var provider = _Initializer.PrepareInitialization(typeToExcludeInProviderService);
 
-// Pre-load the services
-var provider = new LocalServiceProvider(builder.Services.BuildServiceProvider());
+
+// Create a new web application
+var builder = WebApplication
+    .CreateBuilder(args)
+    .LoadConfiguration()
+    .ConfigureTrace()
+    ;
+
+// Append the services
 builder.Initialize(provider);
 
-// Load the services
-provider = new LocalServiceProvider(builder.Services.BuildServiceProvider());
-var app = builder.Build()
-                 .Initialize(provider)
-                 ;
+
+// Load & configure the services
+var app = builder.Build();
+app.Initialize(app.Services);
 
 app.Run();

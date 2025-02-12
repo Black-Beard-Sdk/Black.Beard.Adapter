@@ -2,17 +2,16 @@
 @using MudBlazor
 @using Bb.ComponentModel.DataAnnotations
 
-<MudSelect 
-    T="ListItem"
-    Class="fontPropertyGrid"
-    Label="@Property.GetDisplay()"
-    Variant="@CurrentVariant"
-    Margin="@CurrentMargin"
-    
-    @bind-Value="Value"
-    HelperText="@Property.GetDescription()"
-    AnchorOrigin="Origin.BottomCenter"
-    onfocus="@OnFocus">
+
+<MudSelect T="ListItem"
+           Class="fontPropertyGrid"
+           Label="@GetDisplay()"
+           Variant="@CurrentVariant"
+           Margin="@CurrentMargin"
+           @bind-Value="Value"
+           HelperText="@GetDescription()"
+           AnchorOrigin="Origin.BottomCenter"
+           onfocus="@OnFocus">
 
 
     @foreach (var item in Items)
@@ -21,6 +20,5 @@
     }
 
 </MudSelect>
-
 
 

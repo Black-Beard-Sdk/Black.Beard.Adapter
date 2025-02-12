@@ -1,7 +1,4 @@
-﻿using Bb.ComponentModel.Accessors;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
 
 namespace Bb.Commands
 {
@@ -80,7 +77,6 @@ namespace Bb.Commands
                     if (_dicActionAdd.TryGetValue(type, out c1))
                         c1.Execute(model);
                     break;
-
                 default:
                 case RefreshStrategy.Updated:
                     if (_dicActionUpdate.TryGetValue(type, out c1))

@@ -1,17 +1,18 @@
 ﻿using Bb.ComponentDescriptors;
+using Bb.ComponentModel.Accessors;
 using Bb.ComponentModel.Translations;
 using Bb.Diagrams;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Transactions;
 
 namespace Bb.PropertyGrid
 {
 
-    public partial class PropertyGridView : ITranslateHost
+    public partial class PropertyGridView : ITranslateHost, IDisposable
     {
 
         static PropertyGridView()
@@ -27,7 +28,8 @@ namespace Bb.PropertyGrid
         }
 
 
-
+        [Parameter]
+        public ShowPolicyEnum ShowPolicy { get; set; }
 
         [Parameter]
         public PropertyGridView Parent { get; set; }
@@ -38,8 +40,6 @@ namespace Bb.PropertyGrid
             get => _transactionFactory ?? Parent?.TransactionFactory;
             set { _transactionFactory = value; }
         }
-
-        private Func<object, IDtcTransaction> _transactionFactory;
 
         internal ITransaction StartTransaction(object datas)
         {
@@ -78,7 +78,6 @@ namespace Bb.PropertyGrid
 
         [Parameter]
         public Margin CurrentMargin { get; set; } = Margin.None;
-
         private void Update()
         {
 
@@ -111,13 +110,16 @@ namespace Bb.PropertyGrid
 
                 this.Descriptor.PropertyHasChanged = this.SubPropertyHasChanged;
 
-                try
+                if (!this.ServiceProvider.IsDisposed())
                 {
-                    StateHasChanged();
-                }
-                catch (Exception ex)
-                {
+                    try
+                    {
+                        StateHasChanged();
+                    }
+                    catch (Exception ex)
+                    {
 
+                    }
                 }
 
             }
@@ -260,6 +262,11 @@ namespace Bb.PropertyGrid
             return Descriptor.Validate();
         }
 
+        public void Dispose()
+        {
+            _disposed = true;
+        }
+
         public ObjectDescriptor Descriptor { get; set; }
 
         public static string StrategyName { get; private set; }
@@ -272,6 +279,30 @@ namespace Bb.PropertyGrid
         private Dictionary<string, Func<object>> _dynamicProperties;
         private static bool _mapperInitialized = false;
         private static object _lock = _mapperInitialized = false;
+        private Func<object, IDtcTransaction> _transactionFactory;
+        private bool _disposed;
+    }
+
+
+    public static class PropertyGridViewExtensions
+    {
+
+        public static bool IsDisposed(this IServiceProvider self)
+        {
+
+            bool disposed = true;
+
+            if (self != null)
+            {
+                var pp = self.GetType().GetAccessors(MemberStrategy.Instance);
+                if (pp.TryGetValue("Disposed", out AccessorItem accessor))
+                    disposed = accessor.GetTypedValue<bool>(self);
+                else
+                    disposed = false;
+            }
+
+            return disposed;
+        }
 
     }
 

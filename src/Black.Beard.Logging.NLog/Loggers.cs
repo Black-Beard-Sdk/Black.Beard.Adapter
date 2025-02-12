@@ -1,12 +1,13 @@
-﻿using Bb;
-using NLog;
+﻿using NLog;
 using NLog.Config;
-using System.Collections;
 using System.Text.RegularExpressions;
 
 namespace Bb.Logging.NLog
 {
 
+    /// <summary>
+    /// Load and initialize the logger
+    /// </summary>
     public static class Loggers
     {
 
@@ -15,8 +16,7 @@ namespace Bb.Logging.NLog
             DirectoryToTrace = Directory.GetCurrentDirectory().Combine("Logs");
         }
 
-
-        public static Logger InitializeLogger()
+        public static void InitializeLogger()
         {
 
             string web_log_directory = "web_log_directory";
@@ -39,27 +39,14 @@ namespace Bb.Logging.NLog
                         GlobalDiagnosticsContext.Set(variableName, v);
 
                     else if (variableName != web_log_directory)
-                    {
-
                         Console.WriteLine($"the variable '{variableName}' in the configuration file {configLogPath} can't be resolved");
-                    
-                    }
+                
                 }
 
                 LogManager.Configuration = new XmlLoggingConfiguration(configLogPath);
 
             }
 
-            // Initialize log
-            var logger = LogManager
-                .Setup()
-                .SetupExtensions(s => { })
-                .GetCurrentClassLogger()
-                ;
-
-            logger.Debug("log initialized");
-
-            return logger;
         }
 
         public static string DirectoryToTrace { get; set; }

@@ -13,6 +13,5 @@
 
         public StringType Mask { get; }
     }
-
   
 }

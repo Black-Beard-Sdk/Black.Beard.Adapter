@@ -51,6 +51,11 @@ namespace Bb.Commands
         void Reset();
 
         /// <summary>
+        /// Remove last transaction.
+        /// </summary>
+        void RemoveLast();
+
+        /// <summary>
         /// Return count of stored transaction
         /// </summary>
         int UndoCount { get; }

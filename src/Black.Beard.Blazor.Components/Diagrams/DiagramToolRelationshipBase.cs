@@ -76,7 +76,7 @@ namespace Bb.Diagrams
 
         internal protected virtual LinkProperties CreateLink(SerializableRelationship relationship, PortModel source, PortModel target)
         {
-            var l = CreateLink(relationship, CreateAnchor(source), CreateAnchor(target));
+            var l = this.CreateLink(relationship, CreateAnchor(source), CreateAnchor(target));
             return l;
         }
 

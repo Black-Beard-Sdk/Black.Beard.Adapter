@@ -9,7 +9,7 @@ namespace Site.Loaders
 {
 
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
-    public class WebApplicationBuilderInitializer : IInjectBuilder<WebApplicationBuilder>
+    public class WebApplicationBuilderInitializer : InjectBuilder<WebApplicationBuilder>
     {
 
         public WebApplicationBuilderInitializer()
@@ -17,10 +17,10 @@ namespace Site.Loaders
             Logger = LogManager.GetLogger(nameof(WebApplicationBuilderInitializer));
         }
 
-        public object Execute(WebApplicationBuilder builder)
-        {            
+        public override object Execute(WebApplicationBuilder builder)
+        {
 
-            builder.SetIoc();
+            builder.SetAllIoc((c, d) => true);
 
             var services = builder.Services;
             // Add services to the container.
@@ -34,27 +34,8 @@ namespace Site.Loaders
 
         }
 
-        public bool CanExecute(WebApplicationBuilder context)
-        {
-            return true;
-        }
-
-        public object Execute(object context)
-        {
-            return Execute((WebApplicationBuilder)context);
-        }
-
-        public bool CanExecute(object context)
-        {
-            return CanExecute((WebApplicationBuilder)context);
-        }
-
         public Logger Logger { get; set; }
 
-        public string FriendlyName => typeof(WebApplicationBuilderInitializer).Name;
-
-        public Type Type => typeof(WebApplicationBuilder);
-    
     }
 
 

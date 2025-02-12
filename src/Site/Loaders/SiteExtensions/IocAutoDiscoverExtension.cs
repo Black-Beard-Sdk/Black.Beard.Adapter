@@ -18,40 +18,89 @@ namespace Site.Loaders.SiteExtensions
             _methodOptionConfiguration = typeof(IocAutoDiscoverExtension).GetMethod(nameof(BindConfiguration), BindingFlags.NonPublic | BindingFlags.Static);
         }
 
-        public static IServiceCollection BindConfiguration(this IServiceCollection self, Type type, IConfiguration configuration)
+        public static void DiscoverTypeExposedByAttribute(this string contextKey, Action<Type> action = null)
         {
 
-
-            _methodOptionConfiguration.MakeGenericMethod(type)
-                .Invoke(self, new object[] { self, configuration });
-
-            return self;
+            if (action != null)
+                foreach (var type in GetExposedTypes(contextKey))
+                    action(type);
 
         }
 
-
-        public static IServiceCollection UseTypeExposedByAttribute(this IServiceCollection services, IConfiguration configuration, string contextKey, Action<Type> action = null)
+        public static IServiceCollection UseTypeExposedByAttribute(this IServiceCollection services, IConfiguration configuration, string contextKey, Func<Type, string, bool> filter, Action<Type> action = null)
         {
 
-            foreach (var type in GetExposedTypes(contextKey))
+            if (filter == null)
+                filter = (c, d) => true;
+
+            DiscoverTypeExposedByAttribute(contextKey, type =>
             {
 
-                _methodRegister.MakeGenericMethod(type).Invoke(null, new object[] { services, configuration });
+                if (filter(type, contextKey))
+                {
 
-                if (action != null)
-                    action(type);
+                    _methodRegister.MakeGenericMethod(type).Invoke(null, new object[] { services, configuration });
 
-            }
+                    if (action != null)
+                        action(type);
+                }
+
+            });
 
             return services;
 
         }
 
+        public static IServiceCollection BindConfiguration(this IServiceCollection self, Type type, IConfiguration configuration)
+        {
+            _methodOptionConfiguration.MakeGenericMethod(type)
+                .Invoke(self, new object[] { self, configuration });
+            return self;
+        }
+
+        /// <summary>
+        /// Gets the exposed types in loaded assemblies.
+        /// </summary>
+        /// <param name="contextName">Name of the context.</param>
+        /// <returns></returns>
+        public static IEnumerable<Type> GetExposedTypes(string contextName)
+        {
+            var items = Bb.ComponentModel.TypeDiscovery.Instance
+                .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object), c => c.Context == contextName);
+            return items;
+        }
+
+        public static IEnumerable<Type> GetExposedTypes(Func<ExposeClassAttribute, bool> filter)
+        {
+            var items = Bb.ComponentModel.TypeDiscovery.Instance
+                .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object), c => filter(c));
+            return items;
+        }
+
+
         private static void BindConfiguration<TOptions>(this IServiceCollection self, IConfiguration configuration)
             where TOptions : class
         {
 
-            var type = typeof(TOptions);
+            configuration.ResolveConfiguration(typeof(TOptions), (type, sectionName, section) =>
+            {
+
+                if (section != null)
+                {
+                    var opt = self.AddOptions<TOptions>();
+                    opt.Bind(section)
+                       .ValidateDataAnnotations();
+                }
+
+                else
+                    Trace.TraceWarning("section {0} not found", sectionName);
+
+            });
+
+        }
+
+        public static void ResolveConfiguration(this IConfiguration configuration, Type type, Action<Type, string, IConfigurationSection> action)
+        {
 
             SchemaGenerator.GenerateSchema(type);
 
@@ -59,20 +108,13 @@ namespace Site.Loaders.SiteExtensions
             var schema = type.GenerateSchemaForConfiguration(id);
 
             var attribute = type.GetCustomAttribute<ExposeClassAttribute>();
-            var sectionName = !string.IsNullOrEmpty(attribute?.Name) ? attribute.Name : typeof(TOptions).Name;
+            var sectionName = !string.IsNullOrEmpty(attribute?.Name) ? attribute.Name : type.Name;
 
             var section = configuration.GetSection(sectionName);
 
-            if (section != null)
-                self.AddOptions<TOptions>()
-                    .Bind(section)
-                    .ValidateDataAnnotations();
-
-            else
-                Trace.TraceWarning("section {0} not found", sectionName);
+            action(type, sectionName, section);
 
         }
-
 
         private static void AddType<T>(this IServiceCollection services, IConfiguration configuration)
             where T : class
@@ -86,7 +128,6 @@ namespace Site.Loaders.SiteExtensions
             else
                 services.RegisterType<T>();
         }
-
 
         private static void RegisterType<T>(this IServiceCollection services, Func<IServiceProvider, T> func)
             where T : class
@@ -151,27 +192,6 @@ namespace Site.Loaders.SiteExtensions
                 , exposed.Name
                 , attribute.LifeCycle.ToString());
 
-        }
-
-
-        /// <summary>
-        /// Gets the exposed types in loaded assemblies.
-        /// </summary>
-        /// <param name="contextName">Name of the context.</param>
-        /// <returns></returns>
-        public static IEnumerable<Type> GetExposedTypes(string contextName)
-        {
-            var items = Bb.ComponentModel.TypeDiscovery.Instance
-                .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object), c => c.Context == contextName);
-            return items;
-        }
-
-
-        public static IEnumerable<Type> GetExposedTypes(Func<ExposeClassAttribute, bool> filter)
-        {
-            var items = Bb.ComponentModel.TypeDiscovery.Instance
-                .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object), c => filter(c));
-            return items;
         }
 
         private static readonly MethodInfo? _methodRegister;

@@ -10,9 +10,9 @@ namespace Bb.PropertyGrid
         protected override Task OnInitializedAsync()
         {
 
-            switch (this.Property.Mask)
+            switch (Mask)
             {
-                    
+
                 case StringType.Email:
                     inputType = InputType.Email;
                     break;
@@ -29,7 +29,7 @@ namespace Bb.PropertyGrid
                     break;
 
                 case StringType.Color:
-                     break;
+                    break;
 
                 case StringType.Date:
                     inputType = InputType.Date;
@@ -50,10 +50,10 @@ namespace Bb.PropertyGrid
                 case StringType.Week:
                     inputType = InputType.Week;
                     break;
-                                   
+
                 case StringType.DateTime:
                     break;
-               
+
                 case StringType.Text:
                 case StringType.Password:
                 case StringType.PasswordRepeat:

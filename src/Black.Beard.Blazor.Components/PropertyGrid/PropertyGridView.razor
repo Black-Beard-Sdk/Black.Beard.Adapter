@@ -19,10 +19,11 @@
                             @foreach (PropertyObjectDescriptor property in Descriptor.ItemsByCategories(category))
                             {
                                 <DynamicPropertyComponent Parent="@this"
-                                    Property="@property"
+                                    Descriptor="@property"
                                     Model="@SelectedObject"
                                     CurrentVariant="@CurrentVariant"
-                                    CurrentMargin="@CurrentMargin" />
+                                    CurrentMargin="@CurrentMargin"
+                                    ShowPolicy="@ShowPolicy" />
                             }
                         </MudExpansionPanel>
 
@@ -34,10 +35,12 @@
                     {
                         <DynamicPropertyComponent 
                             Parent="@this"
-                            Property="@property"
+                            Descriptor="@property"
                             Model="@SelectedObject"
                             CurrentVariant="@CurrentVariant"
-                            CurrentMargin="@CurrentMargin" />
+                            CurrentMargin="@CurrentMargin"
+                            ShowPolicy="@ShowPolicy"
+                            />
                     }
                 }
 

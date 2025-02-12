@@ -1,6 +1,7 @@
 ﻿using Bb.Commands;
 using Bb.ComponentModel.Accessors;
 using Bb.ComponentModel.Attributes;
+using Bb.Expressions;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams;
 using Blazor.Diagrams.Core.Geometry;
@@ -259,7 +260,18 @@ namespace Bb.Diagrams
 
             if (_realProperties.TryGetValue(name, out var accessor))
             {
+
+                if (value == null)
+                {
+
+                }
+
+
+                if(!accessor.Type.IsAssignableFrom(value.GetType()))
+                    value = ConverterHelper.ConvertToObject(value, accessor.Type);
+
                 accessor.SetValue(this, value);
+            
             }
             else
             {

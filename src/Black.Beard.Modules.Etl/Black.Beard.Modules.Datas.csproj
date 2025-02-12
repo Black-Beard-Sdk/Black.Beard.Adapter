@@ -30,6 +30,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Etl\Components\" />
+	  <Folder Include="Loaders\" />
 	  <Folder Include="mcd\" />
 	  <Folder Include="WorkflowPda\Components\" />
 	</ItemGroup>

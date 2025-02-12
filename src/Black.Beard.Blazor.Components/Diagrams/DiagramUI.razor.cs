@@ -9,13 +9,10 @@ using Bb.PropertyGrid;
 using Blazor.Diagrams.Core.Models.Base;
 using Bb.ComponentModel.Translations;
 using MudBlazor;
-
 using Bb.Toolbars;
 using Blazor.Diagrams.Components.Widgets;
 using Blazor.Diagrams.Core.Models;
 using Bb.Commands;
-using System.Transactions;
-using Microsoft.JSInterop;
 
 namespace Bb.Diagrams
 {
@@ -171,7 +168,7 @@ namespace Bb.Diagrams
                 return null;
             }
         }
-        
+
         public string IconRedo
         {
             get
@@ -238,7 +235,9 @@ namespace Bb.Diagrams
                 {
                     InvokeAsync(RenderFirstLinks);
                     _timer.Change(Timeout.Infinite, Timeout.Infinite);
-                }, null, 500, 1500);
+                }, null, 500, 1000);
+
+                // Diagram.CommandManager.Initialize();
 
             }
 
@@ -257,7 +256,7 @@ namespace Bb.Diagrams
             {
                 InvokeAsync(RenderFirstLinks2);
                 _timer2.Change(Timeout.Infinite, Timeout.Infinite);
-            }, null, 500, 1500);
+            }, null, 500, 1000);
         }
 
         public void RenderFirstLinks2()
@@ -336,12 +335,18 @@ namespace Bb.Diagrams
                     Factory = (diagram, source, targetAnchor) =>
                     {
 
+                        string description = "Create link";
+
+                        var labelSource = source.GetLabel();
+                        if (labelSource != null)
+                            description += " " + labelSource;
+                        
                         LinkProperties link = null;
 
                         var toolLink = ToolBar?.GetLink(source);
                         if (toolLink != null)
                         {
-                            using (var transaction = this.Diagram.CommandManager.BeginTransaction(Mode.Recording, "", Behavior.RemoveLastTransaction | Behavior.AutoCommit))
+                            using (var transaction = this.Diagram.CommandManager.BeginTransaction(Mode.Recording, description, Behavior.RemoveLastTransaction | Behavior.AutoCommit))
                             {
                                 link = this.Diagram.CreateLink(toolLink, source, targetAnchor);
                             }

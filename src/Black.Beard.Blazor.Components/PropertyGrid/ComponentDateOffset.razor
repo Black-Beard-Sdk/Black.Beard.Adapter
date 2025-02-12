@@ -1,16 +1,15 @@
 ﻿@inherits ComponentFieldBase<DateTimeOffset>
-    @using MudBlazor
+@using MudBlazor
 
-    <MudTextField 
-        Class="fontPropertyGrid"
-            T="DateTimeOffset"
-            Label="@Property.GetDisplay()"
-            HelperText="@Property.GetDescription()"
-            @bind-Value="Value"
-            Validation="Validate"
-            Disabled="@Property.ReadOnly"
-            Format="@Property.FormatString"
-            Variant="@CurrentVariant"
-            Margin="@CurrentMargin"
+<MudTextField Class="fontPropertyGrid"
+              T="DateTimeOffset"
+              Label="@GetDisplay()"
+              HelperText="@GetDescription()"
+              @bind-Value="Value"
+              Validation="Validate"
+              Disabled="@ReadOnly"
+              Format="@FormatString"
+              Variant="@CurrentVariant"
+              Margin="@CurrentMargin"
               onfocus="@OnFocus" />
 

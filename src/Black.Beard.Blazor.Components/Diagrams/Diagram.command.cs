@@ -20,6 +20,7 @@ namespace Bb.Diagrams
 
             var key = new Guid(linkBase.Id);
             if (Relationships.TryGetValue(key, out var link))
+            {
                 using (var trans = this.CommandManager.BeginTransaction(Mode.Recording, $"link {label} has been removed"))
                 {
                     this.Relationships.TryRemove(key);
@@ -30,6 +31,7 @@ namespace Bb.Diagrams
                     trans.Commit();
 
                 }
+            }
 
         }
 
@@ -146,13 +148,15 @@ namespace Bb.Diagrams
             string label = $"Link {l} to {r}";
             var s = (link.Source.Model as PortModel).Parent as UIModel;
 
+            this.CommandManager.RemoveLast();
             using (var trans = this.CommandManager.BeginTransaction(Mode.Recording, label))
             {
 
                 link.TargetAttached -= Links_TargetMapped;
 
-                var m = this.Relationships
-                    .Where(c => c.Uuid.ToString() == link.Id)
+                var m = this.Relationships.As()
+                    .Where(c => c.Value.Uuid.ToString() == link.Id)
+                    .Select(c => c.Value)
                     .FirstOrDefault();
 
                 if (m != null)
@@ -193,7 +197,11 @@ namespace Bb.Diagrams
 
                 if (model is UIModel m)
                 {
-                    var p = this.Models.FirstOrDefault(c => c.Uuid == m.Source.Uuid);
+                    var p = this.Models.As()
+                        .Where(c => c.Value.Uuid == m.Source.Uuid)
+                        .Select(c => c.Value)
+                        .FirstOrDefault();
+
                     if (p != null)
                         this.Models.Remove(p);
                 }
@@ -202,7 +210,6 @@ namespace Bb.Diagrams
 
             }
         }
-
 
         #endregion UI change
 
@@ -275,7 +282,7 @@ namespace Bb.Diagrams
 
             Transaction command = context.Transaction;
             var lastModel = (Diagram)this._load(command.StreamReader, GetType());
-            _diagram.SuspendRefresh = false;
+            _diagram.SuspendRefresh = true;
 
             using (var trans = CommandManager.BeginTransaction(Mode.Restoring, "Restoring"))
             {
@@ -293,9 +300,13 @@ namespace Bb.Diagrams
 
             }
 
-            _diagram.SuspendRefresh = true;
+            _diagram.SuspendRefresh = false;
             _diagram.Refresh();
-
+            foreach (var item in _diagram.Nodes)
+            {
+                item.RefreshAll();
+                item.RefreshLinks();
+            }
         }
 
         private void Prepare(RefreshContext context)
@@ -319,15 +330,46 @@ namespace Bb.Diagrams
             {
                 var right = Models[updated.Uuid];
                 var ui = right.GetUI();
-
-
-
             });
 
             context.ApplyAfterUpdate<SerializableRelationship>(RefreshStrategy.Removed, item =>
             {
                 _diagram.Links.Remove(item.GetUI());
             });
+
+            context.ApplyAfterUpdate<SerializableRelationship>(RefreshStrategy.Added, item =>
+            {
+
+                if (this.Toolbox.TryGetLinkTool(item.Type, out var toolLink))
+                    if (TryGetUIPort(item.Source, out var source))
+                        if (TryGetUIPort(item.Target, out var target))
+                            CreateLink(toolLink, item, source, target);
+
+                        else
+                            Relationships.Remove(item);
+
+            });
+
+            context.ApplyAfterUpdate<List<SerializableRelationship>>(RefreshStrategy.Added, items =>
+            {
+
+                var toRemove = new List<SerializableRelationship>(items.Count);
+                foreach (var item in items)
+                {
+                    if (this.Toolbox.TryGetLinkTool(item.Type, out var toolLink))
+                        if (TryGetUIPort(item.Source, out var source))
+                            if (TryGetUIPort(item.Target, out var target))
+                                CreateLink(toolLink, item, source, target);
+
+                            else
+                                toRemove.Add(item);
+                }
+
+                if (toRemove.Any())
+                    Relationships.RemoveRange(toRemove);
+
+            });
+
         }
 
         public event EventHandler<Diagram>? OnModelHasChanged;

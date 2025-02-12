@@ -30,9 +30,7 @@ namespace Site.Services
 
         public static void GenerateSchema(Type type)
         {
-
             _instance.GenerateSchemaImpl(type);
-
         }
 
         private void GenerateSchemaImpl(Type type)

@@ -1,14 +1,12 @@
 ﻿using Bb.ComponentModel.Translations;
 using Bb.TypeDescriptors;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Reflection;
-using Bb.ComponentModel.Accessors;
-using System.Collections.Generic;
+using System.Collections;
 
 namespace Bb.ComponentDescriptors
 {
+
 
     public class Descriptor : ITranslateHost
     {
@@ -23,14 +21,13 @@ namespace Bb.ComponentDescriptors
             IServiceProvider serviceProvider,
             ITranslateHost hostTranslateService,
             string strategyKey,
-            Type type,
-            Func<PropertyDescriptor, bool> propertyDescriptorFilter,
+            Type? type,
+            Func<System.ComponentModel.PropertyDescriptor, bool> propertyDescriptorFilter,
             Func<PropertyObjectDescriptor, bool> propertyFilter
             )
         {
 
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
+            Resolvers = new List<IPropertyDescriptorTypeResolver>();
 
             _items = new List<Descriptor>();
             _strategy = string.IsNullOrEmpty(strategyKey)
@@ -42,11 +39,9 @@ namespace Bb.ComponentDescriptors
 
             StrategyName = _strategy.Key;
 
-            this.Type = type;
-            this.IsNullable = type.IsClass;
-
             if (propertyDescriptorFilter != null)
                 PropertyDescriptorFilter = propertyDescriptorFilter;
+
             else
                 PropertyDescriptorFilter = (p) =>
                 {
@@ -59,33 +54,85 @@ namespace Bb.ComponentDescriptors
                 PropertyFilter = propertyFilter;
             else
                 PropertyFilter = (p) => true;
+            
+            if(type != null)
+                SetType(type);
+
+        }
+
+
+        protected void SetType(Type type)
+        {
+        
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+            this.Type = type;
+
+            this.Nullable = type.IsClass;
+            IsStapleType = type.IsStapleType();
+
+            if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type))
+                this._listAccessor = new ListAccessor(type);
 
             if (!_types2.Contains(type) && CanBeCreated(type))
                 Descriptor._listKeyValue.Add(type);
+
+            bool isNullable = false;
+            Type? sub = null;
+
+            if (ResolveSubType(Type, ref sub, ref isNullable))
+                SubType = sub;
+
+            Nullable = isNullable;
 
         }
 
         public Descriptor CreateSub(object instance, Type type = null)
         {
-            return new SubObjectDescriptor(instance, type ?? instance.GetType(), this);
+            return new SubObjectDescriptor(instance, type ?? instance.GetType(), this)
+            {
+                Enabled = true,
+            };
         }
 
-
-        public string GetValueKey(object parent)
+        public string GetValueKey(object parent, object child)
         {
 
-            if (Descriptor._listKeyValue.TryGetKey(parent, out var result))
-                return result(parent)?.ToString();
+            if (parent is IDictionary d)
+                foreach (dynamic item in d)
+                    if (item.Value == child)
+                        return item.Key;
+
+            if (Descriptor._listKeyValue.TryGetKey(child, out var result))
+                return result(child)?.ToString();
+
+
+            if (parent is IEnumerable l)
+            {
+                int i = 0;
+                foreach (dynamic item in l)
+                {
+                    if (item == child)
+                        return i.ToString();
+                    i++;
+                }
+            }
 
             return default;
 
         }
 
-        public string GetValueLabel(object parent, string defaultValue)
+        public string GetValueLabel(object item, string defaultValue)
         {
 
-            if (Descriptor._listKeyValue.TryGetLabel(parent, out var result))
-                return result(parent);
+            if (item == null)
+                return string.Empty;
+
+            if (Descriptor._listKeyValue.TryGetLabel(item, out var result))
+                return result(item);
+
+            if (IsStapleType)
+                return item.ToString();
 
             return defaultValue;
 
@@ -101,7 +148,7 @@ namespace Bb.ComponentDescriptors
         }
 
         protected virtual void Analyze()
-        {
+        {          
 
             if (_strategy.TryGetValueByType(Type, out StrategyEditor strategyEditor))
             {
@@ -122,11 +169,11 @@ namespace Bb.ComponentDescriptors
 
         #region Type analyze
 
-        protected static bool ResolveSubType(Type type, out Type subType, out bool isNullable)
+        internal protected static bool ResolveSubType(Type type, ref Type? subType, ref bool isNullable)
         {
 
             subType = null;
-            isNullable = false;
+            isNullable = false;            
 
             if (_types.Contains(type)) { }
 
@@ -160,59 +207,8 @@ namespace Bb.ComponentDescriptors
                 subType = type.GetElementType();
                 // isArray = true;
             }
-            else
-            {
-
-            }
 
             return subType != default;
-
-        }
-
-
-        private static MethodInfo GetMethod(Type type, string name)
-        {
-
-            var methods = type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).Where(c => c.Name == name).ToList();
-
-            if (methods.Count > 1)
-            {
-
-            }
-
-            var method = methods.FirstOrDefault();
-
-            return method;
-
-        }
-
-        protected static Method Resolve(Type type, string methodName, string methodResultName)
-        {
-
-            Method m = null;
-            var method = GetMethod(type, methodName);
-            if (method != null)
-            {
-                Action<object, object> action = (object instance, object value) =>
-                {
-                    method.Invoke(instance, new object[] { value });
-                };
-
-                m = new Method()
-                {
-                    Name = methodResultName,
-                    Action = action,
-                    Type = method.DeclaringType,
-                };
-
-            }
-
-            if (m == null)
-            {
-
-            }
-
-            return m;
 
         }
 
@@ -319,12 +315,6 @@ namespace Bb.ComponentDescriptors
                 item.SetUI(ui);
         }
 
-
-        public static bool IsStapleType(Type type)
-        {
-            return _types.Contains(type);
-        }
-
         internal void HasChanged(PropertyObjectDescriptor propertyObjectDescriptor)
         {
             PropertyHasChanged?.Invoke(propertyObjectDescriptor, Value);
@@ -359,6 +349,9 @@ namespace Bb.ComponentDescriptors
             return r;
         }
 
+
+        public int ChildCount => _items.Count;
+
         public Descriptor RootParent => Parent == null ? this : Parent.RootParent;
 
         public Descriptor Parent { get; protected set; }
@@ -367,6 +360,9 @@ namespace Bb.ComponentDescriptors
         {
             Parent = parent;
         }
+
+
+        public string Kind => GetType().Name; 
 
         /// <summary>
         /// Validation error text
@@ -378,7 +374,15 @@ namespace Bb.ComponentDescriptors
         /// </summary>
         public bool InError { get; set; }
 
-        public bool IsNullable { get; set; }
+        public bool Nullable { get; set; }
+
+        public bool IsStapleType { get; private set; }
+
+        //public static bool IsStapleType(Type type)
+        //{
+        //    return _types.Contains(type);
+        //}
+
 
         public ITranslateService TranslationService { get; }
 
@@ -386,9 +390,10 @@ namespace Bb.ComponentDescriptors
 
         public virtual object Value { get; set; }
 
+        public bool IsList { get; private set; }
+
         public bool IsEnumerable { get; private set; }
 
-        public Type ComponentView { get; set; }
 
         public virtual TranslatedKeyLabel Display { get; internal protected set; }
 
@@ -402,30 +407,33 @@ namespace Bb.ComponentDescriptors
 
         public object Ui { get; protected set; }
 
-        public Func<PropertyDescriptor, bool> PropertyDescriptorFilter { get; }
+        public Func<System.ComponentModel.PropertyDescriptor, bool> PropertyDescriptorFilter { get; }
 
         public Func<PropertyObjectDescriptor, bool> PropertyFilter { get; }
 
         public IEnumerable<Descriptor> Items { get => _items; }
+
 
         /// <summary>
         /// Global strategy name
         /// </summary>
         public string StrategyName { get; }
 
-        public Type Type { get; }
+        public Type ComponentView { get; set; }
+
+        public Type SubType { get; set; }
+
+        public Type Type { get; private set; }
+
+        public List<IPropertyDescriptorTypeResolver> Resolvers { get; protected set; }
 
         public Action<PropertyObjectDescriptor, object> PropertyHasChanged { get; set; }
-
-
-        public bool CanAdd => AddMethod != null;
-        public Method AddMethod { get; protected set; }
-
-        public bool CanDel => DelMethod != null;
-        public Method DelMethod { get; protected set; }
-
+        public ListAccessor ListAccessor => _listAccessor;
+        
 
         protected readonly StrategyMapper _strategy;
+
+
         private readonly List<Descriptor> _items;
         private readonly string? _valueLabel;
         private static readonly ListKeyLabels _listKeyValue;
@@ -522,39 +530,8 @@ namespace Bb.ComponentDescriptors
             typeof(char[]),
 
         };
+        public ListAccessor _listAccessor;
 
     }
-
-
-    public class Method
-    {
-
-        public Type Type { get; set; }
-
-        public string Name { get; set; }
-
-        public Action<object, object> Action { get; set; }
-
-    }
-
-    //[System.AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
-    //public sealed class MethodAttribute : Attribute
-    //{
-
-    //    // This is a positional argument
-    //    public MethodAttribute(string context, string methodType, string methodName)
-    //    {
-    //        this.Context = context;
-    //        this.MethodType = methodType;
-    //        this.MethodName = methodName;
-    //    }
-
-    //    public string Context { get; }
-
-    //    public string MethodType { get; }
-
-    //    public string MethodName { get; }
-
-    //}
 
 }

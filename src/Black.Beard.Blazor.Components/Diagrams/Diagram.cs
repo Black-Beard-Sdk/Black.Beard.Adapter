@@ -4,7 +4,9 @@ using Bb.Toolbars;
 using Bb.TypeDescriptors;
 using Blazor.Diagrams;
 using Blazor.Diagrams.Core.Geometry;
+using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using MudBlazor;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -83,7 +85,7 @@ namespace Bb.Diagrams
 
                 c.RemoveProperties
                 (
-                    nameof(Diagram.DynamicToolbox), 
+                    nameof(Diagram.DynamicToolbox),
                     nameof(Diagram.CanMemorize)
                 );
 
@@ -193,7 +195,7 @@ namespace Bb.Diagrams
 
             if (string.IsNullOrEmpty(name))
             {
-                var currentNames = new HashSet<string>(Models.Select(c => c.Label));
+                var currentNames = new HashSet<string>(Models.As().Select(c => c.Value.Label));
                 int count = 1;
                 while (currentNames.Contains(name = $"{specification.GetDefaultName()}{count}"))
                     count++;
@@ -240,7 +242,7 @@ namespace Bb.Diagrams
             return parent;
 
         }
-     
+
         public IEnumerable<UIModel> GetUIChildren(Guid guid)
         {
             return _diagram.Nodes
@@ -270,6 +272,42 @@ namespace Bb.Diagrams
             return null;
 
         }
+
+        public bool TryGetPort(Guid id, out Port port)
+        {
+         
+            port = null;
+
+            foreach (var item in this.Models)
+                foreach (var port1 in item.Ports)
+                    if (port.Uuid == id)
+                    {
+                        port = port1;
+                        return true;
+                    }
+
+            return false;
+
+        }
+
+        public bool TryGetUIPort(Guid id, out PortModel port)
+        {
+
+            var uuid = id.ToString();
+            port = null;
+
+            foreach (NodeModel node in this._diagram.Nodes)
+                foreach (var port1 in node.Ports)
+                    if (port1.Id == uuid)
+                    {
+                        port = port1;
+                        return true;
+                    }
+
+            return false;
+
+        }
+
 
         #endregion models
 
@@ -426,7 +464,7 @@ namespace Bb.Diagrams
 
             if (_list2 == null)
             {
-                Dictionary<string, ToolbarGroup> groups = new Dictionary<string, ToolbarGroup>();              
+                Dictionary<string, ToolbarGroup> groups = new Dictionary<string, ToolbarGroup>();
                 _list2 = new ToolbarList(Guid.NewGuid(), this.Name, groups.Values);
             }
 

@@ -94,8 +94,6 @@ namespace Bb.Configuration.Git
 
         public GitConfiguration GitConfiguration { get; set; }
 
-        public string RepositoryLocal { get; private set; }
-
         /// <summary>
         /// Refresh the git repository
         /// </summary>
@@ -185,7 +183,6 @@ namespace Bb.Configuration.Git
                     var identity = new Identity(GitConfiguration.GitUserName, GitConfiguration.GitEmail);
                     var signature = new Signature(identity, DateTimeOffset.Now);
                     Commands.Pull(repo, signature, pullOptions);
-                    this.RepositoryLocal = localFolder;
                 }
 
                 return true;
@@ -205,7 +202,7 @@ namespace Bb.Configuration.Git
             try
             {
                 var cloneOptions = GetCloneOptions(branch);
-                this.RepositoryLocal = Repository.Clone(GitConfiguration.GitRemoteUrl, localFolder, cloneOptions);
+                Repository.Clone(GitConfiguration.GitRemoteUrl, localFolder, cloneOptions);
                 return true;
             }
             catch (Exception ex)

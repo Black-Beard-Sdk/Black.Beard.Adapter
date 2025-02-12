@@ -16,6 +16,10 @@ namespace Bb.PropertyGrid
 
         }
 
+
+        [Parameter]
+        public ShowPolicyEnum ShowPolicy { get; set; }
+
         [Parameter]
         public PropertyGridView Parent { get; set; }
 
@@ -38,7 +42,7 @@ namespace Bb.PropertyGrid
         public Margin CurrentMargin { get; set; } = Margin.Dense;
 
         [Parameter]
-        public Descriptor Property { get; set; }
+        public Descriptor Descriptor { get; set; }
 
         [Parameter]
         public Action<PropertyObjectDescriptor> PropertyValidationHasChanged { get; set; }
@@ -55,9 +59,6 @@ namespace Bb.PropertyGrid
         [Inject]
         public IServiceProvider ServiceProvider { get; set; }
 
-        //[Parameter]
-        //public ITransactionManager TransactionManager { get; set; }
-
         public IDictionary<string, object> Parameters
         {
             get
@@ -67,8 +68,8 @@ namespace Bb.PropertyGrid
                 {
                     { "CurrentVariant", CurrentVariant },
                     { "CurrentMargin", CurrentMargin },
-                    { "Descriptor", Property },
-                    //{ "TransactionManager", TransactionManager },
+                    { "Descriptor", Descriptor },
+                    { "ShowPolicy", ShowPolicy }
                 };
 
                 Parent?.BuildDynamicParameter(result);
@@ -78,10 +79,17 @@ namespace Bb.PropertyGrid
             }
         }
 
-
         private object _model;
         private DynamicComponent Ui;
 
     }
+
+    [Flags]
+    public enum ShowPolicyEnum
+    {
+        None = 0,
+        HideLabel = 1,
+    }
+
 
 }

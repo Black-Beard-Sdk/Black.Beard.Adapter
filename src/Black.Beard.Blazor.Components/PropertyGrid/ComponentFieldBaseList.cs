@@ -2,13 +2,14 @@
 using Bb.ComponentModel.Factories;
 using Bb.ComponentModel.Translations;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using System.Collections;
+using System.Diagnostics.Metrics;
+using static MudBlazor.CategoryTypes;
+using static MudBlazor.Colors;
 
 namespace Bb.PropertyGrid
 {
-
 
     public partial class ComponentFieldBaseList : ComponentFieldBase
     {
@@ -22,63 +23,95 @@ namespace Bb.PropertyGrid
         {
             get
             {
+
+                this._currentItem = null;
+
+                List<ComponentFieldListItem> _items = new List<ComponentFieldListItem>();
                 var items = Descriptor?.Value as IEnumerable;
                 if (items != null && this.Descriptor != null)
                 {
+
                     int cnt = 0;
                     if (_keyDefaultValue == null)
                         _keyDefaultValue = new TranslatedKeyLabel($"No name")
                             .Translate(this.TranslateService);
 
-                    int isSelected = 0;
                     foreach (object item in items)
                     {
-                        cnt++;
-                        var key = this.Descriptor.GetValueKey(item);
-                        if (!_dic.TryGetValue(key, out ComponentFieldListItem? value))
-                            _dic.Add(key, value = GetViewModel(cnt, item));
-                        if (value.IsCurrent)
-                            isSelected++;
-                    }
+                        var value = GetViewModel(cnt++, item);
+                        if (value != null)
+                            _items.Add(value);
+                        else
+                        {
 
-                    if (isSelected != 1)
-                        ChangeCurrent(_dic.FirstOrDefault().Value);
+                        }
+                    }
 
                 }
 
-                return _dic.Values;
+
+                if (this._currentItem == null)
+                    this._currentItemKey = null;
+
+
+                if (_items.Count > 0 && this._currentItemKey == null)
+                {
+                    this._currentItem = _items[0];
+                    this._currentItemKey = this._currentItem;
+                    this._currentItem.IsCurrent = true;
+                }
+
+                return _items;
 
             }
         }
 
+        private object GetKey(object value)
+        {
+            var items = Descriptor?.Value as IEnumerable;
+            var key = this.Descriptor.ListAccessor.GetKey(items, value);
+            return key;
+        }
+
+        private ComponentFieldListItem GetViewModel(int cnt, object item)
+        {
+
+            ComponentFieldListItem value;
+            var subDescriptor = this.Descriptor.CreateSub(item);
+
+            Func<object, string> name;
+            name = c => subDescriptor.GetValueLabel(c, $"{_keyDefaultValue} {cnt}");
+            value = new ComponentFieldListItem((SubObjectDescriptor)subDescriptor, name)
+            {
+                PropertyGridView = this.ParentGrid
+            };
+
+            if (this._currentItemKey != null && value.Key.Equals(_currentItemKey))
+            {
+                this._currentItem = value;
+                value.IsCurrent = true;
+            }
+
+            return value;
+
+        }
+
+        public bool CanAdd => Descriptor?.ListAccessor?.CanAdd ?? false && CanCreate();
+
+        public bool CanDel => Descriptor?.ListAccessor?.CanDel ?? false; 
+
         public async void Add()
         {
 
-            object newItem;
-
-            if (PropertyObjectDescriptor.Create(this.StrategyName, Property.SubType, this.Descriptor?.ServiceProvider, out newItem))
-            {
-
-            }
-            else if (Property.SubType.IsClass && Property.SubType.GetConstructor([]) != null)
-            {
-                newItem = Activator.CreateInstance(Property.SubType);
-                if (newItem != null && newItem is IInitialize i)
-                    i.Initialize(this.Descriptor?.ServiceProvider);
-
-            }
-
+            object newItem = CreateNewItem();
             if (newItem != null)
             {
 
-                var value1 = GetViewModel(_dic.Count, newItem);
-
-                using (var transaction = GetTransaction($"Add {Property.SubType.Name} {value1.Label}"))
+                using (var transaction = GetTransaction($"Add {Descriptor.SubType.Name} "))
                 {
-                    var value = Descriptor.Value;
-                    var method = this.Descriptor.Type.GetMethod("Add");
-                    method.Invoke(value, new object[] { newItem });
-                    ChangeCurrent(value1);
+
+                    var key = Descriptor.ListAccessor.GetKey(Descriptor.Value, newItem);
+                    Descriptor.ListAccessor.Add(Descriptor.Value, key, newItem);
                     PropertyChange();
                 }
 
@@ -99,7 +132,6 @@ namespace Bb.PropertyGrid
             bool? result = await mbox.ShowAsync();
         }
 
-
         internal void OnClick(MouseEventArgs args, ComponentFieldListItem current)
         {
             if (ChangeCurrent(current))
@@ -109,15 +141,13 @@ namespace Bb.PropertyGrid
             }
         }
 
-
         protected async void Remove()
         {
-            using (var transaction = GetTransaction($"Remove {Property.SubType.Name} {_currentItem.Label}"))
+
+            using (var transaction = GetTransaction($"Remove {Descriptor.SubType.Name} {_currentItem.Label}"))
             {
-                var value = Descriptor.Value;
-                var method = this.Descriptor.Type.GetMethod("Remove");
-                method.Invoke(value, new object[] { _currentItem.Instance });
-                Property?.PropertyChange();
+                var key = Descriptor.ListAccessor.GetKey(Descriptor.Value, _currentItem.Value);
+                Descriptor.ListAccessor.Del(Descriptor.Value, key);
                 PropertyChange();
             }
 
@@ -125,18 +155,54 @@ namespace Bb.PropertyGrid
         }
 
 
+        private bool CanCreate()
+        {
+
+            if (_canCreate.HasValue)
+                return _canCreate.Value;
+
+            try
+            {
+                _canCreate = CreateNewItem() != null;
+            }
+            catch (Exception)
+            {
+                _canCreate = false;
+            }
+
+            return _canCreate.Value;
+
+        }
+
+        private bool? _canCreate;
+
+        private object? CreateNewItem()
+        {
+
+            object newItem;
+            var type = Descriptor.SubType;
+            if (PropertyObjectDescriptor.Create(this.StrategyName, type, this.Descriptor?.ServiceProvider, out newItem))
+            {
+                return newItem;
+
+            }
+
+            return null;
+
+        }
+
         private bool ChangeCurrent(ComponentFieldListItem current)
         {
+
             bool isChanged = false;
-            foreach (var item in _dic)
+            if (current != null && current.Key != _currentItemKey)
             {
-                var i = item.Value;
-                var p = i.IsCurrent;
-                i.IsCurrent = i.Instance == current.Instance;
-                if (p != i.IsCurrent)
-                    isChanged = true;
+                _currentItem = current;
+                _currentItemKey = current.Key;
+                isChanged = true;
             }
             return isChanged;
+
         }
 
         protected MudMessageBox mbox { get; set; }
@@ -153,18 +219,9 @@ namespace Bb.PropertyGrid
             return false;
         }
 
-        private ComponentFieldListItem GetViewModel(int cnt, object item)
-        {
-            ComponentFieldListItem value;
-            Descriptor subDescriptor = this.Descriptor.CreateSub(item);
-            value = new ComponentFieldListItem(subDescriptor
-                , c => subDescriptor.GetValueLabel(c, $"{_keyDefaultValue} {cnt}")
-                , item);
-            return value;
-        }
-
         private string _keyDefaultValue;
         private Dictionary<object, ComponentFieldListItem> _dic = new Dictionary<object, ComponentFieldListItem>();
+        private object _currentItemKey;
         private ComponentFieldListItem _currentItem;
 
     }

@@ -2,7 +2,6 @@
 using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using Microsoft.Extensions.Configuration;
-using System.Reflection;
 
 namespace Bb.Configuration.Vault.Azure
 {
@@ -12,31 +11,13 @@ namespace Bb.Configuration.Vault.Azure
     /// Load configuration from Vault
     /// </summary>
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<IConfigurationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
-    public class ConfigurationVaultBuilderInitializer : IInjectBuilder<IConfigurationBuilder>
+    public class ConfigurationVaultBuilderInitializer : InjectBuilder<IConfigurationBuilder>
     {
 
 
-        public ConfigurationVaultBuilderInitializer()
+        public override bool CanExecute(IConfigurationBuilder context)
         {
 
-        }
-
-        public string FriendlyName => typeof(ConfigurationVaultBuilderInitializer).Name;
-
-        public Type Type => typeof(ConfigurationVaultBuilderInitializer);
-
-        public object Execute(object context)
-        {
-            return Execute((IConfigurationBuilder)context);
-        }
-
-        public bool CanExecute(object context)
-        {
-            return CanExecute((IConfigurationBuilder)context);
-        }
-
-        public bool CanExecute(IConfigurationBuilder context)
-        {
             var builtConfig = context.Build();
             var canExecute = builtConfig["Initializer:" + FriendlyName];
             if (canExecute != null)
@@ -56,7 +37,7 @@ namespace Bb.Configuration.Vault.Azure
 
         }
 
-        public object Execute(IConfigurationBuilder context)
+        public override object Execute(IConfigurationBuilder context)
         {
 
             var builtConfig = context.Build();

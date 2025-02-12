@@ -19,19 +19,21 @@ namespace Bb.PropertyGrid
         protected override Task OnInitializedAsync()
         {
 
-            if (this.Property.ListProvider != null && ListResolver == null)
+            var property = this.Property;
+            var listProvider = property?.ListProvider;
+            if (listProvider != null && ListResolver == null)
             {
 
-                this.ListResolver = (IListProvider)Descriptor.ServiceProvider.GetService(this.Property.ListProvider);
+                this.ListResolver = (IListProvider)Descriptor.ServiceProvider.GetService(listProvider);
 
                 if (this.ListResolver == null)
                 {
-                    var factory2 = ObjectCreatorByIoc.GetActivator<IListProvider>(this.Property.ListProvider);
+                    var factory2 = ObjectCreatorByIoc.GetActivator<IListProvider>(listProvider);
                     this.ListResolver = factory2.Call(string.Empty, Descriptor.ServiceProvider);
                 }
 
-                this.ListResolver.Property = this.Property.PropertyDescriptor;
-                this.ListResolver.Instance = this.Property.Parent.Value;
+                this.ListResolver.Property = property.PropertyDescriptor;
+                this.ListResolver.Instance = property.Parent.Value;
 
             }
 

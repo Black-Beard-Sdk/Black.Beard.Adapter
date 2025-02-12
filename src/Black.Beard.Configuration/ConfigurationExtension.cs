@@ -3,8 +3,9 @@ using Bb.ComponentModel.Factories;
 using Bb.ComponentModel.Loaders;
 using Bb.ComponentModel;
 using System.Reflection;
+using System.Diagnostics;
 
-namespace Site.Loaders.SiteExtensions
+namespace Bb.Configuration
 {
 
 
@@ -75,6 +76,12 @@ namespace Site.Loaders.SiteExtensions
         public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder)
         {
 
+            //ILogger logger = LoggerFactory.Create(builder =>
+            //{
+            //}).CreateLogger<WebApplicationBuilder>();
+
+            //logger.LogTrace("Load configuration");
+
             builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
             {
                 config.LoadConfiguration(null, null);   // Load all files in the paths.
@@ -114,35 +121,70 @@ namespace Site.Loaders.SiteExtensions
             Func<FileInfo, bool> filter = null)
         {
 
+            var files = new ConfigurationLoader(pattern);
 
-            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-            var contentRootPath = Assembly.GetEntryAssembly()
-                .Location
-                .AsFile()
-                .Directory.FullName;
-
-            var dirs = new List<DirectoryInfo>()
+            foreach (var file in files)
             {
-                contentRootPath.AsDirectory()
-            };
 
-            dirs.AddRange(ConfigurationFolder.Instance);         
+                var c = file.Count();
+                FileInfo f = null;
+                if (c == 1)
+                    f = file.FirstOrDefault().FileInfo;
 
-            if (string.IsNullOrEmpty(pattern))
-                pattern = $"*.{environmentName}.json";
+                else if (c == 2)
+                {                   
+                    
+                    var f1 = file.FirstOrDefault(c => string.IsNullOrEmpty(c.Environment));
+                    if (f1.FileInfo != null)
+                        Load(config, f1.FileInfo);
 
-            foreach (var dir in dirs)
-            {
-                foreach (var file in dir.GetFiles(pattern))
-                    if (filter == null || filter(file))
-                    {
-                        config.AddJsonFile(file.FullName, optional: false, reloadOnChange: false);
-                        Console.WriteLine($"configuration file {file.FullName} is loaded.");
-                    }
+                    var f2 = file.FirstOrDefault(c => !string.IsNullOrEmpty(c.Environment));
+                    if (f2.FileInfo != null)
+                        Load(config, f2.FileInfo);
+
+                }
+
+                if (f != null)
+                    Load(config, f);
+
             }
 
             return config;
 
+        }
+
+        private static void Load(IConfigurationBuilder config, FileInfo f)
+        {
+
+            var type = FileContentTypeDetector.DetectFileType(f);
+            switch (type)
+            {
+
+                case "JSON":
+                    config.AddJsonFile(f.FullName, optional: false, reloadOnChange: false);
+                    Trace.WriteLine($"configuration file {f.FullName} is loaded.");
+                    break;
+
+                case "XML":
+                    config.AddXmlFile(f.FullName, optional: false, reloadOnChange: false);
+                    Trace.WriteLine($"configuration file {f.FullName} is loaded.");
+                    break;
+
+                case "INI":
+                    config.AddIniFile(f.FullName, optional: false, reloadOnChange: false);
+                    Trace.WriteLine($"configuration file {f.FullName} is loaded.");
+                    break;
+
+                case "PerKey":
+                    config.AddKeyPerFile(f.FullName, optional: false, reloadOnChange: false);
+                    Trace.WriteLine($"configuration file {f.FullName} is loaded.");
+                    break;
+
+                default:
+                    Trace.WriteLine($"configuration file {f.FullName} is is not recognized.");
+                    break;
+
+            }
         }
 
         private static bool FilePathIsAbsolute(this string path)
@@ -174,4 +216,5 @@ namespace Site.Loaders.SiteExtensions
         }
 
     }
+
 }

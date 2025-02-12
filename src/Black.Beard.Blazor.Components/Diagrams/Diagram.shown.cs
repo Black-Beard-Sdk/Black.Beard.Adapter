@@ -17,10 +17,23 @@ namespace Bb.Diagrams
         {
 
             _diagram = diagram;
-
+            _diagram.SuspendRefresh = true;
             using (CommandManager.BeginTransaction(Commands.Mode.Paused, "Paused"))
             {
                 Apply();
+            }
+            _diagram.SuspendRefresh = false;
+            _diagram.Refresh();
+            foreach (var item in _diagram.Nodes)
+            {
+                item.RefreshAll();
+                item.RefreshLinks();
+            }
+
+            foreach (var item in _diagram.Links)
+            {
+                item.Refresh();
+                item.RefreshLinks();
             }
 
         }
@@ -50,7 +63,7 @@ namespace Bb.Diagrams
 
             foreach (var item in toRemove)
             {
-                Models.RemoveRange(Models.Where(c => c.UuidParent == item.Uuid));
+                Models.RemoveRange(Models.As().Where(c => c.Value.UuidParent == item.Uuid).Select(c => c.Value));
                 Models.Remove(item);
             }
 
@@ -119,22 +132,36 @@ namespace Bb.Diagrams
             var l = i.ToList();
             foreach (SerializableRelationship item in l)
             {
+
                 if (Relationships.TryGetValue(item.Uuid, out var oldItem))
-                    if (!object.Equals(oldItem, item))
-                    {
-                        Relationships.Remove(oldItem);
-                        Relationships.Add(item);
-                    }
+                    RemoveSerializableRelationship(item, oldItem);
 
                 if (item.GetUI() == null)
-                    if (this.Toolbox.TryGetLinkTool(item.Type, out var toolLink))
-                        if (dicPort.TryGetValue(item.Source, out PortModel source))
-                            if (dicPort.TryGetValue(item.Target, out PortModel target))
-                                CreateLink(toolLink, item, source, target);
+                    CreateLink(dicPort, item);
 
-                            else
-                                Relationships.Remove(item);
             }
+
+        }
+
+        private void RemoveSerializableRelationship(SerializableRelationship item, SerializableRelationship oldItem)
+        {
+            if (!object.Equals(oldItem, item))
+            {
+                Relationships.Remove(oldItem);
+                Relationships.Add(item);
+            }
+        }
+
+        private void CreateLink(Dictionary<Guid, PortModel> dicPort, SerializableRelationship item)
+        {
+
+            if (this.Toolbox.TryGetLinkTool(item.Type, out var toolLink))
+                if (dicPort.TryGetValue(item.Source, out PortModel source))
+                    if (dicPort.TryGetValue(item.Target, out PortModel target))
+                        CreateLink(toolLink, item, source, target);
+
+                    else
+                        Relationships.Remove(item);
 
         }
 

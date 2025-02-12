@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using Bb.Configuration;
 
 namespace Bb.Configuration.Git
 {
@@ -21,35 +22,10 @@ namespace Bb.Configuration.Git
     /// GitBranch : the branch to use. by default the main branch is used.
     /// </example>
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<IConfigurationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
-    public class ConfigurationGitBuilderInitializer : IInjectBuilder<IConfigurationBuilder>
+    public class ConfigurationGitBuilderInitializer : InjectBuilderBase<IConfigurationBuilder>
     {
 
-
-        public string FriendlyName => typeof(ConfigurationGitBuilderInitializer).Name;
-
-        public Type Type => typeof(ConfigurationGitBuilderInitializer);
-
-        public ConfigurationGitBuilderInitializer()
-        {
-
-            _targetFolder = Assembly.GetEntryAssembly()
-                .Location
-                .AsFile()
-                .Directory.Combine("uploadedConfiguration");
-
-        }
-
-        public object Execute(object context)
-        {
-            return Execute((IConfigurationBuilder)context);
-        }
-
-        public bool CanExecute(object context)
-        {
-            return CanExecute((IConfigurationBuilder)context);
-        }
-
-        public bool CanExecute(IConfigurationBuilder context)
+        public override bool CanExecute(IConfigurationBuilder context)
         {
 
             var builtConfig = context.Build();
@@ -71,7 +47,7 @@ namespace Bb.Configuration.Git
 
         }
 
-        public object Execute(IConfigurationBuilder context)
+        public override object Execute(IConfigurationBuilder context)
         {
 
             // Download configuration from git
@@ -80,7 +56,7 @@ namespace Bb.Configuration.Git
 
             // Load downloaded configuration
             var paths = _targetFolder.AsDirectory().GetDirectories().Select(c => c.FullName);
-            context.LoadConfigurationFile(paths.ToArray(), null, null);
+            context.LoadConfiguration();
 
             return context;
 

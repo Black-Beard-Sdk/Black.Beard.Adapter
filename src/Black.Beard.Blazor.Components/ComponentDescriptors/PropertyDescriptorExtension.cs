@@ -7,6 +7,39 @@ namespace Bb.ComponentDescriptors
 {
 
 
+    public static class TypeExtension
+    {
+
+
+        public static bool IsStapleType(this Type self)
+        {
+
+            if (self == typeof(string) || self.IsEnum)
+                return true;
+
+            if (self.IsArray)
+                return false;
+
+            if (self.BaseType != null)
+                if (self.BaseType != typeof(ValueType))
+                    return false;
+
+            if (self.IsGenericTypeDefinition)
+                return false;
+
+            if (self.Assembly == typeof(string).Assembly)
+            {
+
+                if (self.IsValueType)
+                    return true;
+
+            }
+
+            return false;
+
+        }
+    }
+
     public static class PropertyDescriptorExtension
     {
 

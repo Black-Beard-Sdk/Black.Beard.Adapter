@@ -1,5 +1,7 @@
 ﻿using Bb.ComponentModel.Factories;
 using Bb.ComponentModel.Translations;
+using Bb.Diagrams;
+using Bb.TypeDescriptors;
 using MudBlazor;
 using System.Collections;
 using System.ComponentModel;
@@ -22,12 +24,34 @@ namespace Bb.ComponentDescriptors
         /// <param name="strategyKey"></param>
         public PropertyObjectDescriptor(System.ComponentModel.PropertyDescriptor property, Descriptor parent, string strategyKey, Func<PropertyDescriptor, bool> propertyDescriptorFilter,
             Func<PropertyObjectDescriptor, bool> propertyFilter)
-            : base(parent.ServiceProvider, parent, strategyKey, property.PropertyType, propertyDescriptorFilter, propertyFilter)
+            : base(parent.ServiceProvider, parent, strategyKey, null, propertyDescriptorFilter, propertyFilter)
         {
 
             Parent = parent;
             Name = property.Name;
             PropertyDescriptor = property;
+            ComponentType = property.ComponentType;
+
+
+            // Resolve Type of the property and others informations
+            this.Resolvers = new List<IPropertyDescriptorTypeResolver>(PropertyDescriptor
+                .GetAttributes<Attribute>()
+                .Where(c => typeof(IPropertyDescriptorTypeResolver).IsAssignableFrom(c.GetType()))
+                .Cast<IPropertyDescriptorTypeResolver>());
+
+            Type type = null;
+            if (Resolvers.Count > 0)
+                foreach (var item in this.Resolvers)
+                    if (item is IPropertyDescriptorTypeResolver r)
+                        if (r.ResolveType(this, property.PropertyType, out type))
+                            break;
+            SetType(type ?? property.PropertyType);
+
+
+            if (this._listAccessor != null)
+            {
+                this.ReadOnly = this._listAccessor.CanSet;
+            }
 
             Analyze();
 
@@ -37,52 +61,6 @@ namespace Bb.ComponentDescriptors
 
             Step = 1;
             Line = 1;
-            ComponentType = property.ComponentType;
-
-
-            if (ResolveSubType(Type, out Type sub, out bool isNullable))
-            {
-                SubType = sub;
-                IsNullable = isNullable;
-                //AddMethod = Resolve(Type, "Add", "Add");
-                //DelMethod = Resolve(Type, "Remove", "Del");
-            }
-
-            IsNullable = isNullable;
-
-
-            //if (ResolveSubType
-            //(
-            //    Type, out Type sub,
-            //    out bool isNullable, out bool isBrowsable, out bool isArray))
-            //{
-            //    SubType = sub;
-            //    IsNullable = isNullable;
-            //    Browsable = isBrowsable;
-            //    if (isBrowsable)
-            //    {
-            //        if (isArray)
-            //        {
-
-            //        }
-            //        else
-            //        {
-
-            //            AddMethod = Resolve(Type, "Add", "Add");
-            //            DelMethod = Resolve(Type, "Remove", "Del");
-
-            //            if (AddMethod == null && Value is IEnumerable e && IsEmpty(e))
-            //                isBrowsable = false;
-
-            //        }
-            //    }
-
-            //}
-            //else
-            //{
-            //    IsNullable = isNullable;
-            //    Browsable = isBrowsable;
-            //}
 
         }
 
@@ -103,10 +81,7 @@ namespace Bb.ComponentDescriptors
             Category = property.Category.GetTranslation();
             Browsable = property.IsBrowsable;
             ReadOnly = property.IsReadOnly;
-
             base.Analyze();
-
-            IsValid = ComponentView != null;
 
         }
 
@@ -137,6 +112,9 @@ namespace Bb.ComponentDescriptors
                     catch (Exception) { }
 
             }
+
+            else if (type.IsClass && type.GetConstructor([]) != null)
+                result = Activator.CreateInstance(type);
 
             if (result != null)
             {
@@ -279,11 +257,9 @@ namespace Bb.ComponentDescriptors
 
         public Type ComponentType { get; }
 
-        public Type SubType { get; set; }
-
         //public Descriptor Parent { get; }
 
-        public bool IsValid { get; private set; }
+        public bool IsValid => ComponentView != null;
 
         /// <summary>
         /// PropertyDescriptor
@@ -322,7 +298,6 @@ namespace Bb.ComponentDescriptors
         public string PatternString { get; set; }
 
         public StringType Mask { get; set; }
-
 
 
     }

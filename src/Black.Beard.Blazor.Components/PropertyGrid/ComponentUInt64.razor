@@ -1,19 +1,19 @@
 ﻿@inherits ComponentFieldBase<UInt64>
-    @using MudBlazor
+@using MudBlazor
 
-    <MudNumericField 
-        T="UInt64"
-        Class="fontPropertyGrid"
-        @bind-Value="Value"
-        Label="@Property.GetDisplay()"
-        HelperText="@Property.GetDescription()"
-        Validation="Validate"
-        Disabled="@Property.ReadOnly"
-        Format="@Property.FormatString"
-        Variant="@CurrentVariant"
-        Margin="@CurrentMargin"
-        Min="@GetMinimum()"
-        Max="@GetMaximum()"
-        Step="@GetStep()" 
-        onfocus="@OnFocus" />
 
+<MudNumericField T="UInt64"
+                 Class="fontPropertyGrid"
+                 @bind-Value="Value"
+                 Label="@GetDisplay()"
+                 HelperText="@GetDescription()"
+                 Validation="Validate"
+                 Disabled="@ReadOnly"
+                 Format="@FormatString"
+                 Variant="@CurrentVariant"
+                 Margin="@CurrentMargin"
+                 Min="@GetMinimum()"
+                 Max="@GetMaximum()"
+                 Step="@GetStep()"
+                 onfocus="@OnFocus" 
+                 />

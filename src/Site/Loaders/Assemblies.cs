@@ -2,6 +2,7 @@
 using Bb;
 using System.Reflection;
 using static MudBlazor.CategoryTypes;
+using Bb.ComponentModel.Attributes;
 
 namespace Site.Loaders
 {
@@ -12,7 +13,7 @@ namespace Site.Loaders
         /// <summary>
         /// Ensure required assemblies are loaded
         /// </summary>
-        public static void Load(string filename, string[] configPaths)
+        public static ExposedAssemblyRepositories Resolve(string filename, string[] configPaths)
         {
 
             foreach (var repertoireConfig in configPaths)
@@ -26,13 +27,16 @@ namespace Site.Loaders
                     {
                         ExposedAssemblyRepositories assemblies
                             = file.LoadFromFileAndDeserialize<ExposedAssemblyRepositories>();
-                        assemblies.Load();
+                        
+                        return assemblies;
                     }
                     catch (Exception ex)
                     {
                         throw;
                     }
             }
+
+            return null;
 
         }
 
@@ -77,6 +81,28 @@ namespace Site.Loaders
 
         }
 
+        private static bool ContainPage2(this Assembly assembly)
+        {
+
+            var name = typeof(ExposeClassAttribute).Assembly.FullName;
+            AssemblyName[] m = assembly.GetReferencedAssemblies();
+
+            if (m.Any(c => c.Name.StartsWith(name)))
+                return assembly.ExportedTypes.Any(c => c.GetCustomAttributes().OfType<Microsoft.AspNetCore.Components.RouteAttribute>().Any());
+
+            return false;
+
+        }
+
+        private static bool ContainPage2(this Assembly assembly, string textToSearch)
+        {
+            AssemblyName[] m = assembly.GetReferencedAssemblies();
+            if (m.Any(c => c.Name.StartsWith(textToSearch)))
+                return assembly.ExportedTypes.Any(c => c.GetCustomAttributes().OfType<Microsoft.AspNetCore.Components.RouteAttribute>().Any());
+
+            return false;
+
+        }
 
     }
 }

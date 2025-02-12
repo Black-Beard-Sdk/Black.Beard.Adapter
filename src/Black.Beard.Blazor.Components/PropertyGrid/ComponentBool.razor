@@ -1,15 +1,14 @@
 ﻿@inherits ComponentFieldBase<bool>
 @using MudBlazor
 
-    <MudCheckBox Class="fontPropertyGrid;PropertyGridAjustPosition"
-        T="bool"
-        Label="@Property.GetDisplay()"
-        HelperText="@Property.GetDescription()"
 
-        @bind-Checked="Value"
-
-        Disabled="@Property.ReadOnly"
-        Variant="@CurrentVariant"
-        Margin="@CurrentMargin"
-        onfocus="@OnFocus"
+<MudCheckBox Class="fontPropertyGrid;PropertyGridAjustPosition"
+             T="bool"
+             Label="@GetDisplay()"
+             HelperText="@GetDescription()"
+             @bind-Checked="Value"
+             Disabled="@ReadOnly"
+             Variant="@CurrentVariant"
+             Margin="@CurrentMargin"
+             onfocus="@OnFocus" 
              />

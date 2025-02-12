@@ -14,11 +14,11 @@ namespace Site.Loaders.SiteExtensions
 
             builder.WebHost.ConfigureLogging(logging =>
             {
-                logging.Initialize(new LocalServiceProvider(builder.Services.BuildServiceProvider()));
+                logging.Initialize(builder.Services.BuildServiceProvider());
             });
 
             return builder;
-        
+
         }
 
     }

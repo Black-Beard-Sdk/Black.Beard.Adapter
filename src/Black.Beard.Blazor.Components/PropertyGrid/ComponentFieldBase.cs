@@ -36,6 +36,9 @@ namespace Bb.PropertyGrid
         public string StrategyName => Descriptor?.StrategyName;
 
         [Parameter]
+        public ShowPolicyEnum ShowPolicy { get; set; }
+
+        [Parameter]
         public Descriptor? Descriptor
         {
             get => _descriptor;
@@ -51,6 +54,21 @@ namespace Bb.PropertyGrid
 
             }
         }
+
+
+        public string GetDisplay() => ShowPolicy.HasFlag(ShowPolicyEnum.HideLabel) 
+            ? null 
+            : Descriptor?.GetDisplay() ?? string.Empty;
+
+        public string GetDescription() => Descriptor?.GetDescription() ?? string.Empty;
+        public bool ReadOnly => Property?.ReadOnly ?? false;
+        public int Minimum => Property?.Minimum ?? int.MaxValue;
+        public int Maximum => Property?.Maximum ?? int.MaxValue;
+        public int Line => Property?.Line ?? 1;
+        public string FormatString => Property?.FormatString ?? string.Empty;
+        public StringType Mask => Property?.Mask ?? StringType.Undefined;
+
+
 
         public PropertyObjectDescriptor? Property
         {
@@ -73,7 +91,7 @@ namespace Bb.PropertyGrid
         /// <returns></returns>
         public ITransaction GetTransaction(string label)
         {
-             return ParentGrid.StartTransaction(label);
+            return ParentGrid.StartTransaction(label);
         }
 
         public virtual string? ValueString { get; set; }

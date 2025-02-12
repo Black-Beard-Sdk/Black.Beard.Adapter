@@ -1,19 +1,19 @@
 ﻿@inherits ComponentFieldBase<float>
     @using MudBlazor
 
-    <MudNumericField 
-        T="float"
-        Class="fontPropertyGrid"
-        @bind-Value="Value"
-        Label="@Property.GetDisplay()"
-        HelperText="@Property.GetDescription()"
-        Disabled="@Property.ReadOnly"
-        Validation="Validate"
-        Format="@Property.FormatString"
-        Variant="@CurrentVariant"
-        Margin="@CurrentMargin"
-        Min="@GetMinimum()"
-        Max="@GetMaximum()"
-        Step="@GetStep()"
-        onfocus="@OnFocus" />
+
+<MudNumericField T="float"
+                 Class="fontPropertyGrid"
+                 @bind-Value="Value"
+                 Label="@GetDisplay()"
+                 HelperText="@GetDescription()"
+                 Disabled="@ReadOnly"
+                 Validation="Validate"
+                 Format="@FormatString"
+                 Variant="@CurrentVariant"
+                 Margin="@CurrentMargin"
+                 Min="@GetMinimum()"
+                 Max="@GetMaximum()"
+                 Step="@GetStep()"
+                 onfocus="@OnFocus" />
 

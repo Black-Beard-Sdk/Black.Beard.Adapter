@@ -1,30 +1,15 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
-using Bb.ComponentModel.Loaders;
 using Bb;
 
 namespace Site.Loaders
 {
 
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplication>), LifeCycle = IocScopeEnum.Transiant)]
-    public class WebApplicationInitializer : IInjectBuilder<WebApplication>
-    {
+    public class WebApplicationInitializer : InjectBuilder<WebApplication>
+    {             
 
-        public string FriendlyName => typeof(WebApplicationInitializer).Name;
-
-        public Type Type => typeof(WebApplication);
-
-        public bool CanExecute(WebApplication context)
-        {
-            return true;
-        }
-
-        public bool CanExecute(object context)
-        {
-            return CanExecute((WebApplication)context);
-        }
-
-        public object Execute(WebApplication app)
+        public override object Execute(WebApplication app)
         {
 
             // Configure the HTTP request pipeline.
@@ -58,12 +43,6 @@ namespace Site.Loaders
             return null;
 
         }
-
-        public object Execute(object context)
-        {
-            return Execute((WebApplication)context);
-        }
-
 
     }
 

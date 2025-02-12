@@ -1,18 +1,18 @@
 ﻿@inherits ComponentFieldBase<Int16>
     @using MudBlazor
 
-    <MudNumericField 
-        T="Int16"
-        Class="fontPropertyGrid"
-        @bind-Value="Value"
-        Label="@Property.GetDisplay()"
-        HelperText="@Property.GetDescription()"
-        Validation="Validate"
-        Disabled="@Property.ReadOnly"
-        Format="@Property.FormatString"
-        Variant="@CurrentVariant"
-        Margin="@CurrentMargin"
-        Min="@GetMinimum()"
-        Max="@GetMaximum()"
-        Step="@GetStep()"
-        onfocus="@OnFocus" />
+
+    <MudNumericField T="Int16"
+                     Class="fontPropertyGrid"
+                     @bind-Value="Value"
+                     Label="@GetDisplay()"
+                     HelperText="@GetDescription()"
+                     Validation="Validate"
+                     Disabled="@ReadOnly"
+                     Format="@FormatString"
+                     Variant="@CurrentVariant"
+                     Margin="@CurrentMargin"
+                     Min="@GetMinimum()"
+                     Max="@GetMaximum()"
+                     Step="@GetStep()"
+                     onfocus="@OnFocus" />

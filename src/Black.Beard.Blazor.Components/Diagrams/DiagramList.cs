@@ -4,18 +4,147 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Channels;
-using static MudBlazor.CategoryTypes;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Bb.Diagrams
 {
+
+    public static class DiagramListExtension
+    {
+
+        public static IEnumerable<KeyValuePair<TKey, TValue>> As<TKey, TValue>(this DiagramList<TKey, TValue> self)
+            where TKey : IComparable
+            where TValue : class
+        {
+
+            return self;
+
+        }
+
+    }
+
+    public class DiagramListJsonConverter : JsonConverter<DiagramList>
+    {
+
+        public DiagramListJsonConverter()
+        {
+
+        }
+
+        public override bool CanConvert(Type typeToConvert)
+        {
+            return typeof(DiagramList).IsAssignableFrom(typeToConvert);
+        }
+
+        public override DiagramList? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+
+            var types = ResolveTypes(typeToConvert);
+
+            if (types != null)
+            {
+                var converter = (JsonConverter<object>)Activator.CreateInstance( typeof(DiagramListJsonConverter<,>).MakeGenericType(types));
+                return (DiagramList)converter.Read(ref reader, typeToConvert, options);
+            }
+
+            return null;
+
+        }
+
+        private static Type[] ResolveTypes(Type typeToConvert)
+        {
+
+            if (typeToConvert.IsConstructedGenericType)
+            {
+
+                var type = typeToConvert.GetGenericTypeDefinition();
+                if (type == typeof(DiagramList<,>))
+                {
+
+                    var a = typeToConvert.GetGenericArguments();
+                    if (a.Length == 2)
+
+                        return a;
+                }
+
+            }
+
+            return ResolveTypes(typeToConvert.BaseType);
+
+        }
+
+        public override void Write(Utf8JsonWriter writer, DiagramList value, JsonSerializerOptions options)
+        {
+
+            var types = ResolveTypes(value.GetType());
+            if (types != null)
+            {
+                var converter = (JsonConverter<object>)Activator.CreateInstance(typeof(DiagramListJsonConverter<,>).MakeGenericType(types));
+                converter.Write(writer, value, options);
+            }
+
+        }
+
+    }
+
+    public class DiagramListJsonConverter<TKey, TValue> : JsonConverter<object>
+        where TKey : IComparable
+        where TValue : class
+    {
+
+        public DiagramListJsonConverter()
+        {
+
+        }
+
+        public override object? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+
+            var list = (DiagramList<TKey, TValue>)Activator.CreateInstance(typeToConvert);
+
+            while (reader.Read())
+            {
+
+                if (reader.TokenType == JsonTokenType.EndArray)
+                    break;
+
+                var value = (TValue)JsonSerializer.Deserialize(ref reader, typeof(TValue), options);
+                list.Add(value);
+
+            }
+
+            return list;
+
+        }
+
+        public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+        {
+            var list = (DiagramList<TKey, TValue>)value;
+            JsonSerializer.Serialize(writer, list.Values, options);
+        }
+
+
+    }
+
+    public class DiagramList
+    {
+
+
+
+    }
 
     /// <summary>
     /// Represents a thread-safe collection of diagram nodes with unique keys.
     /// </summary>
     /// <typeparam name="TValue">The type of elements in the collection, which must implement IKey.</typeparam>
     public class DiagramList<TKey, TValue>
-        : ICollection<TValue>
+        : DiagramList
+        , ICollection<TValue>
+        , IDictionary<TKey, TValue>
+        , ICollection<KeyValuePair<TKey, TValue>>
+        , IEnumerable<KeyValuePair<TKey, TValue>>
         , INotifyCollectionChanged
         , INotifyPropertyChanging
         , INotifyPropertyChanged
@@ -23,6 +152,9 @@ namespace Bb.Diagrams
         where TKey : IComparable
         where TValue : class
     {
+
+
+
 
         #region ctors
 
@@ -164,10 +296,34 @@ namespace Bb.Diagrams
         /// <param name="newItem">The element to add to the collection.</param>
         public void Add(TValue newItem)
         {
+            var key = _key(newItem);
+            Add(key, newItem);
+        }
+
+
+        /// <summary>
+        /// Adds a new item to the collection.
+        /// </summary>
+        /// <param name="newItem">The item to add to the collection.</param>
+        /// <remarks>
+        /// This method adds a new item to the collection. If the item's key already exists in the collection, it will be replaced with the new item.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">Thrown when the newItem parameter is null.</exception>
+        public void Add(KeyValuePair<TKey, TValue> value)
+        {
+            Add(value.Key, value.Value);
+        }
+
+        /// <summary>
+        /// Try to add element to the collection or replace it if the keys already exists.
+        /// </summary>
+        /// <param name="key">The key of the element to add to the collection.</param>
+        /// <param name="value">The element to add to the collection.</param>
+        public void Add(TKey key, TValue value)
+        {
 
             bool t = false;
             TValue oldValue = default;
-            var key = _key(newItem);
 
             var dispose = () =>
             {
@@ -177,12 +333,12 @@ namespace Bb.Diagrams
                     if (oldValue != null)
                     {
                         Unsuscribes(oldValue);
-                        OnReplacedInCollection(oldValue, newItem);
+                        OnReplacedInCollection(oldValue, value);
                     }
                     else
-                        OnChangedInCollection(NotifyCollectionChangedAction.Add, new[] { newItem });
+                        OnChangedInCollection(NotifyCollectionChangedAction.Add, new[] { value });
 
-                    Suscribes(newItem);
+                    Suscribes(value);
 
                 }
 
@@ -195,7 +351,7 @@ namespace Bb.Diagrams
                     {
                         if (!_dic.ContainsKey(key))
                         {
-                            _dic.Add(key, newItem);
+                            _dic.Add(key, value);
                             t = true;
                         }
                     }
@@ -206,15 +362,13 @@ namespace Bb.Diagrams
                         if (_dic.TryGetValue(key, out oldValue))
                         {
                             t = true;
-                            _dic[key] = newItem;
+                            _dic[key] = value;
                         }
                     }
 
             }
 
         }
-
-
 
         /// <summary>
         /// Removes all elements from the collection.
@@ -265,6 +419,52 @@ namespace Bb.Diagrams
                         }
 
             return false;
+
+        }
+
+        /// <summary>
+        /// Removes the first occurrence of a specific element from the collection.
+        /// </summary>
+        /// <param name="value">The element to remove from the collection.</param>
+        /// <returns>true if the element was successfully removed; otherwise, false.</returns>
+        public bool Remove(KeyValuePair<TKey, TValue> value)
+        {
+            return Remove(value.Key);
+        }
+
+        /// <summary>
+        /// Removes the first occurrence of a specific element from the collection.
+        /// </summary>
+        /// <param name="key">The key of the element to remove from the collection.</param>
+        /// <returns>true if the element was successfully removed; otherwise, false.</returns>
+        public bool Remove(TKey key)
+        {
+
+            TValue? item = default;
+            bool t = false;
+
+            var dispose = () =>
+            {
+                Unsuscribes(item);
+                OnChangedInCollection(NotifyCollectionChangedAction.Remove, [item]);
+            };
+
+            using (_lock.LockForUpgradeableRead(dispose))
+                if (_dic.TryGetValue(key, out item))
+                {
+
+                    if (_dic.ContainsKey(key))
+                        using (_lock.LockForWrite())
+                            if (_dic.ContainsKey(key))
+                            {
+                                _dic.Remove(key);
+                                t = true;
+                                return true;
+                            }
+
+                }
+
+            return t;
 
         }
 
@@ -357,6 +557,17 @@ namespace Bb.Diagrams
         /// <summary>
         /// Return true if the collection contains the specified key.
         /// </summary>
+        /// <param name="value">item to evaluate</param>
+        /// <returns></returns>
+        public bool Contains(KeyValuePair<TKey, TValue> value)
+        {
+            using (_lock.LockForRead())
+                return _dic.ContainsKey(value.Key);
+        }
+
+        /// <summary>
+        /// Return true if the collection contains the specified key.
+        /// </summary>
         /// <param name="key">key to evaluate</param>
         /// <returns></returns>
         public bool ContainsKey(TKey key)
@@ -409,6 +620,23 @@ namespace Bb.Diagrams
                 o.CopyTo(array, arrayIndex);
             }
         }
+
+        /// <summary>
+        /// Copies the elements of the collection to an array, starting at a particular array index.
+        /// </summary>
+        /// <param name="array">The one-dimensional array that is the destination of the elements copied from the collection.</param>
+        /// <param name="arrayIndex">The zero-based index in the array at which copying begins.</param>
+        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        {
+
+            var d = _dic as IDictionary<TKey, TValue>;
+            using (_lock.LockForRead())
+            {
+                d.CopyTo(array, arrayIndex);
+            }
+
+        }
+
 
         /// <summary>
         /// Tries to get the value associated with the specified key.
@@ -496,6 +724,7 @@ namespace Bb.Diagrams
         /// </summary>
         /// <param name="oldItem">The old item replaced in the collection.</param>
         /// <param name="newItem">The new item replacing the old item in the collection.</param>
+
 
         protected void OnChangedInCollection(NotifyCollectionChangedAction impact, TValue[] newitems)
         {
@@ -705,7 +934,7 @@ namespace Bb.Diagrams
                             context.Apply(RefreshStrategy.Updated, s, $"update {typeof(TValue)} {k}");
                         }
                     }
-                
+
 
             }
 
@@ -723,7 +952,9 @@ namespace Bb.Diagrams
                     updatedItems.Add((value, item));
 
                 else
-                    addedItems.Add(value);
+                {
+                    addedItems.Add(item);
+                }
             }
 
         }
@@ -748,6 +979,44 @@ namespace Bb.Diagrams
 
             return i;
 
+        }
+
+        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
+        {
+            return _dic.GetEnumerator();
+        }
+
+
+        //
+        // Résumé :
+        //     Gets an System.Collections.Generic.ICollection`1 containing the keys of the System.Collections.Generic.IDictionary`2.
+        //
+        //
+        // Retourne :
+        //     An System.Collections.Generic.ICollection`1 containing the keys of the object
+        //     that implements System.Collections.Generic.IDictionary`2.
+        public ICollection<TKey> Keys
+        {
+            get
+            {
+                return _dic.Keys;
+            }
+        }
+
+        //
+        // Résumé :
+        //     Gets an System.Collections.Generic.ICollection`1 containing the values in the
+        //     System.Collections.Generic.IDictionary`2.
+        //
+        // Retourne :
+        //     An System.Collections.Generic.ICollection`1 containing the values in the object
+        //     that implements System.Collections.Generic.IDictionary`2.
+        public ICollection<TValue> Values
+        {
+            get
+            {
+                return _dic.Values;
+            }
         }
 
         /// <summary>

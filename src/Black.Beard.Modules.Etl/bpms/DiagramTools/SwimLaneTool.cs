@@ -30,8 +30,8 @@ namespace Bb.Modules.Bpms
             double x = 0d;
 
             SerializableDiagramNode last = null;
-
-            foreach (var item in diagram.Models.Where(c => c.ToolType == Key))
+            var src = diagram.Models.As().Where(c => c.Value.ToolType == Key).Select(c => c.Value);
+            foreach (var item in src)
                 if (item != node)
                     if (item.Position.Y >= y)
                     {

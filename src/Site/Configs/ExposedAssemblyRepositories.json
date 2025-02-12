@@ -11,7 +11,7 @@
     { "AssemblyName": "Black.Beard.Modules" },
     { "AssemblyName": "Black.Beard.Modules.Datas" },
     { "AssemblyName": "Black.Beard.Configuration.Git" },
-    { "AssemblyName": "Black.Beard.Logging.NLog" }
+    { "AssemblyName": "Black.Beard.Monitoring" }
 
   ]
 

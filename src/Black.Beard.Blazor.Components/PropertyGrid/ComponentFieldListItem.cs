@@ -1,13 +1,12 @@
 ﻿using Bb.ComponentDescriptors;
+using System.ComponentModel;
+using static MudBlazor.CategoryTypes;
 
 namespace Bb.PropertyGrid
 {
 
-
-
     public class ComponentFieldListItem
     {
-
 
         /// <summary>
         /// Initialize a new instance of ComponentFieldListItem
@@ -15,31 +14,49 @@ namespace Bb.PropertyGrid
         /// <param name="descriptor"></param>
         /// <param name="name"></param>
         /// <param name="instance"></param>
-        public ComponentFieldListItem(Descriptor descriptor, Func<object, string> name, object instance)
+        public ComponentFieldListItem(
+            SubObjectDescriptor descriptor,
+            Func<object, string> name)
         {
             IsCurrent = false;
             this.Descriptor = descriptor;
-            this._label = name;
-            this._key = descriptor.GetValueKey(instance);
-            this.Instance = instance;
+            this._functionNabel = name;
             this.PropertyGridView = null;
         }
+
+        [Browsable(false)]
+        public bool IsStapleType => Descriptor?.IsStapleType ?? false;
 
         /// <summary>
         /// Return true if the item is the current item selected
         /// </summary>
+        [Browsable(false)]
         public bool IsCurrent { get; set; }
 
+        [Browsable(false)]
+        public SubObjectDescriptor Descriptor { get; }
 
-        public Descriptor Descriptor { get; }
+        [Browsable(false)]
+        public object Key => Descriptor.GetKey();
 
+        [Browsable(false)]
+        public string Label => _functionNabel(Value);
 
-        public object Key => _key;
+        [PropertyDescriptorTypeResolver<ResolveTypeFromValue>]
+        [Browsable(true)]
+        public object Value
+        {
+            get
+            {
+                return this.Descriptor.Value;
+            }
+            set
+            {
+                this.Descriptor.Value = value;
+            }
+        }
 
-        public string Label => _label(Instance);
-
-        public object Instance { get; }
-
+        [Browsable(false)]
         public PropertyGridView PropertyGridView
         {
             get => _PropertyGridView;
@@ -53,8 +70,8 @@ namespace Bb.PropertyGrid
         }
 
         private PropertyGridView _PropertyGridView;
-        private readonly Func<object, string> _label;
-        private readonly string _key;
+        private readonly Func<object, string> _functionNabel;
+        private readonly object _key;
     }
 
 

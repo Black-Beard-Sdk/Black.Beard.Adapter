@@ -58,6 +58,7 @@ namespace Bb.Modules
             var options = base.BuildJsonSerializerOptions();
             options.AppendConverterFor(Model, Initializer);
             options.Converters.Add(new SerializableDiagramNodeJsonConverter());
+            options.Converters.Add(new DiagramListJsonConverter());
             return options;
         }
 

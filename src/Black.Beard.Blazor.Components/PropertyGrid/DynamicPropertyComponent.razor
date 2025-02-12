@@ -1,6 +1,10 @@
 ﻿@page "/DynamicPropertyComponent"
 
-@if (Property.Enabled && Property.ComponentView != null)
+@if (Descriptor != null && Descriptor.Enabled && Descriptor.ComponentView != null)
 {
-    <DynamicComponent @ref="Ui" Type="@Property.ComponentView" Parameters="@Parameters" />
+    <DynamicComponent 
+        @ref="Ui" 
+        Type="@Descriptor.ComponentView" 
+        Parameters="@Parameters" 
+        />
 }

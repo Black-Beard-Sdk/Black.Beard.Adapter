@@ -12,21 +12,14 @@ namespace Bb.Logging.NLog
 
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<Initializer>), LifeCycle = IocScopeEnum.Transiant)]
     [Priority(1)]
-    public class ConfigLoader : IInjectBuilder<Initializer>
+    public class ConfigLoaderInitializer : InjectBuilder<Initializer>
     {
 
-        public string FriendlyName => typeof(ConfigLoader).Name;
-
-        public Type Type => typeof(ConfigLoader);
-
-        public bool CanExecute(Initializer context) => context.CanExecuteModule(FriendlyName);
-
-        public bool CanExecute(object context) => CanExecute((Initializer)context);
-
-        public object Execute(object context) => Execute((Initializer)context);
-
-        public object Execute(Initializer context)
+        public override object Execute(Initializer context)
         {
+
+            if (!InternetConnectivityChecker.IsConnected)
+                return null;
 
             var cnx = Configuration.GetConnexionStringKeyValues(FriendlyName);
             var remoteUrl = cnx["url"];
@@ -50,10 +43,11 @@ namespace Bb.Logging.NLog
                         : Environment.CurrentDirectory.Combine("Config");
 
                     folder = folder.Combine("Current");
+                    var dir = folder.AsDirectory();
+
 
                     var loader = new ConfigurationLoader(git);
 
-                    var dir = folder.AsDirectory();
                     dir.Refresh();
                     if (dir.Exists)
                     {
@@ -65,9 +59,8 @@ namespace Bb.Logging.NLog
                         }
                     }
 
-                    loader.Refresh(folder);
-
-                    ConfigurationFolder.AddDirectoryIfExists(loader.RepositoryLocal);
+                    if (loader.Refresh(folder))
+                        ConfigurationFolder.AddDirectoryIfExists(dir);
 
                 }
             }

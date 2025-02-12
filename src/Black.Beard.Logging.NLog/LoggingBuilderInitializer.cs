@@ -18,34 +18,10 @@ namespace Bb.Logging.NLog
     /// GitBranch : the branch to use. by default the main branch is used.
     /// </example>
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<ILoggingBuilder>), LifeCycle = IocScopeEnum.Transiant)]
-    public class LoggingBuilderInitializer : IInjectBuilder<ILoggingBuilder>
-    {
+    public class LoggingBuilderInitializer : InjectBuilder<ILoggingBuilder>
+    {     
 
-        public string FriendlyName => typeof(LoggingBuilderInitializer).Name;
-
-        public Type Type => typeof(LoggingBuilderInitializer);
-
-        public LoggingBuilderInitializer()
-        {
-
-        }
-
-        public object Execute(object context)
-        {
-            return Execute((ILoggingBuilder)context);
-        }
-
-        public bool CanExecute(object context)
-        {
-            return CanExecute((ILoggingBuilder)context);
-        }
-
-        public bool CanExecute(ILoggingBuilder context)
-        {
-            return true;
-        }
-
-        public object Execute(ILoggingBuilder context)
+        public override object Execute(ILoggingBuilder context)
         {
             context.ClearProviders();
             context.SetMinimumLevel(LogLevel.Trace);

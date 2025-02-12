@@ -3,14 +3,14 @@
 @using Bb.ComponentDescriptors
 @using Bb.ComponentModel.Translations
 
-<PropertyGridView 
-    class="fontPropertyGrid" 
-    @ref="CurrentPropertyGridView"
-    SelectedObject="@Value"
-    AfterPropertyHaschanged="PropertyHasChanged"
-    CurrentMargin="@CurrentMargin"
-    CurrentVariant="@CurrentVariant"
-    WithGroup="@WithGroup"
-    TransactionFactory="@ParentGrid.TransactionFactory"
-    Parent="@ParentGrid"
-    Focused="OnFocusedRelay" />
+
+<PropertyGridView class="fontPropertyGrid"
+                  @ref="CurrentPropertyGridView"
+                  SelectedObject="@Value"
+                  AfterPropertyHaschanged="PropertyHasChanged"
+                  CurrentMargin="@CurrentMargin"
+                  CurrentVariant="@CurrentVariant"
+                  WithGroup="@WithGroup"
+                  TransactionFactory="@ParentGrid.TransactionFactory"
+                  Parent="@ParentGrid"
+                  Focused="OnFocusedRelay" />
